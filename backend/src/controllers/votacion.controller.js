@@ -1,0 +1,100 @@
+"use strict"
+import { 
+    postVotacion,
+    deleteVotacion,
+    getVotacion,
+    getVotaciones,
+    updateVotacion,
+    } from "../services/votacion.service.js";
+
+export async function postVotacion(req, res) {
+    try {
+        //Verificamos que lo cree solamente un admin
+        if (!req.user || req.user.rol !== "admin") {
+            return handleErrorClient(res, 403, "No tienes permisos para crear una votación");
+        }
+        const { body } = req;
+    
+        const { error } = votacionBodyValidation.validate(body);
+    
+        if (error) return handleErrorClient(res, 400, error.message);
+    
+        const [votacion, errorVotacion] = await postVotacion(body);
+    
+        if (errorVotacion) return handleErrorClient(res, 400, errorVotacion);
+    
+        handleSuccess(res, 201, "Votación creada", votacion);
+    } catch (error) {
+        handleErrorServer(res, 500, error.message);
+    }
+    }
+
+export async function deleteVotacion(req, res) {
+    try {
+        //Verificamos que lo elimine solamente un admin
+        if (!req.user || req.user.rol !== "admin") {
+        return handleErrorClient(res, 403, "No tienes permisos para eliminar una votación");
+        }
+        const { id } = req.params;
+    
+        const [votacion, errorVotacion] = await deleteVotacion(id);
+    
+        if (errorVotacion) return handleErrorClient(res, 404, errorVotacion);
+    
+        handleSuccess(res, 200, "Votación eliminada", votacion);
+    } catch (error) {
+        handleErrorServer(res, 500, error.message);
+    }
+    }
+
+export async function getVotacion(req, res) {
+  try {
+    const { id, nombre } = req.query;
+
+    const [votacion, errorVotacion] = await getVotacion({ id, nombre });
+
+    if (errorVotacion) return handleErrorClient(res, 404, errorVotacion);
+
+    handleSuccess(res, 200, "Votación encontrada", votacion);
+  } catch (error) {
+    handleErrorServer(res, 500, error.message);
+  }
+}
+
+export async function getVotaciones(req, res) {
+  try {
+    const [votaciones, errorVotaciones] = await getVotaciones();
+
+    if (errorVotaciones) return handleErrorClient(res, 404, errorVotaciones);
+
+    votaciones.length === 0
+      ? handleSuccess(res, 204)
+      : handleSuccess(res, 200, "Votaciones encontradas", votaciones);
+  } catch (error) {
+    handleErrorServer(res, 500, error.message);
+  }
+}
+
+export async function updateVotacion(req, res) {
+  try {
+    //Solo lo puede modificar un admin
+    if (!req.user || req.user.rol !== "admin") {
+      return handleErrorClient(res, 403, "No tienes permisos para modificar una votación");
+    }
+
+    const { id } = req.params;
+    const { body } = req;
+
+    const { error } = votacionBodyValidation.validate(body);
+
+    if (error) return handleErrorClient(res, 400, error.message);
+
+    const [votacion, errorVotacion] = await updateVotacion(id, body);
+
+    if (errorVotacion) return handleErrorClient(res, 404, errorVotacion);
+
+    handleSuccess(res, 200, "Votación actualizada", votacion);
+  } catch (error) {
+    handleErrorServer(res, 500, error.message);
+  }
+}
