@@ -2,82 +2,107 @@
 import Documento from "../entity/documento.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 
-export async function createDocumentoService(data, user) {
+// CREATE
+export async function createDocumentoService(data) {
     try {
-        const docRepo = AppDataSource.getRepository(Documento);
-
-        const nuevoDocumento = docRepo.create({
-        titulo: data.titulo,
-        tipo: data.tipo,
-        urlArchivo: data.urlArchivo, // Debe venir del middleware de subida de archivos
-        subidoPor: user ? user.nombreCompleto : data.subidoPor,
-        id_actividad: data.id_actividad || null,
-        fechaSubida: new Date(),
-        });
-
-        await docRepo.save(nuevoDocumento);
-
-        return [nuevoDocumento, null];
+        const repo = AppDataSource.getRepository(Documento);
+        const documento = repo.create(data);
+        await repo.save(documento);
+        return [documento, null];
     } catch (error) {
         return [null, "Error al crear documento: " + error.message];
     }
 }
 
+// READ (Todos)
 export async function getDocumentosService(filtro = {}) {
     try {
-        const docRepo = AppDataSource.getRepository(Documento);
-
-        // Puedes agregar filtros por tipo, id_actividad, etc.
+        const repo = AppDataSource.getRepository(Documento);
         const where = {};
         if (filtro.tipo) where.tipo = filtro.tipo;
         if (filtro.id_actividad) where.id_actividad = filtro.id_actividad;
-
-        const documentos = await docRepo.find({
-        where,
-        order: { fechaSubida: "DESC" },
-        });
-
+        const documentos = await repo.find({ where, order: { fechaSubida: "DESC" } });
         return [documentos, null];
     } catch (error) {
         return [null, "Error al obtener documentos: " + error.message];
-    }
+    }  
 }
 
-export async function getDocumentoByIdService(id) {
+// READ (Uno)
+export async function getDocumentoService(query) {
     try {
-        const docRepo = AppDataSource.getRepository(Documento);
-        const documento = await docRepo.findOneBy({ id: parseInt(id) });
+        const repo = AppDataSource.getRepository(Documento);
+        const documento = await repo.findOne({ where: query });
         if (!documento) return [null, "Documento no encontrado"];
         return [documento, null];
     } catch (error) {
-        return [null, "Error al buscar el documento: " + error.message];
+        return [null, "Error al buscar documento: " + error.message];
     }
 }
 
-export async function updateDocumentoService(id, data) {
+// UPDATE
+export async function updateDocumentoService(query, data) {
     try {
-        const docRepo = AppDataSource.getRepository(Documento);
-        const documento = await docRepo.findOneBy({ id: parseInt(id) });
+        const repo = AppDataSource.getRepository(Documento);
+        const documento = await repo.findOne({ where: query });
         if (!documento) return [null, "Documento no encontrado"];
-
-        Object.assign(documento, data, { fechaSubida: new Date() });
-
-        await docRepo.save(documento);
-
+        Object.assign(documento, data);
+        await repo.save(documento);
         return [documento, null];
     } catch (error) {
-        return [null, "Error al actualizar el documento: " + error.message];
+        return [null, "Error al actualizar documento: " + error.message];
     }
 }
 
-export async function deleteDocumentoService(id) {
+// DELETE
+export async function deleteDocumentoService(query) {
     try {
-        const docRepo = AppDataSource.getRepository(Documento);
-        const documento = await docRepo.findOneBy({ id: parseInt(id) });
+        const repo = AppDataSource.getRepository(Documento);
+        const documento = await repo.findOne({ where: query });
         if (!documento) return [null, "Documento no encontrado"];
-        await docRepo.remove(documento);
+        await repo.remove(documento);
         return [documento, null];
     } catch (error) {
-        return [null, "Error al eliminar el documento: " + error.message];
+        return [null, "Error al eliminar documento: " + error.message];
     }
 }
+
+/*
+// DELETE (Por ID)
+export async function deleteDocumentoByIdService(id) {
+    try {
+        const repo = AppDataSource.getRepository(Documento);
+        const documento = await repo.findOne({ where: { id } });
+        if (!documento) return [null, "Documento no encontrado"];
+        await repo.remove(documento);
+        return [documento, null];
+    } catch (error) {
+        return [null, "Error al eliminar documento: " + error.message];
+    }
+}
+// DELETE (Por ID y Tipo)
+export async function deleteDocumentoByIdAndTipoService(id, tipo) {
+    try {
+        const repo = AppDataSource.getRepository(Documento);
+        const documento = await repo.findOne({ where: { id, tipo } });
+        if (!documento) return [null, "Documento no encontrado"];
+        await repo.remove(documento);
+        return [documento, null];
+    } catch (error) {
+        return [null, "Error al eliminar documento: " + error.message];
+    }
+}
+
+// DELETE (Por ID y Actividad)
+export async function deleteDocumentoByIdAndActividadService(id, id_actividad) {
+    try {
+        const repo = AppDataSource.getRepository(Documento);
+        const documento = await repo.findOne({ where: { id, id_actividad } });
+        if (!documento) return [null, "Documento no encontrado"];
+        await repo.remove(documento);
+        return [documento, null];
+    } catch (error) {
+        return [null, "Error al eliminar documento: " + error.message];
+    }
+}
+*/

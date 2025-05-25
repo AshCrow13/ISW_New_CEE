@@ -19,7 +19,7 @@ export const documentoSchema = Joi.object({
             "any.only": "El tipo debe ser comunicado, acta o resultado.",
             "any.required": "El tipo es obligatorio."
     }),
-    urlArchivo: Joi.string()
+    urlArchivo: Joi.string() // URL del archivo almacenado en el servidor
         .uri()
         .required()
         .messages({
@@ -40,3 +40,31 @@ export const documentoSchema = Joi.object({
             "number.positive": "La actividad debe ser un número positivo."
     }),
 }).unknown(false);
+
+export const documentoUpdateSchema = Joi.object({
+    titulo: Joi.string()
+        .min(5)
+        .max(100),
+    tipo: Joi.string()
+        .valid("comunicado", "acta", "resultado"),
+    urlArchivo: Joi.string()
+        .uri(),
+    subidoPor: Joi.string()
+        .min(5)
+        .max(100),
+    id_actividad: Joi.number()
+        .integer()
+        .positive()
+        .allow(null),
+}).unknown(false);
+
+export const documentoQuerySchema = Joi.object({
+    id: Joi.number()
+        .integer()
+        .positive(),
+    tipo: Joi.string()
+        .valid("comunicado", "acta", "resultado"),
+    id_actividad: Joi.number()
+        .integer()
+        .positive(),
+}).or("id", "tipo", "id_actividad").unknown(false);
