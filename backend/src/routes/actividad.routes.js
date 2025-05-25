@@ -1,23 +1,21 @@
 "use strict";
 import { Router } from "express";
-import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 import {
-    createActividad,
-    getActividades,
-    getActividadById,
-    updateActividad,
-    deleteActividad,
+    createActividad, 
+    deleteActividad, 
+    getActividad,
+    getActividades,    
+    updateActividad,    
 } from "../controllers/actividad.controller.js";
 
 const router = Router();
 
-router.use(authenticateJwt);
-
 router
-    .get("/", getActividades)
-    .get("/:id", getActividadById)
-    .post("/", createActividad)
-    .patch("/:id", updateActividad)
-    .delete("/:id", deleteActividad);
+    .get("/", getActividades) // Lista todas o filtra por categoria/fecha
+    .get("/detail", getActividad) // Busca una por id, categoria o fecha
+    .post("/", createActividad) // Crea una nueva actividad
+    .patch("/detail", updateActividad) // Actualiza una actividad existente
+    .delete("/detail", deleteActividad); // Elimina una actividad
 
 export default router;
+

@@ -9,8 +9,7 @@ import {
 import {
     documentoQuerySchema,
     documentoSchema,
-    documentoUpdateSchema,
-    
+    documentoUpdateSchema,    
 } from "../validations/documento.validation.js";
 import {
     handleErrorClient,
