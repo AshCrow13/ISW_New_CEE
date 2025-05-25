@@ -67,3 +67,37 @@ export const actividadSchema = Joi.object({
             "any.only": "El estado debe ser publicada, pendiente o finalizada."
         })
 }).unknown(false);
+
+export const actividadUpdateSchema = Joi.object({
+    titulo: Joi.string()
+        .min(5)
+        .max(100),
+    descripcion: Joi.string()
+        .min(10)
+        .max(2000),
+    fecha: Joi.date()
+        .iso(),
+    lugar: Joi.string()
+        .min(5)
+        .max(100),
+    categoria: Joi.string()
+        .valid("Deportivo", "Recreativo", "Oficial"),
+    responsable: Joi.string()
+        .min(5)
+        .max(100),
+    recursos: Joi.string()
+        .max(500)
+        .allow(null, ""),
+    estado: Joi.string()
+        .valid("publicada", "pendiente", "finalizada"),
+}).unknown(false);
+
+export const actividadQuerySchema = Joi.object({
+    id: Joi.number()
+        .integer()
+        .positive(),
+    categoria: Joi.string()
+        .valid("Deportivo", "Recreativo", "Oficial"),
+    fecha: Joi.date()
+        .iso(),
+}).or("id", "categoria", "fecha").unknown(false);

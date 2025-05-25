@@ -28,17 +28,17 @@ const ActividadSchema = new EntitySchema({
             length: 100,
             nullable: false,
         },
-        categoria: {
+        categoria: { // Ejemplo: "charlas", "talleres", "seminarios"
             type: "varchar",
             length: 50,
             nullable: false,
         },
-        responsable: {
+        responsable: { // nombre del responsable de la actividad
             type: "varchar",
             length: 100,
             nullable: false,
         },
-        recursos: {
+        recursos: { // recursos necesarios para la actividad, como materiales o equipos
             type: "text",
             nullable: true,
         },
