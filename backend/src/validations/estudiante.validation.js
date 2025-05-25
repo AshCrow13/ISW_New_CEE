@@ -40,7 +40,6 @@ export const estudianteSchema = Joi.object({
         }),
 }).unknown(false);
 
-/*
 // Validación para actualizar estudiante
 export const estudianteUpdateSchema = Joi.object({
     nombreCompleto: Joi.string()
@@ -82,4 +81,3 @@ export const estudianteLoginSchema = Joi.object({
         .max(50)
         .required(),
 }).or("email", "rut").unknown(false);
-*/
