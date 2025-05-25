@@ -16,5 +16,6 @@ router.get("/votacion/Todas", getVotacion);
 router.patch("/votacion/:id", updateVotacion);
 router.delete("/votacion/:id", deleteVotacion);
 
+export default router
 
 

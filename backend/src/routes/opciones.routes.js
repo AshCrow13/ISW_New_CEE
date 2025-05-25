@@ -15,3 +15,5 @@ router.get("/votacion/:votacionid/op", getOpciones);
 router.get("/votacion/:votacionid/:id", getOpcion);
 router.patch("/votacion/:votacionid/:id", updateOpcion);
 router.delete("/votacion/:votacionid/:id", deleteOpcion);
+
+export default router
