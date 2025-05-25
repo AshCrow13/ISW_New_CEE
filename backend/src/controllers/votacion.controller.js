@@ -49,6 +49,7 @@ export async function deleteVotacion(req, res) {
 
 export async function getVotacion(req, res) {
   try {
+    //Utiliza query(URL) para buscar por id o nombre
     const { id, nombre } = req.query;
 
     const [votacion, errorVotacion] = await getVotacion({ id, nombre });
