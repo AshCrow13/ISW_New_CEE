@@ -6,6 +6,10 @@ import{
     getOpciones,
     updateOpcion
 } from "../services/opciones.service.js";
+import {
+    opcionesBodyValidation,
+    opcionesQueryValidation
+} from "../validations/opciones.validation.js";
 
 //Postear una opcion en una votacion especifica
 export async function postOpcion(req, res) {
@@ -22,7 +26,6 @@ export async function postOpcion(req, res) {
         body.votacion = {id: Number(votacionId)};
 
         const { error } = opcionesBodyValidation.validate(body);
-    
         if (error) return handleErrorClient(res, 400, error.message);
     
         const [opcion, errorOpcion] = await postOpcion(body);
@@ -42,6 +45,8 @@ export async function deleteOpcion(req, res) {
             return handleErrorClient(res, 403, "No tienes permisos para eliminar una opción");
         }
         const { votacionId, id } = req.params;
+        const { error } = opcionesQueryValidation.validate({ id });
+        if(error) return handleErrorClient(res, 400, error.message);
     
         const [opcion, errorOpcion] = await deleteOpcion(Number(id), Number(votacionId));
     
@@ -57,6 +62,8 @@ export async function deleteOpcion(req, res) {
 export async function getOpcion(req, res) {
     try {
         const { votacionId, id } = req.query;
+        const { error } = opcionesQueryValidation.validate({ id });
+        if (error) return handleErrorClient(res, 400, error.message);
     
         const [opcion, errorOpcion] = await getOpcion({ id: Number(id), votacionId: Number(votacionId) });
     
@@ -71,6 +78,10 @@ export async function getOpcion(req, res) {
 export async function getOpciones(req, res) {
     try {
         const { votacionId } = req.params;
+        const { error } = opcionesQueryValidation.validate({ votacionId });
+        if (error) return handleErrorClient(res, 400, error.message);
+
+
         const [opciones, errorOpciones] = await getOpciones( {votacionId: Number(votacionId)});
     
         if (errorOpciones) return handleErrorClient(res, 404, errorOpciones);
@@ -88,6 +99,9 @@ export async function updateOpcion(req, res) {
         if (!req.user || req.user.rol !== "admin") {
             return handleErrorClient(res, 403, "No tienes permisos para actualizar una opción");
         }
+        const { errorq } = opcionesQueryValidation.validate(req.params);
+        if (errorq) return handleErrorClient(res, 400, error.message);
+
         const { votacionId, id } = req.params;
         const { body } = req;
     

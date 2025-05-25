@@ -6,6 +6,10 @@ import {
     getVotaciones,
     updateVotacion,
     } from "../services/votacion.service.js";
+import {
+    votacionBodyValidation,
+    votacionQueryValidation
+} from "../validations/votacion.validation.js";
 
 export async function postVotacion(req, res) {
     try {
@@ -36,6 +40,9 @@ export async function deleteVotacion(req, res) {
         return handleErrorClient(res, 403, "No tienes permisos para eliminar una votación");
         }
         const { id } = req.params;
+        const { error } = votacionQueryValidation.validate({ id });
+
+        if (error) return handleErrorClient(res, 400, error.message);
     
         const [votacion, errorVotacion] = await deleteVotacion(id);
     
@@ -51,6 +58,9 @@ export async function getVotacion(req, res) {
   try {
     //Utiliza query(URL) para buscar por id o nombre
     const { id, nombre } = req.query;
+    const { error } = votacionQueryValidation.validate({ id, nombre });
+    
+    if (error) return handleErrorClient(res, 400, error.message);
 
     const [votacion, errorVotacion] = await getVotacion({ id, nombre });
 
@@ -65,6 +75,9 @@ export async function getVotacion(req, res) {
 export async function getVotaciones(req, res) {
   try {
     const [votaciones, errorVotaciones] = await getVotaciones();
+    const { error } = votacionQueryValidation.validate(votaciones);
+
+    if (error) return handleErrorClient(res, 400, error.message);
 
     if (errorVotaciones) return handleErrorClient(res, 404, errorVotaciones);
 

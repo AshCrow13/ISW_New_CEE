@@ -27,3 +27,16 @@ export const opcionesQueryValidation = Joi.object({
     "object.missing":
       "Debes proporcionar al menos un parámetro: id o texto.",
   });
+
+export const opcionesBodyValidation = Joi.object({
+  texto: Joi.string()
+    .min(1)
+    .max(255)
+    .required()
+    .messages({
+      "string.empty": "El texto no puede estar vacío.",
+      "string.base": "El texto debe ser de tipo string.",
+      "string.min": "El texto debe tener como mínimo 1 carácter.",
+      "string.max": "El texto debe tener como máximo 255 caracteres.",
+    }),
+});
