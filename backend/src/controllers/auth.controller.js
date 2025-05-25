@@ -1,18 +1,10 @@
-// VERIFICAR QUE EL CODIGO FUNCIONA CON LOS DEMAS ARCHIVOS******
-
 "use strict";
-import { loginEstudianteService, 
-  registerEstudianteService 
+import {
+  loginService as loginEstudianteService,
+  registerService as registerEstudianteService,
 } from "../services/auth.service.js";
-import { 
-  estudianteLoginSchema, 
-  estudianteSchema,
-} from "../validations/estudiante.validation.js";
-import { 
-  handleErrorClient, 
-  handleErrorServer, 
-  handleSuccess, 
-} from "../handlers/responseHandlers.js";
+import { estudianteLoginSchema, estudianteSchema } from "../validations/estudiante.validation.js";
+import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers/responseHandlers.js";
 
 // LOGIN
 export async function loginEstudiante(req, res) {
@@ -21,12 +13,12 @@ export async function loginEstudiante(req, res) {
     if (error)
       return handleErrorClient(res, 400, "Error de validación", error.message);
 
-    const [token, user, errMsg] = await loginEstudianteService(req.body);
+    const [token, errMsg] = await loginEstudianteService(req.body);
     if (errMsg)
       return handleErrorClient(res, 400, "Login fallido", errMsg);
 
     res.cookie("jwt", token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-    handleSuccess(res, 200, "Inicio de sesión exitoso", { token, estudiante: user });
+    handleSuccess(res, 200, "Inicio de sesión exitoso", { token });
   } catch (error) {
     handleErrorServer(res, 500, error.message);
   }
