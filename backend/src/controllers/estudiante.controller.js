@@ -13,6 +13,7 @@ import {
     handleSuccess,
 } from "../handlers/responseHandlers.js";
 
+// CREATE
 export async function createEstudiante(req, res) {
     try {
         const { body } = req;
@@ -28,6 +29,7 @@ export async function createEstudiante(req, res) {
     }
 }
 
+// READ (Todos)
 export async function getEstudiantes(req, res) {
     try {
         const [estudiantes, errorEstudiantes] = await getEstudiantesService();
@@ -38,6 +40,7 @@ export async function getEstudiantes(req, res) {
     }
 }
 
+// READ (Uno)
 export async function getEstudiante(req, res) {
     try {
         const { query } = req;
@@ -53,6 +56,7 @@ export async function getEstudiante(req, res) {
     }
 }
 
+// UPDATE
 export async function updateEstudiante(req, res) {
     try {
         const { query, body } = req;
@@ -71,6 +75,7 @@ export async function updateEstudiante(req, res) {
     }
 }
 
+// DELETE
 export async function deleteEstudiante(req, res) {
     try {
         const { query } = req;
