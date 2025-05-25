@@ -2,6 +2,7 @@
 import {opcionesSchema} from "../entity/opciones.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 
+
 export async function postOpcion(body) {
     try {
         const opcionesRepository = AppDataSource.getRepository(opcionesSchema);
@@ -14,10 +15,13 @@ export async function postOpcion(body) {
     }
 }
 
-export async function deleteOpcion(id) {
+//Eliminar una opcion en una votacion especifica
+export async function deleteOpcion(id, votacionId) {
     try {
         const opcionesRepository = AppDataSource.getRepository(opcionesSchema);
-        const opcionToDelete = await opcionesRepository.findOneBy({ id });
+        const opcionToDelete = await opcionesRepository.findOneBy({
+            where:{id, votacion:{id:votacionId}}
+        });
         if (!opcionToDelete) return [null, "Opción no encontrada"];
         await opcionesRepository.remove(opcionToDelete);
         return [opcionToDelete, null];
@@ -27,12 +31,11 @@ export async function deleteOpcion(id) {
     }
 }
 
-export async function getOpcion(query) {
+export async function getOpcion(id, votacionId) {
     try {
-        const { id, texto } = query;
         const opcionesRepository = AppDataSource.getRepository(opcionesSchema);
         const opcionFound = await opcionesRepository.findOne({
-            where: [{ id: id }, { texto: texto }],
+            where: {id, votacion:{id:votacionId}}
         });
         if (!opcionFound) return [null, "Opción no encontrada"];
         return [opcionFound, null];
@@ -42,10 +45,15 @@ export async function getOpcion(query) {
     }
 }
 
-export async function getOpciones() {
+export async function getOpciones(votacionId) {
     try {
         const opcionesRepository = AppDataSource.getRepository(opcionesSchema);
-        const opciones = await opcionesRepository.find();
+        const opciones = await opcionesRepository.find(
+            {
+                where: { votacion: { id: votacionId } },
+                relations: ["votacion"],
+            }
+        );
         if (!opciones || opciones.length === 0) return [null, "No hay opciones"];
         return [opciones, null];
     } catch (error) {
@@ -54,10 +62,14 @@ export async function getOpciones() {
     }
 }
 
-export async function updateOpcion(id, body) {
+export async function updateOpcion(id, votacionId, body) {
     try {
         const opcionesRepository = AppDataSource.getRepository(opcionesSchema);
-        const opcionToUpdate = await opcionesRepository.findOneBy({ id });
+        const opcionToUpdate = await opcionesRepository.findOneBy(
+            { 
+            where: {id, votacion:{id:votacionId}}
+            }
+        );
         if (!opcionToUpdate) return [null, "Opción no encontrada"];
         opcionesRepository.merge(opcionToUpdate, body);
         const updatedOpcion = await opcionesRepository.save(opcionToUpdate);
