@@ -11,7 +11,7 @@ const votacionSchema = new EntitySchema({
             generated: true,
         },
         nombre: {
-            type: "string",
+            type: "varchar",
             length: 255,
             nullable: false,
         },

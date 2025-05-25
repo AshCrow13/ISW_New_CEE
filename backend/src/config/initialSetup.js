@@ -18,6 +18,7 @@ async function createEstudiantes() {
           email: "administrador2024@gmail.cl",
           password: await encryptPassword("admin1234"),
           rol: "administrador",
+          carrera: "Ingeniería en Computación e Informática",
         }),
       ),
       estudianteRepository.save(
@@ -27,6 +28,7 @@ async function createEstudiantes() {
           email: "usuario1.2024@gmail.cl",
           password: await encryptPassword("user1234"),
           rol: "usuario",
+          carrera: "Ingeniería en Computación e Informática",
         })
       ),
       estudianteRepository.save(
@@ -36,6 +38,7 @@ async function createEstudiantes() {
           email: "usuario2.2024@gmail.cl",
           password: await encryptPassword("user1234"),
           rol: "usuario",
+          carrera: "Ingeniería en Minas",
         }),
       ),
       estudianteRepository.save(
@@ -45,6 +48,7 @@ async function createEstudiantes() {
           email: "usuario3.2024@gmail.cl",
           password: await encryptPassword("user1234"),
           rol: "usuario",
+          carrera: "Ingeniería en Computación e Informática",
         }),
       ),
       estudianteRepository.save(
@@ -54,6 +58,7 @@ async function createEstudiantes() {
           email: "usuario4.2024@gmail.cl",
           password: await encryptPassword("user1234"),
           rol: "usuario",
+          carrera: "Ingeniería en Computación e Informática",
         }),
       ),
       estudianteRepository.save(
@@ -63,6 +68,7 @@ async function createEstudiantes() {
           email: "usuario5.2024@gmail.cl",
           password: await encryptPassword("user1234"),
           rol: "usuario",
+          carrera: "Ingeniería en Computación e Informática",
         }),
       ),
       estudianteRepository.save(
@@ -72,6 +78,7 @@ async function createEstudiantes() {
           email: "usuario6.2024@gmail.cl",
           password: await encryptPassword("user1234"),
           rol: "usuario",
+          carrera: "Ingeniería en Computación e Informática",
         }),
       ),
     ]);

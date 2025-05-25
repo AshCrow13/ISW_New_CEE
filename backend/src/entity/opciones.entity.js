@@ -11,7 +11,7 @@ const opcionesSchema = new EntitySchema({
             generated: true,
         },
         texto: {
-            type: "string",
+            type: "varchar",
             length: 255,
             nullable: false,
         },
