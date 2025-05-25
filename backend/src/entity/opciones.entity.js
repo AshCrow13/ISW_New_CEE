@@ -23,6 +23,12 @@ const opcionesSchema = new EntitySchema({
             joinColumn: true,
             nullable: false,
         },
+        votos: {
+            type: "one-to-many",
+            target: "Voto",
+            inverseSide: "opcion",
+            cascade: true,
+        },
     },
 });
 
