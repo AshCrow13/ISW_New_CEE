@@ -93,3 +93,82 @@ export async function registerService(user) {
     return [null, "Error interno del servidor"];
   }
 }
+
+/*
+
+// VERIFICAR QUE EL CODIGO FUNCIONA CON LOS DEMAS ARCHIVOS******
+
+"use strict";
+import Estudiante from "../entity/estudiante.entity.js";
+import jwt from "jsonwebtoken";
+import { AppDataSource } from "../config/configDb.js";
+import bcrypt from "bcryptjs";
+import { ACCESS_TOKEN_SECRET } from "../config/configEnv.js";
+
+// LOGIN
+export async function loginEstudianteService({ email, rut, password }) {
+  try {
+    const estudianteRepo = AppDataSource.getRepository(Estudiante);
+
+    let estudiante = null;
+    if (email) {
+      estudiante = await estudianteRepo.findOne({ where: { email } });
+    } else if (rut) {
+      estudiante = await estudianteRepo.findOne({ where: { rut } });
+    }
+
+    if (!estudiante) return [null, null, "El usuario no existe."];
+    if (!estudiante.password) return [null, null, "El usuario no tiene contraseña registrada."];
+
+    const isMatch = await bcrypt.compare(password, estudiante.password);
+    if (!isMatch) return [null, null, "Contraseña incorrecta."];
+
+    const payload = {
+      id: estudiante.id,
+      nombreCompleto: estudiante.nombreCompleto,
+      rut: estudiante.rut,
+      email: estudiante.email,
+      carrera: estudiante.carrera,
+    };
+
+    const token = jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: "1d" });
+
+    const { password: _, ...estudianteSinPassword } = estudiante;
+
+    return [token, estudianteSinPassword, null];
+  } catch (error) {
+    return [null, null, "Error interno al autenticar: " + error.message];
+  }
+}
+
+// REGISTRO
+export async function registerEstudianteService(data) {
+  try {
+    const estudianteRepo = AppDataSource.getRepository(Estudiante);
+
+    const existingRut = await estudianteRepo.findOne({ where: { rut: data.rut } });
+    if (existingRut) return [null, "Ya existe un estudiante con ese RUT."];
+
+    const existingEmail = await estudianteRepo.findOne({ where: { email: data.email } });
+    if (existingEmail) return [null, "Ya existe un estudiante con ese email."];
+
+    let passwordHasheado = undefined;
+    if (data.password) {
+      passwordHasheado = await bcrypt.hash(data.password, 10);
+    }
+
+    const estudiante = estudianteRepo.create({
+      ...data,
+      password: passwordHasheado,
+    });
+    await estudianteRepo.save(estudiante);
+
+    const { password: _, ...estudianteSinPassword } = estudiante;
+    return [estudianteSinPassword, null];
+  } catch (error) {
+    return [null, "Error al registrar estudiante: " + error.message];
+  }
+}
+
+
+*/
