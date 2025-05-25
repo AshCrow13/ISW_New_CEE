@@ -13,8 +13,8 @@ const router = Router();
 router
     .get("/", getEstudiantes) // Listar todos
     .get("/detail", getEstudiante) // Buscar por id, rut o email
-    .post("/", createEstudiante)
-    .patch("/detail", updateEstudiante)
-    .delete("/detail", deleteEstudiante);
+    .post("/", createEstudiante) // Crear
+    .patch("/detail", updateEstudiante) // Actualizar
+    .delete("/detail", deleteEstudiante); // Eliminar
 
 export default router;
