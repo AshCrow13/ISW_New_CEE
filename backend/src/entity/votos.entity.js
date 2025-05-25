@@ -14,7 +14,7 @@ const votosSchema = new EntitySchema({
     relations:{
         usuario:{
             type:"many-to-one",
-            target:"User",
+            target:"Estudiante",
             JoinColumn: true,
             nullable:false,
         },

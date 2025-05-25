@@ -11,7 +11,7 @@ const opcionesSchema = new EntitySchema({
             generated: true,
         },
         texto: {
-            type: "string",
+            type: "varchar",
             length: 255,
             nullable: false,
         },
@@ -22,6 +22,12 @@ const opcionesSchema = new EntitySchema({
             target: "Votacion",
             joinColumn: true,
             nullable: false,
+        },
+        votos: {
+            type: "one-to-many",
+            target: "Voto",
+            inverseSide: "opcion",
+            cascade: true,
         },
     },
 });

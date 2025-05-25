@@ -5,10 +5,17 @@ import {
     getVotos,
     getConteo
  } from "../services/votos.service"
+ import { votosQueryValidation, votosBodyValidation } from "../validations/votos.validation";
+
 
 export async function postVoto(req, res){
     try{
         const usuarioId = req.usuario.id;
+        const { errorb } = votosBodyValidation.validate(req.body);
+        if (errorb) return handleErrorClient(res, 400, error.message);
+        const { error: errorQuery } = votosQueryValidation.validate(req.params);
+        if (errorQuery) return handleErrorClient(res, 400, errorQuery.message);
+
         const { votacionId, opcionId } = req.body;
 
         const [voto, error] = await votar({usuarioId, votacionId, opcionId});
@@ -26,6 +33,8 @@ export async function postVoto(req, res){
 export async function getVotos(req, res){
     try{
         const votacionId = req.params.id;
+        const { errorq } = votosQueryValidation.validate({ id: votacionId });
+        if (errorq) return handleErrorClient(res, 400, errorq.message);
         const [votos, error] = await getVotos(Number(votacionId));
 
         if (error) {
@@ -42,6 +51,8 @@ export async function getVotos(req, res){
 export async function getConteo(req, res){
     try{
         const votacionId = req.params.id;
+        const { errorq } = votosQueryValidation.validate({ id: votacionId });
+        if (errorq) return handleErrorClient(res, 400, errorq.message);
         const [conteo, error] = await getConteo(Number(votacionId));
         if (error) {
             return res.status(400).json({ message: error });
