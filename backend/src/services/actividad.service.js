@@ -2,76 +2,81 @@
 import Actividad from "../entity/actividad.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 
-export async function createActividadService(data, user) {
+// CREATE
+export async function createActividadService(data) {
     try {
-        const actividadRepo = AppDataSource.getRepository(Actividad);
-
-        const nuevaActividad = actividadRepo.create({
-        titulo: data.titulo,
-        descripcion: data.descripcion,
-        fecha: data.fecha,
-        lugar: data.lugar,
-        categoria: data.categoria,
-        responsable: user ? user.nombreCompleto : data.responsable,
-        recursos: data.recursos,
-        estado: "publicada",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    });
-
-        await actividadRepo.save(nuevaActividad);
-
-        return [nuevaActividad, null];
+        const repo = AppDataSource.getRepository(Actividad);
+        const actividad = repo.create(data);
+        await repo.save(actividad);
+        return [actividad, null];
     } catch (error) {
         return [null, "Error al crear actividad: " + error.message];
     }
 }
 
-export async function getActividadesService() {
+// READ (Todos - con filtro)
+export async function getActividadesService(filtro = {}) {
     try {
-        const actividadRepo = AppDataSource.getRepository(Actividad);
-        const actividades = await actividadRepo.find({ order: { fecha: "ASC" } });
+        const repo = AppDataSource.getRepository(Actividad);
+        const where = {};
+        if (filtro.categoria) where.categoria = filtro.categoria;
+        if (filtro.fecha) where.fecha = filtro.fecha; // Para búsqueda exacta, si quieres rango usa otro método
+        const actividades = await repo.find({ where, order: { fecha: "ASC" } }); // Ordenar por fecha ascendente
         return [actividades, null];
     } catch (error) {
         return [null, "Error al obtener actividades: " + error.message];
     }
 }
 
-export async function getActividadByIdService(id) {
+// READ (Uno)
+export async function getActividadService(query) {
     try {
-        const actividadRepo = AppDataSource.getRepository(Actividad);
-        const actividad = await actividadRepo.findOneBy({ id: parseInt(id) });
+        const repo = AppDataSource.getRepository(Actividad);
+        const actividad = await repo.findOne({ where: query });
         if (!actividad) return [null, "Actividad no encontrada"];
         return [actividad, null];
     } catch (error) {
-        return [null, "Error al buscar la actividad: " + error.message];
+        return [null, "Error al buscar actividad: " + error.message];
     }
 }
 
-export async function updateActividadService(id, data) {
+// UPDATE
+export async function updateActividadService(query, data) {
     try {
-        const actividadRepo = AppDataSource.getRepository(Actividad);
-        const actividad = await actividadRepo.findOneBy({ id: parseInt(id) });
+        const repo = AppDataSource.getRepository(Actividad);
+        const actividad = await repo.findOne({ where: query });
         if (!actividad) return [null, "Actividad no encontrada"];
-
         Object.assign(actividad, data, { updatedAt: new Date() });
-
-        await actividadRepo.save(actividad);
-
+        await repo.save(actividad);
         return [actividad, null];
     } catch (error) {
-        return [null, "Error al actualizar la actividad: " + error.message];
+        return [null, "Error al actualizar actividad: " + error.message];
     }
 }
 
-export async function deleteActividadService(id) {
+// DELETE
+export async function deleteActividadService(query) {
     try {
-        const actividadRepo = AppDataSource.getRepository(Actividad);
-        const actividad = await actividadRepo.findOneBy({ id: parseInt(id) });
+        const repo = AppDataSource.getRepository(Actividad);
+        const actividad = await repo.findOne({ where: query });
         if (!actividad) return [null, "Actividad no encontrada"];
-        await actividadRepo.remove(actividad);
+        await repo.remove(actividad);
         return [actividad, null];
     } catch (error) {
-        return [null, "Error al eliminar la actividad: " + error.message];
+        return [null, "Error al eliminar actividad: " + error.message];
     }
 }
+/*
+// DELETE (Múltiples)
+export async function deleteActividadesService(query) {
+    try {
+        const repo = AppDataSource.getRepository(Actividad);
+        const actividades = await repo.find({ where: query });
+        if (actividades.length === 0) return [null, "No se encontraron actividades para eliminar"];
+        await repo.remove(actividades);
+        return [actividades, null];
+    } catch (error) {
+        return [null, "Error al eliminar actividades: " + error.message];
+    }
+}
+*/

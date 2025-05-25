@@ -1,7 +1,7 @@
 "use strict";
 import Joi from "joi";
 
-// Validación para rut chileno, puedes ajustar el regex si lo deseas
+// Validación para rut chileno*
 const rutRegex = /^(?:(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}|[1-9]\d{6}|[1-2]\d{7}|29\.999\.999|29999999)-[\dkK]$/;
 
 export const estudianteSchema = Joi.object({
@@ -40,9 +40,44 @@ export const estudianteSchema = Joi.object({
         }),
 }).unknown(false);
 
-// Validación para filtros y updates (puedes adaptarlas según tu necesidad)
+// Validación para actualizar estudiante
+export const estudianteUpdateSchema = Joi.object({
+    nombreCompleto: Joi.string()
+        .min(8)
+        .max(100),
+    carrera: Joi.string()
+        .min(3)
+        .max(100),
+    telefono: Joi.string()
+        .pattern(/^[0-9+]{9,20}$/)
+        .allow(null, ""),
+    password: Joi.string()
+        .min(8)
+        .max(50),
+}).unknown(false);
+
+// Validación para eliminar estudiante
 export const estudianteQuerySchema = Joi.object({
-    id: Joi.number().integer().positive(),
-    rut: Joi.string().pattern(rutRegex),
-    email: Joi.string().email(),
+    id: Joi.number()
+        .integer()
+        .positive(),
+    rut: Joi.string()
+        .pattern(rutRegex),
+    email: Joi.string()
+        .email(),
 }).or("id", "rut", "email").unknown(false);
+
+// Validación para login de estudiante
+// Se permite el login por email o rut, pero no ambos
+export const estudianteLoginSchema = Joi.object({
+    email: Joi.string()
+        .email()
+        .min(10)
+        .max(255),
+    rut: Joi.string()
+        .pattern(rutRegex),
+    password: Joi.string()
+        .min(8)
+        .max(50)
+        .required(),
+}).or("email", "rut").unknown(false);
