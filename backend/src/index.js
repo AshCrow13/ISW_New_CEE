@@ -6,6 +6,7 @@ import indexRoutes from "./routes/index.routes.js";
 import session from "express-session";
 import passport from "passport";
 import express, { json, urlencoded } from "express";
+import"./cron/votacion.cron.js"; // Importar cron para que se ejecute al iniciar el servidor
 import { cookieKey, HOST, PORT } from "./config/configEnv.js";
 import { connectDB } from "./config/configDb.js";
 import { createEstudiantes } from "./config/initialSetup.js";

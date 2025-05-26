@@ -23,14 +23,20 @@ const EstudianteSchema = new EntitySchema({
             length: 255, 
             nullable: false, 
             unique: true },
+        rol:{
+            type: "varchar", 
+            length: 50, 
+            nullable: false, 
+            default: "estudiante"
+        },
         carrera: { 
             type: "varchar", 
             length: 100, 
             nullable: false },
-        /*password: { 
+        password: { 
             type: "varchar", 
             length: 255, 
-            nullable: false },*/
+            nullable: false },
         createdAt: {
             type: "timestamp with time zone",
             default: () => "CURRENT_TIMESTAMP",

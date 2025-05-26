@@ -19,6 +19,19 @@ const votacionSchema = new EntitySchema({
             type: "boolean", // true = abierto, false = cerrado
             default: true,
         },
+        inicio: {
+            type: "timestamp",
+            nullable: false,
+        },
+        duracion: {
+            type: "int", // Duración en minutos
+            nullable: false,
+        },
+        fin: {
+            type: "timestamp",
+            nullable: false,
+        },
+
     },
     relations: {
         opciones: {

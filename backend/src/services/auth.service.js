@@ -34,6 +34,7 @@ export async function loginService(estudiante) {
       email: estudianteFound.email,
       rut: estudianteFound.rut,
       rol: estudianteFound.rol,
+      carrera: estudianteFound.carrera,
     };
 
     const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
@@ -79,8 +80,9 @@ export async function registerService(estudiante) {
       nombreCompleto,
       email,
       rut,
+      rol: estudiante.rol || "estudiante",
+      carrera: estudiante.carrera,
       password: await encryptPassword(estudiante.password),
-      rol: "usuario",
     });
 
     await estudianteRepository.save(newEstudiante);

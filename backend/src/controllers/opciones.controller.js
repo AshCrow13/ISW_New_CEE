@@ -1,21 +1,23 @@
 "use strict"
 import{
-    postOpcion,
-    deleteOpcion,
-    getOpcion,
-    getOpciones,
-    updateOpcion
+    postOpcion as postOpcionService,
+    deleteOpcion as deleteOpcionService,
+    getOpcion as getOpcionService,
+    getOpciones as getOpcionesService,
+    updateOpcion as updateOpcionService
 } from "../services/opciones.service.js";
 import {
     opcionesBodyValidation,
-    opcionesQueryValidation
+    opcionesQueryValidation,
+    opcionesVotacionIdValidation
 } from "../validations/opciones.validation.js";
+import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers/responseHandlers.js";
 
-//Postear una opcion en una votacion especifica
+//Postear una opcion en una votacion especificaService
 export async function postOpcion(req, res) {
     try {
         //Verificamos que lo cree solamente un admin
-        if (!req.user || req.user.rol !== "admin") {
+        if (!req.user || req.user.rol !== "administrador") {
             return handleErrorClient(res, 403, "No tienes permisos para crear una opción");
         }
         if (req.user.carrera !== "Ingeniería en Computación e Informática") {
@@ -31,7 +33,7 @@ export async function postOpcion(req, res) {
         const { error } = opcionesBodyValidation.validate(body);
         if (error) return handleErrorClient(res, 400, error.message);
     
-        const [opcion, errorOpcion] = await postOpcion(body);
+        const [opcion, errorOpcion] = await postOpcionService(body);
     
         if (errorOpcion) return handleErrorClient(res, 400, errorOpcion);
     
@@ -43,8 +45,8 @@ export async function postOpcion(req, res) {
 //Eliminar una opcion en una votacion especifica
 export async function deleteOpcion(req, res) {
     try {
-        //Verificamos que lo elimine solamente un admin
-        if (!req.user || req.user.rol !== "admin") {
+        //Verificamos que lo elimine solamente un admin 
+        if (!req.user || req.user.rol !== "administrador") {
             return handleErrorClient(res, 403, "No tienes permisos para eliminar una opción");
         }
         if (req.user.carrera !== "Ingeniería en Computación e Informática") {
@@ -54,7 +56,7 @@ export async function deleteOpcion(req, res) {
         const { error } = opcionesQueryValidation.validate({ id });
         if(error) return handleErrorClient(res, 400, error.message);
     
-        const [opcion, errorOpcion] = await deleteOpcion(Number(id), Number(votacionId));
+        const [opcion, errorOpcion] = await deleteOpcionService(Number(id), Number(votacionId));
     
         if (errorOpcion) return handleErrorClient(res, 404, errorOpcion);
     
@@ -70,11 +72,12 @@ export async function getOpcion(req, res) {
         if(req.user.carrera !== "Ingeniería en Computación e Informática") {
             return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden ver las opciones");
         }
-        const { votacionId, id } = req.query;
-        const { error } = opcionesQueryValidation.validate({ id });
+        const { votacionId, id } = req.params;
+        console.log("VotacionId", votacionId , "Id", id);
+        const { error } = opcionesQueryValidation.validate({ id: Number(id) });
         if (error) return handleErrorClient(res, 400, error.message);
     
-        const [opcion, errorOpcion] = await getOpcion({ id: Number(id), votacionId: Number(votacionId) });
+        const [opcion, errorOpcion] = await getOpcionService(Number(id), Number(votacionId));
     
         if (errorOpcion) return handleErrorClient(res, 404, errorOpcion);
     
@@ -90,11 +93,12 @@ export async function getOpciones(req, res) {
             return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden ver las opciones");
         }
         const { votacionId } = req.params;
-        const { error } = opcionesQueryValidation.validate({ votacionId });
+        console.log("VotacionId", votacionId);
+        const { error } = opcionesVotacionIdValidation.validate({ votacionId });
         if (error) return handleErrorClient(res, 400, error.message);
 
 
-        const [opciones, errorOpciones] = await getOpciones( {votacionId: Number(votacionId)});
+        const [opciones, errorOpciones] = await getOpcionesService(Number(votacionId));
     
         if (errorOpciones) return handleErrorClient(res, 404, errorOpciones);
     
@@ -111,7 +115,7 @@ export async function updateOpcion(req, res) {
             return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden actualizar opciones");
         }
         //Verificamos que lo elimine solamente un admin
-        if (!req.user || req.user.rol !== "admin") {
+        if (!req.user || req.user.rol !== "administrador") {
             return handleErrorClient(res, 403, "No tienes permisos para actualizar una opción");
         }
         const { errorq } = opcionesQueryValidation.validate(req.params);
@@ -124,7 +128,7 @@ export async function updateOpcion(req, res) {
     
         if (error) return handleErrorClient(res, 400, error.message);
     
-        const [opcion, errorOpcion] = await updateOpcion(Number(id), body, Number(votacionId));
+        const [opcion, errorOpcion] = await updateOpcionService(Number(votacionId), Number(id), body);
     
         if (errorOpcion) return handleErrorClient(res, 404, errorOpcion);
     
