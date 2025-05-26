@@ -25,12 +25,21 @@ export async function postVotacion(req, res) {
         if (req.user.carrera !== "Ingeniería en Computación e Informática") {
             return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden crear votaciones");
         }
-        const { body } = req;
-    
-        const { error } = votacionBodyValidation.validate(body);
-    
-        if (error) return handleErrorClient(res, 400, error.message);
-    
+        const { nombre, duracion, opciones, estado} = req.body;
+        const { errorb } = votacionBodyValidation.validate({ nombre, duracion, opciones, estado });
+        if (errorb) return handleErrorClient(res, 400, error.message);
+        const inicio = new Date();
+        const fin = new Date(inicio.getTime() + duracion * 60000); // 24 horas después
+         
+        const body = {
+            nombre,
+            inicio,
+            duracion,
+            fin,
+            estado: true || req.body.estado, // Por defecto, la votación está abierta
+            opciones // Incluimos cualquier otro campo adicional que pueda venir en el body
+        };
+
         const [votacion, errorVotacion] = await postVotacionService(body);
     
         if (errorVotacion) return handleErrorClient(res, 400, errorVotacion);

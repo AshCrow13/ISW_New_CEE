@@ -8,9 +8,9 @@ export async function postVotacion(body) {
         const votacionRepository = AppDataSource.getRepository(votacionSchema);
         const opcionesRepository = AppDataSource.getRepository(opcionesSchema);
 
-        const {nombre, estado, opciones} = body;
+        const {nombre, estado,inicio, duracion, fin, opciones} = body;
 
-        const nuevaVotacion = votacionRepository.create({ nombre, estado });
+        const nuevaVotacion = votacionRepository.create({ nombre, estado, inicio, duracion, fin });
         const guardarVotacion = await votacionRepository.save(nuevaVotacion);
 
         let opcionesVotacion = [];
