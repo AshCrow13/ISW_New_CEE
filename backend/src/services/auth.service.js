@@ -79,6 +79,7 @@ export async function registerService(estudiante) {
       nombreCompleto,
       email,
       rut,
+      carrera: estudiante.carrera,
       password: await encryptPassword(estudiante.password),
       rol: "usuario",
     });
