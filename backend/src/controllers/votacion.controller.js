@@ -1,10 +1,10 @@
 "use strict"
 import { 
-    postVotacion,
-    deleteVotacion,
-    getVotacion,
-    getVotaciones,
-    updateVotacion,
+    postVotacion as postVotacionService,
+    deleteVotacion as deleteVotacionService,
+    getVotacion as getVotacionService,
+    getVotaciones as getVotacionesService,
+    updateVotacion as updateVotacionService,
     } from "../services/votacion.service.js";
 import {
     votacionBodyValidation,
@@ -27,7 +27,7 @@ export async function postVotacion(req, res) {
     
         if (error) return handleErrorClient(res, 400, error.message);
     
-        const [votacion, errorVotacion] = await postVotacion(body);
+        const [votacion, errorVotacion] = await postVotacionService(body);
     
         if (errorVotacion) return handleErrorClient(res, 400, errorVotacion);
     
@@ -52,7 +52,7 @@ export async function deleteVotacion(req, res) {
 
         if (error) return handleErrorClient(res, 400, error.message);
     
-        const [votacion, errorVotacion] = await deleteVotacion(id);
+        const [votacion, errorVotacion] = await deleteVotacionService(id);
     
         if (errorVotacion) return handleErrorClient(res, 404, errorVotacion);
     
@@ -74,7 +74,7 @@ export async function getVotacion(req, res) {
     
     if (error) return handleErrorClient(res, 400, error.message);
 
-    const [votacion, errorVotacion] = await getVotacion({ id, nombre });
+    const [votacion, errorVotacion] = await getVotacionService({ id, nombre });
 
     if (errorVotacion) return handleErrorClient(res, 404, errorVotacion);
 
@@ -90,7 +90,7 @@ export async function getVotaciones(req, res) {
       return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden buscar votaciones");
     }
 
-    const [votaciones, errorVotaciones] = await getVotaciones();
+    const [votaciones, errorVotaciones] = await getVotacionesService();
     const { error } = votacionQueryValidation.validate(votaciones);
 
     if (error) return handleErrorClient(res, 400, error.message);
@@ -122,7 +122,7 @@ export async function updateVotacion(req, res) {
 
     if (error) return handleErrorClient(res, 400, error.message);
 
-    const [votacion, errorVotacion] = await updateVotacion(id, body);
+    const [votacion, errorVotacion] = await updateVotacionService(id, body);
 
     if (errorVotacion) return handleErrorClient(res, 404, errorVotacion);
 

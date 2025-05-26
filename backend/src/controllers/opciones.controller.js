@@ -1,17 +1,17 @@
 "use strict"
 import{
-    postOpcion,
-    deleteOpcion,
-    getOpcion,
-    getOpciones,
-    updateOpcion
+    postOpcion as postOpcionService,
+    deleteOpcion as deleteOpcionService,
+    getOpcion as getOpcionService,
+    getOpciones as getOpcionesService,
+    updateOpcion as updateOpcionService
 } from "../services/opciones.service.js";
 import {
     opcionesBodyValidation,
     opcionesQueryValidation
 } from "../validations/opciones.validation.js";
 
-//Postear una opcion en una votacion especifica
+//Postear una opcion en una votacion especificaService
 export async function postOpcion(req, res) {
     try {
         //Verificamos que lo cree solamente un admin
@@ -31,7 +31,7 @@ export async function postOpcion(req, res) {
         const { error } = opcionesBodyValidation.validate(body);
         if (error) return handleErrorClient(res, 400, error.message);
     
-        const [opcion, errorOpcion] = await postOpcion(body);
+        const [opcion, errorOpcion] = await postOpcionService(body);
     
         if (errorOpcion) return handleErrorClient(res, 400, errorOpcion);
     
@@ -43,7 +43,7 @@ export async function postOpcion(req, res) {
 //Eliminar una opcion en una votacion especifica
 export async function deleteOpcion(req, res) {
     try {
-        //Verificamos que lo elimine solamente un admin
+        //Verificamos que lo elimine solamente un admin 
         if (!req.user || req.user.rol !== "admin") {
             return handleErrorClient(res, 403, "No tienes permisos para eliminar una opción");
         }
@@ -54,7 +54,7 @@ export async function deleteOpcion(req, res) {
         const { error } = opcionesQueryValidation.validate({ id });
         if(error) return handleErrorClient(res, 400, error.message);
     
-        const [opcion, errorOpcion] = await deleteOpcion(Number(id), Number(votacionId));
+        const [opcion, errorOpcion] = await deleteOpcionService(Number(id), Number(votacionId));
     
         if (errorOpcion) return handleErrorClient(res, 404, errorOpcion);
     
@@ -74,7 +74,7 @@ export async function getOpcion(req, res) {
         const { error } = opcionesQueryValidation.validate({ id });
         if (error) return handleErrorClient(res, 400, error.message);
     
-        const [opcion, errorOpcion] = await getOpcion({ id: Number(id), votacionId: Number(votacionId) });
+        const [opcion, errorOpcion] = await getOpcionService({ id: Number(id), votacionId: Number(votacionId) });
     
         if (errorOpcion) return handleErrorClient(res, 404, errorOpcion);
     
@@ -94,7 +94,7 @@ export async function getOpciones(req, res) {
         if (error) return handleErrorClient(res, 400, error.message);
 
 
-        const [opciones, errorOpciones] = await getOpciones( {votacionId: Number(votacionId)});
+        const [opciones, errorOpciones] = await getOpcionesService( {votacionId: Number(votacionId)});
     
         if (errorOpciones) return handleErrorClient(res, 404, errorOpciones);
     
@@ -124,7 +124,7 @@ export async function updateOpcion(req, res) {
     
         if (error) return handleErrorClient(res, 400, error.message);
     
-        const [opcion, errorOpcion] = await updateOpcion(Number(id), body, Number(votacionId));
+        const [opcion, errorOpcion] = await updateOpcionService(Number(id), body, Number(votacionId));
     
         if (errorOpcion) return handleErrorClient(res, 404, errorOpcion);
     

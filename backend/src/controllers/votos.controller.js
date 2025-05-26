@@ -1,13 +1,13 @@
 "use strict"
-import { handleErrorServer } from "../handlers/responseHandlers";
+import { handleErrorServer } from "../handlers/responseHandlers.js";
 import { 
-    postVoto,
-    getVotos,
-    getConteo
- } from "../services/votos.service"
- import { votosQueryValidation, votosBodyValidation } from "../validations/votos.validation";
+    postVoto as postVotoService,
+    getVotos as getVotosService,
+    getConteo as getConteoService,
+ } from "../services/votos.service.js"
+ import { votosQueryValidation, votosBodyValidation } from "../validations/votos.validation.js";
 
-
+  
 export async function postVoto(req, res){
     try{
         if (req.user.carrera !== "Ingeniería en Computación e Informática") {
@@ -16,11 +16,11 @@ export async function postVoto(req, res){
         const usuarioId = req.user.id;
         const { errorb } = votosBodyValidation.validate(req.body);
         if (errorb) return handleErrorClient(res, 400, error.message);
+
         const { error: errorQuery } = votosQueryValidation.validate(req.params);
         if (errorQuery) return handleErrorClient(res, 400, errorQuery.message);
 
         const { votacionId, opcionId } = req.body;
-
         const [voto, error] = await votar({usuarioId, votacionId, opcionId});
 
         if (error) {
@@ -54,7 +54,7 @@ export async function getVotos(req, res){
         return res.status(500).json({ message: "Error interno del servidor" });
     }
 }
-
+ 
 export async function getConteo(req, res){
     try{
         if (req.user.carrera !== "Ingeniería en Computación e Informática") {

@@ -3,8 +3,8 @@ import {
     postVoto,
     getVotos,
     getConteo
- } from '../controllers/votos.controller';
-import { authenticateJwt } from '../middlewares/authentication.middleware';
+ } from '../controllers/votos.controller.js';
+import { authenticateJwt } from '../middlewares/authentication.middleware.js';
 
  const router = Router();
 
