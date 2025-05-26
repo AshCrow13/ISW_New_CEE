@@ -1,5 +1,5 @@
 "use strict";
-import Instancias from "../entity/instancias.entity.js";
+import Instancia from "../entity/instancias.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 
 // Create
@@ -55,7 +55,7 @@ export async function updateInstanciaService(query, data) {
 }
 
 // Delete
-export async function deleteInstanciasService(query) {
+export async function deleteInstanciaService(query) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
         const instancia = await repo.findOne({ where: query });
