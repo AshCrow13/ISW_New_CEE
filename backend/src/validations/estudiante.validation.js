@@ -38,18 +38,18 @@ export const estudianteSchema = Joi.object({
         .pattern(/^[a-zA-Z0-9]+$/)
         .required()
         .messages({
-          "string.empty": "La contraseña no puede estar vacía.",
-          "any.required": "La contraseña es obligatorio.",
-          "string.base": "La contraseña debe ser de tipo texto.",
-          "string.min": "La contraseña debe tener al menos 8 caracteres.",
-          "string.max": "La contraseña debe tener como máximo 26 caracteres.",
-          "string.pattern.base": "La contraseña solo puede contener letras y números.",
+            "string.empty": "La contraseña no puede estar vacía.",
+            "any.required": "La contraseña es obligatorio.",
+            "string.base": "La contraseña debe ser de tipo texto.",
+            "string.min": "La contraseña debe tener al menos 8 caracteres.",
+            "string.max": "La contraseña debe tener como máximo 26 caracteres.",
+            "string.pattern.base": "La contraseña solo puede contener letras y números.",
         }),
     rol: Joi.string()
         .valid("administrador", "usuario")
         .default("usuario")
         .messages({
-            "any.only": "El rol debe ser 'administrador' o 'usuario'.",})
+            "any.only": "El rol debe ser 'administrador' o 'usuario'.", })
 }).unknown(false);
 
 // Validación para actualizar estudiante
