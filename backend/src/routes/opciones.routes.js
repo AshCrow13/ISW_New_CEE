@@ -7,13 +7,14 @@ import {
     getOpciones,
     updateOpcion,
 } from "../controllers/opciones.controller.js"
+import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 
 const router = Router()
 
-router.post("/votacion/:votacionId/", postOpcion);
-router.get("/votacion/:votacionid/op", getOpciones);
-router.get("/votacion/:votacionid/:id", getOpcion);
-router.patch("/votacion/:votacionid/:id", updateOpcion);
-router.delete("/votacion/:votacionid/:id", deleteOpcion);
+router.post("/:votacionId/", authenticateJwt, postOpcion);
+router.get("/:votacionid/op", authenticateJwt, getOpciones);
+router.get("/:votacionid/:id", authenticateJwt, getOpcion);
+router.patch("/:votacionid/:id", authenticateJwt, updateOpcion);
+router.delete("/:votacionid/:id", authenticateJwt, deleteOpcion);
 
 export default router;
