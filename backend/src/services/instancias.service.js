@@ -2,7 +2,7 @@
 import Instancias from "../entity/instancias.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 
-
+// Create
 export async function createInstanciaService(data) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
@@ -27,6 +27,7 @@ export async function getInstanciasService(filtro = {}) {
         return [null, "Error al obtener Instancias: " + error.message];
     }
 }
+
 // Get one
 export async function getInstanciaService(query) {
     try {
