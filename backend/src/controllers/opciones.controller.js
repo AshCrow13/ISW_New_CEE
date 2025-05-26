@@ -72,11 +72,12 @@ export async function getOpcion(req, res) {
         if(req.user.carrera !== "Ingeniería en Computación e Informática") {
             return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden ver las opciones");
         }
-        const { votacionId, id } = req.query;
-        const { error } = opcionesQueryValidation.validate({ id });
+        const { votacionId, id } = req.params;
+        console.log("VotacionId", votacionId , "Id", id);
+        const { error } = opcionesQueryValidation.validate({ id: Number(id) });
         if (error) return handleErrorClient(res, 400, error.message);
     
-        const [opcion, errorOpcion] = await getOpcionService({ id: Number(id), votacionId: Number(votacionId) });
+        const [opcion, errorOpcion] = await getOpcionService(Number(id), Number(votacionId));
     
         if (errorOpcion) return handleErrorClient(res, 404, errorOpcion);
     
