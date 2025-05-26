@@ -1,7 +1,8 @@
 "use strict";
 import {NotificarAsamblea
 } from "../middlewares/email.middleware.js";
-
+import { getEstudiantes    
+} from "./estudiante.controller.js";
 import {
     createInstanciaService, 
     deleteInstanciaService, 
@@ -20,9 +21,12 @@ import {
     handleSuccess,
 } from "../handlers/responseHandlers.js";
 
+const listaEmails = ["as0etrius@gmail.com", "prozero133@gmail.com", "matias.cartes2001@alumnos.ubiobio"]
 // CREATE
 export async function createInstancia(req, res) {
+
     try {
+
         const { error } = instanciaSchema.validate(req.body);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
 
@@ -30,14 +34,46 @@ export async function createInstancia(req, res) {
         if (err) return handleErrorClient(res, 400, err);
 
         handleSuccess(res, 201, "Instancia creada correctamente", instancia);
-
-        NotificarAsamblea("prozero133@gmail.com", "WarThunder");
+// const listadoestudiantes = getEstudiantes();
+    // print(listadoestudiantes);
+        for (const email in listaEmails){
+            NotificarAsamblea(listaEmails[email],req.body);
+        }   
 
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
 
 }
+/*
+export async function createInstancia(req, res) {
+  try {
+    const { error } = instanciaSchema.validate(req.body);
+    if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
+
+    // Generar clave de 6 dígitos aleatoria
+    const claveAsistencia = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Inyectar campos adicionales a la data
+    const instanciaData = {
+      ...req.body,
+      claveAsistencia,
+      asistenciaAbierta: false,
+    };
+
+    const [instancia, err] = await createInstanciaService(instanciaData);
+    if (err) return handleErrorClient(res, 400, err);
+
+    // Notificación a alumnos
+    for (const email of listaEmails) {
+      NotificarAsamblea(listaEmails[email],req.body);
+    }
+
+    handleSuccess(res, 201, "Instancia creada correctamente", instancia);
+  } catch (error) {
+    handleErrorServer(res, 500, error.message);
+  }
+}*/
 
 // READ (Todos - con filtro)
 export async function getInstancias(req, res) {

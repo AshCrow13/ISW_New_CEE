@@ -24,6 +24,16 @@ const InstanciaSchema = new EntitySchema({
             length: 100,
             nullable: false,
         },
+        /*asistenciaAbierta: {
+        type: "boolean",
+        default: false,
+        nullable: false,
+        },
+        claveAsistencia: {
+        type: "varchar",
+        length: 6,
+        nullable: false,
+        },*/
         createdAt: {
             type: "timestamp with time zone",
             default: () => "CURRENT_TIMESTAMP",

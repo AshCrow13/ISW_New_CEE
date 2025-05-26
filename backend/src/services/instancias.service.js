@@ -19,9 +19,9 @@ export async function getInstanciasService(filtro = {}) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
         const where = {};
-        if (filtro.categoria) where.categoria = filtro.categoria;
-        if (filtro.fecha) where.fecha = filtro.fecha; 
-        const instancias = await repo.find({ where, order: { fecha: "ASC" } });
+        if (filtro.id) where.id = filtro.id;
+        if (filtro.Fecha) where.Fecha = filtro.Fecha; 
+        const instancias = await repo.find({ where, order: { Fecha: "ASC" } });
         return [instancias, null];
     } catch (error) {
         return [null, "Error al obtener Instancias: " + error.message];
