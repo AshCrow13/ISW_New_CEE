@@ -45,12 +45,11 @@ export const estudianteSchema = Joi.object({
           "string.max": "La contraseña debe tener como máximo 26 caracteres.",
           "string.pattern.base": "La contraseña solo puede contener letras y números.",
         }),
-    telefono: Joi.string()
-        .pattern(/^[0-9+]{9,20}$/)
-        .allow(null, "")
+    rol: Joi.string()
+        .valid("administrador", "usuario")
+        .default("usuario")
         .messages({
-            "string.pattern.base": "El teléfono solo puede contener números y +.",
-        }),
+            "any.only": "El rol debe ser 'administrador' o 'usuario'.",})
 }).unknown(false);
 
 // Validación para actualizar estudiante
