@@ -1,10 +1,9 @@
-import votosSchema from "../entity/votos.entity";
-import { AppDataSource } from "../config/configDb";
+import votosSchema from "../entity/votos.entity.js";
+import { AppDataSource } from "../config/configDb.js";
 
 export async function postVoto(usuarioId, votacionId, opcionId) {
     try {
         const votoRep = AppDataSource.getRepository(votosSchema);
-
         //Verificamos que en la votacion no haya votado el usuario anteriomente
         const votoExiste = await votoRep.findOne({
             where: {
@@ -53,6 +52,7 @@ export async function getConteo(votacionId) {
         const votoRep = AppDataSource.getRepository(votosSchema);
         const conteo = await votoRep
             .createQueryBuilder("voto")
+            .innerJoin("voto.opcion", "opcion")
             .select("opcion.id", "opcionId")
             .addSelect("COUNT(voto.id)", "conteo")
             .where("voto.votacion.id = :votacionId", { votacionId })

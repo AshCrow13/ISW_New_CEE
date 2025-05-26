@@ -1,6 +1,6 @@
 "use strict"
 import votacionSchema from "../entity/votacion.entity.js";
-import opcionesSchema from "../entity/opcionVotacion.entity.js";
+import opcionesSchema from "../entity/opciones.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 
 export async function postVotacion(body) {
@@ -8,9 +8,9 @@ export async function postVotacion(body) {
         const votacionRepository = AppDataSource.getRepository(votacionSchema);
         const opcionesRepository = AppDataSource.getRepository(opcionesSchema);
 
-        const {nombre, estado, opciones} = body;
+        const {nombre, estado,inicio, duracion, fin, opciones} = body;
 
-        const nuevaVotacion = votacionRepository.create({ nombre, estado });
+        const nuevaVotacion = votacionRepository.create({ nombre, estado, inicio, duracion, fin });
         const guardarVotacion = await votacionRepository.save(nuevaVotacion);
 
         let opcionesVotacion = [];

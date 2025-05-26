@@ -1,8 +1,8 @@
 "use strict";
 import Estudiante from "../entity/estudiante.entity.js";
 import { AppDataSource } from "../config/configDb.js";
-//import { comparePassword, encryptPassword } from "../helpers/bcrypt.helper.js";
-//import bcrypt from "bcryptjs";
+import { comparePassword, encryptPassword } from "../helpers/bcrypt.helper.js";
+import bcrypt from "bcryptjs";
 
 // CREATE
 export async function createEstudianteService(data) {

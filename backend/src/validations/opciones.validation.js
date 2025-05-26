@@ -40,3 +40,7 @@ export const opcionesBodyValidation = Joi.object({
       "string.max": "El texto debe tener como máximo 255 caracteres.",
     }),
 });
+
+export const opcionesVotacionIdValidation = Joi.object({
+  votacionId: Joi.number().integer().positive().required()
+});
