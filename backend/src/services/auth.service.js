@@ -34,6 +34,7 @@ export async function loginService(estudiante) {
       email: estudianteFound.email,
       rut: estudianteFound.rut,
       rol: estudianteFound.rol,
+      carrera: estudianteFound.carrera,
     };
 
     const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {

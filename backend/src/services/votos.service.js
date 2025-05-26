@@ -4,7 +4,6 @@ import { AppDataSource } from "../config/configDb.js";
 export async function postVoto(usuarioId, votacionId, opcionId) {
     try {
         const votoRep = AppDataSource.getRepository(votosSchema);
-
         //Verificamos que en la votacion no haya votado el usuario anteriomente
         const votoExiste = await votoRep.findOne({
             where: {

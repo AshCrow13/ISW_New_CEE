@@ -12,9 +12,9 @@ import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 const router = Router()
 
 router.post("/:votacionId/", authenticateJwt, postOpcion);
-router.get("/:votacionid/op", authenticateJwt, getOpciones);
-router.get("/:votacionid/:id", authenticateJwt, getOpcion);
-router.patch("/:votacionid/:id", authenticateJwt, updateOpcion);
-router.delete("/:votacionid/:id", authenticateJwt, deleteOpcion);
+router.get("/:votacionId/op", authenticateJwt, getOpciones);
+router.get("/:votacionId/:id", authenticateJwt, getOpcion);
+router.patch("/:votacionId/:id", authenticateJwt, updateOpcion);
+router.delete("/:votacionId/:id", authenticateJwt, deleteOpcion);
 
 export default router;

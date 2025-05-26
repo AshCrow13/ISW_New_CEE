@@ -125,7 +125,7 @@ export async function updateOpcion(req, res) {
     
         if (error) return handleErrorClient(res, 400, error.message);
     
-        const [opcion, errorOpcion] = await updateOpcionService(Number(id), body, Number(votacionId));
+        const [opcion, errorOpcion] = await updateOpcionService(Number(votacionId), Number(id), body);
     
         if (errorOpcion) return handleErrorClient(res, 404, errorOpcion);
     
