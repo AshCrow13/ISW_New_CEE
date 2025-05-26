@@ -6,6 +6,7 @@ import {
     getConteo as getConteoService,
  } from "../services/votos.service.js"
  import { votosQueryValidation, votosBodyValidation } from "../validations/votos.validation.js";
+import { handleErrorClient, handleSuccess } from "../handlers/responseHandlers.js";
 
   
 export async function postVoto(req, res){

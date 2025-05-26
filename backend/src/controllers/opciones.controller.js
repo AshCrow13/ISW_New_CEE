@@ -10,12 +10,13 @@ import {
     opcionesBodyValidation,
     opcionesQueryValidation
 } from "../validations/opciones.validation.js";
+import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers/responseHandlers.js";
 
 //Postear una opcion en una votacion especificaService
 export async function postOpcion(req, res) {
     try {
         //Verificamos que lo cree solamente un admin
-        if (!req.user || req.user.rol !== "admin") {
+        if (!req.user || req.user.rol !== "administrador") {
             return handleErrorClient(res, 403, "No tienes permisos para crear una opción");
         }
         if (req.user.carrera !== "Ingeniería en Computación e Informática") {
@@ -44,7 +45,7 @@ export async function postOpcion(req, res) {
 export async function deleteOpcion(req, res) {
     try {
         //Verificamos que lo elimine solamente un admin 
-        if (!req.user || req.user.rol !== "admin") {
+        if (!req.user || req.user.rol !== "administrador") {
             return handleErrorClient(res, 403, "No tienes permisos para eliminar una opción");
         }
         if (req.user.carrera !== "Ingeniería en Computación e Informática") {
@@ -111,7 +112,7 @@ export async function updateOpcion(req, res) {
             return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden actualizar opciones");
         }
         //Verificamos que lo elimine solamente un admin
-        if (!req.user || req.user.rol !== "admin") {
+        if (!req.user || req.user.rol !== "administrador") {
             return handleErrorClient(res, 403, "No tienes permisos para actualizar una opción");
         }
         const { errorq } = opcionesQueryValidation.validate(req.params);

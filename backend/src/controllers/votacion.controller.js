@@ -10,12 +10,15 @@ import {
     votacionBodyValidation,
     votacionQueryValidation
 } from "../validations/votacion.validation.js";
+import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers/responseHandlers.js";
 
 export async function postVotacion(req, res) {
     try {
-        //Verificamos que lo cree solamente un admin
-        if (!req.user || req.user.rol !== "admin") {
-            return handleErrorClient(res, 403, "No tienes permisos para crear una votación");
+        if (!req.user) {
+          return handleErrorClient(res, 401, "Debes estar autenticado para crear una votación");
+        }
+        if (req.user.rol !== "administrador") {
+          return handleErrorClient(res, 403, "No tienes permisos para crear una votación");
         }
         //Nos aseguramos que solo creen estudiantes de "Ingeniería en Computación e Informática"
         if (req.user.carrera !== "Ingeniería en Computación e Informática") {
@@ -40,7 +43,7 @@ export async function postVotacion(req, res) {
 export async function deleteVotacion(req, res) {
     try {
         //Verificamos que lo elimine solamente un admin
-        if (!req.user || req.user.rol !== "admin") {
+        if (!req.user || req.user.rol !== "administrador") {
         return handleErrorClient(res, 403, "No tienes permisos para eliminar una votación");
         }
         //Verificamos que solo elimine estudiantes de "Ingeniería en Computación e Informática"
@@ -108,7 +111,7 @@ export async function getVotaciones(req, res) {
 export async function updateVotacion(req, res) {
   try {
     //Solo lo puede modificar un admin
-    if (!req.user || req.user.rol !== "admin") {
+    if (!req.user || req.user.rol !== "administrador") {
       return handleErrorClient(res, 403, "No tienes permisos para modificar una votación");
     }
     if (req.user.carrera !== "Ingeniería en Computación e Informática") {

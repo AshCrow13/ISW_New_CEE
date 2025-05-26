@@ -8,7 +8,7 @@ import { authenticateJwt } from '../middlewares/authentication.middleware.js';
 
  const router = Router();
 
-router.post('/votacion/:votacionId/votar', authenticateJwt ,postVoto);
-router.get('/votacion/:votacionId/votos', getVotos);
-router.get('/votacion/:votacionId/conteo', getConteo);
+router.post('/:votacionId/votar', authenticateJwt ,postVoto);
+router.get('/:votacionId/votos', authenticateJwt, getVotos)
+router.get('/:votacionId/conteo', authenticateJwt, getConteo);
 export default router;
