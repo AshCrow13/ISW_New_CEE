@@ -42,7 +42,8 @@ export async function getVotos(req, res){
             return res.status(403).json({ message: "Solo estudiantes de Ingeniería en Computación e Informática pueden ver los votos" });
         }
 
-        const votacionId = req.params.id;
+        const votacionId = req.params.votacionId;
+        console.log("Votacion ID:", votacionId);
         const { errorq } = votosQueryValidation.validate({ id: votacionId });
         if (errorq) return handleErrorClient(res, 400, errorq.message);
         const [votos, error] = await getVotosService(Number(votacionId));
@@ -64,7 +65,7 @@ export async function getConteo(req, res){
             return res.status(403).json({ message: "Solo estudiantes de Ingeniería en Computación e Informática pueden ver el conteo de votos" });
         }
 
-        const votacionId = req.params.id;
+        const votacionId = req.params.votacionId;
         const { errorq } = votosQueryValidation.validate({ id: votacionId });
         if (errorq) return handleErrorClient(res, 400, errorq.message);
         const [conteo, error] = await getConteoService(Number(votacionId));

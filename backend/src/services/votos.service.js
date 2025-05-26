@@ -52,6 +52,7 @@ export async function getConteo(votacionId) {
         const votoRep = AppDataSource.getRepository(votosSchema);
         const conteo = await votoRep
             .createQueryBuilder("voto")
+            .innerJoin("voto.opcion", "opcion")
             .select("opcion.id", "opcionId")
             .addSelect("COUNT(voto.id)", "conteo")
             .where("voto.votacion.id = :votacionId", { votacionId })
