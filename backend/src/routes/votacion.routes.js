@@ -10,11 +10,11 @@ import {
 
 const router = Router()
 
-router.post("/votacion", postVotacion);
-router.get("/votacion/:id", getVotaciones);
-router.get("/votacion/Todas", getVotacion);
-router.patch("/votacion/:id", updateVotacion);
-router.delete("/votacion/:id", deleteVotacion);
+router.post("/", postVotacion);
+router.get("/:id", getVotaciones);
+router.get("/Todas", getVotacion);
+router.patch("/:id", updateVotacion);
+router.delete("/:id", deleteVotacion); 
 
 export default router;
 
