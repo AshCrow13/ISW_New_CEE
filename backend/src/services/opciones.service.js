@@ -20,7 +20,7 @@ export async function deleteOpcion(id, votacionId) {
     try {
         const opcionesRepository = AppDataSource.getRepository(opcionesSchema);
         const opcionToDelete = await opcionesRepository.findOneBy({
-            where:{id, votacion:{id:votacionId}}
+            id, votacion:{id:votacionId}
         });
         if (!opcionToDelete) return [null, "Opción no encontrada"];
         await opcionesRepository.remove(opcionToDelete);
