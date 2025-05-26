@@ -37,3 +37,5 @@ const InstanciaSchema = new EntitySchema({
         },
     },
 });
+
+export default InstanciaSchema;
