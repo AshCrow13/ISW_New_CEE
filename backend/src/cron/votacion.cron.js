@@ -1,10 +1,10 @@
 "use strict"
 import cron from "node-cron";
-import { AppDataSource } from "../config/configDb";
-import votacionSchema from "../models/votacion.model.js";
+import { AppDataSource } from "../config/configDb.js";
+import votacionSchema from "../entity/votacion.entity.js";
 
 // Tarea programada para cerrar votaciones automáticamente
-cron.schedule("* * * * *"), async () => {
+cron.schedule("* * * * *", async () => {
     try {
         const votacionRepository = AppDataSource.getRepository(votacionSchema);
         const ahora = new Date();
@@ -23,4 +23,5 @@ cron.schedule("* * * * *"), async () => {
         }
     } catch (error) {
         console.error("Error al ejecutar la tarea programada:", error);
-    }}
+    }
+});
