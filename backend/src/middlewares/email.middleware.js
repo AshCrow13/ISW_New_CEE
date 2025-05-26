@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -18,7 +18,7 @@ transporter.verify((error) => {
     }
 });
 
-async function NotificarAsamblea(destinatario, tematicas) {
+export async function NotificarAsamblea(destinatario, tematicas) {
     const mailOptions = {
         from: '"Vinculate Cee" omarcatrileo20@gmail.com', // dirección del remitente
         // to: destinatario, // dirección del destinatario, pasada en la solicitud
@@ -34,8 +34,4 @@ async function NotificarAsamblea(destinatario, tematicas) {
     } catch (error) {
         handleErrorServer( 500, error.message);
     }
-};
-
-module.exports = {
-  NotificarAsamblea
 };

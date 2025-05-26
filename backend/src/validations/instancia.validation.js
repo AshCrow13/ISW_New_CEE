@@ -1,7 +1,7 @@
 "use strict";
 import Joi from "joi";
 
-export const instanciaSchema = Joi.objet({
+export const instanciaSchema = Joi.object({
     Temas: Joi.string()
         .min(2)
         .max(300)
@@ -12,7 +12,7 @@ export const instanciaSchema = Joi.objet({
             "string.max": "El tema debe tener máximo 300 caracteres.",
             "any.required": "El tema es obligatorio."
         }),
-    Fechas: Joi.string()
+    Fecha: Joi.date()
         .iso()
         .required()
         .messages({
@@ -43,9 +43,6 @@ export const instanciaUpdateSchema = Joi.object({
 }).unknown(false);
 
 export const instanciaQuerySchema = Joi.object({
-    id: Joi.number()
-        .integer()
-        .positive(),
-    Fechas: Joi.number()
+    Fechas: Joi.date()
         .iso(),
-}).or("id","Fechas").unknown(false);
+}).or("Fechas").unknown(false);

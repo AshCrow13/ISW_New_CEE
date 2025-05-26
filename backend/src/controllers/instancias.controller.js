@@ -1,7 +1,6 @@
 "use strict";
 import {NotificarAsamblea
-
-} from "../middlewares/email.middlewares.js";
+} from "../middlewares/email.middleware.js";
 
 import {
     createInstanciaService, 

@@ -4,6 +4,7 @@ import authRoutes from "./auth.routes.js";
 import estudianteRoutes from "./estudiante.routes.js";
 import actividadRoutes from "./actividad.routes.js";
 import documentoRoutes from "./documento.routes.js";
+import instanciaRoutes from "./instancias.routes.js";
 
 const router = Router();
 
@@ -11,5 +12,5 @@ router.use("/auth", authRoutes);
 router.use("/estudiantes", estudianteRoutes);
 router.use("/actividades", actividadRoutes);
 router.use("/documentos", documentoRoutes);
-
+router.use("/asamblea", instanciaRoutes);
 export default router;
