@@ -10,7 +10,10 @@ import {
 
 export async function postVoto(req, res){
     try{
-        const usuarioId = req.usuario.id;
+        if (req.user.carrera !== "Ingeniería en Computación e Informática") {
+            return res.status(403).json({ message: "Solo estudiantes de Ingeniería en Computación e Informática pueden votar" });
+        }
+        const usuarioId = req.user.id;
         const { errorb } = votosBodyValidation.validate(req.body);
         if (errorb) return handleErrorClient(res, 400, error.message);
         const { error: errorQuery } = votosQueryValidation.validate(req.params);
@@ -32,6 +35,10 @@ export async function postVoto(req, res){
 
 export async function getVotos(req, res){
     try{
+        if (req.user.carrera !== "Ingeniería en Computación e Informática") {
+            return res.status(403).json({ message: "Solo estudiantes de Ingeniería en Computación e Informática pueden ver los votos" });
+        }
+
         const votacionId = req.params.id;
         const { errorq } = votosQueryValidation.validate({ id: votacionId });
         if (errorq) return handleErrorClient(res, 400, errorq.message);
@@ -50,6 +57,10 @@ export async function getVotos(req, res){
 
 export async function getConteo(req, res){
     try{
+        if (req.user.carrera !== "Ingeniería en Computación e Informática") {
+            return res.status(403).json({ message: "Solo estudiantes de Ingeniería en Computación e Informática pueden ver el conteo de votos" });
+        }
+
         const votacionId = req.params.id;
         const { errorq } = votosQueryValidation.validate({ id: votacionId });
         if (errorq) return handleErrorClient(res, 400, errorq.message);

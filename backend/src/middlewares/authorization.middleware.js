@@ -1,4 +1,4 @@
-import User from "../entity/user.entity.js";
+import Estudiante from "../entity/estudiante.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import {
 handleErrorClient,
@@ -7,7 +7,7 @@ handleErrorServer,
 
 export async function isAdmin(req, res, next) {
 try {
-    const userRepository = AppDataSource.getRepository(User);
+    const userRepository = AppDataSource.getRepository(Estudiante);
 
     const userFound = await userRepository.findOneBy({ email: req.user.email });
 
