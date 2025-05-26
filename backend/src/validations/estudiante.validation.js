@@ -33,12 +33,17 @@ export const estudianteSchema = Joi.object({
             "any.required": "La carrera es obligatoria."
         }),
     password: Joi.string()
-        .min(8).max(50).required()
+        .min(8)
+        .max(26)
+        .pattern(/^[a-zA-Z0-9]+$/)
+        .required()
         .messages({
-            "string.empty": "La contraseña no puede estar vacía.",
-            "string.min": "La contraseña debe tener al menos 8 caracteres.",
-            "string.max": "La contraseña debe tener máximo 50 caracteres.",
-            "any.required": "La contraseña es obligatoria."
+          "string.empty": "La contraseña no puede estar vacía.",
+          "any.required": "La contraseña es obligatorio.",
+          "string.base": "La contraseña debe ser de tipo texto.",
+          "string.min": "La contraseña debe tener al menos 8 caracteres.",
+          "string.max": "La contraseña debe tener como máximo 26 caracteres.",
+          "string.pattern.base": "La contraseña solo puede contener letras y números.",
         }),
     telefono: Joi.string()
         .pattern(/^[0-9+]{9,20}$/)
