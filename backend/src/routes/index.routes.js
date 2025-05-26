@@ -10,9 +10,11 @@ import votacionRoutes from "./votacion.routes.js";
 import votosRoutes from "./votos.routes.js";
 
 import instanciaRoutes from "./instancias.routes.js";
+// import asistenciaRoutes from "./asistencia.routes.js";
 
 const router = Router();
 
+// router.use("/asistencia", asistenciaRoutes);
 router.use("/auth", authRoutes);
 router.use("/estudiantes", estudianteRoutes);
 router.use("/actividades", actividadRoutes);

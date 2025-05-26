@@ -43,6 +43,8 @@ export const instanciaUpdateSchema = Joi.object({
 }).unknown(false);
 
 export const instanciaQuerySchema = Joi.object({
-    Fechas: Joi.date()
-        .iso(),
-}).or("Fechas").unknown(false);
+  id: Joi.number().integer().positive(), // permite buscar por ID
+  Fecha: Joi.date().iso(),               // permite buscar por fecha ISO (ej: 2025-06-01)
+  Sala: Joi.string().min(2).max(100),    // permite buscar por sala
+  Temas: Joi.string().min(2).max(300),   // permite buscar por tema si lo necesitas
+}).unknown(false);
