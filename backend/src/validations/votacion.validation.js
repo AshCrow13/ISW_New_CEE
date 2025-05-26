@@ -22,16 +22,7 @@ export const votacionQueryValidation = Joi.object({
   estado: Joi.boolean()
     .messages({
       "boolean.base": "El estado debe ser un valor booleano.",
-    }),
-  opciones: Joi.array()
-    .items(
-      Joi.string().min(1).max(255)).min(2).required({
-        "string.empty": "El texto de la opción no puede estar vacío.",
-        "string.base": "El texto de la opción debe ser de tipo string.",
-        "string.min": "El texto de la opción debe tener como mínimo 2 caracteres.",
-        "string.max": "El texto de la opción debe tener como máximo 255 caracteres.",
-      }
-    )
+    })
 })
   .or("id", "nombre")
   .unknown(false)
@@ -66,4 +57,29 @@ export const votacionBodyValidation = Joi.object({
         "string.max": "El texto de la opción debe tener como máximo 255 caracteres.",
       }
     )
+});
+
+export const votacionUpdateBodyValidation = Joi.object({
+  nombre: Joi.string()
+    .min(5)
+    .max(50)
+    .messages({
+      "string.empty": "El nombre no puede estar vacío.",
+      "string.base": "El nombre debe ser de tipo string.",
+      "string.min": "El nombre debe tener como mínimo 5 caracteres.",
+      "string.max": "El nombre debe tener como máximo 50 caracteres.",
+    }).optional(),
+  estado: Joi.boolean()
+    .messages({
+      "boolean.base": "El estado debe ser un valor booleano.",
+    }).optional(),
+  opciones: Joi.array()
+    .items(
+      Joi.string().min(1).max(255)).min(2).messages({
+        "string.empty": "El texto de la opción no puede estar vacío.",
+        "string.base": "El texto de la opción debe ser de tipo string.",
+        "string.min": "El texto de la opción debe tener como mínimo 2 caracteres.",
+        "string.max": "El texto de la opción debe tener como máximo 255 caracteres.",
+      }
+    ).optional()
 });

@@ -8,7 +8,8 @@ import {
     } from "../services/votacion.service.js";
 import {
     votacionBodyValidation,
-    votacionQueryValidation
+    votacionQueryValidation,
+    votacionUpdateBodyValidation
 } from "../validations/votacion.validation.js";
 import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers/responseHandlers.js";
 
@@ -72,12 +73,13 @@ export async function getVotacion(req, res) {
       return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden buscar votaciones");
     }
 
-    const { id, nombre } = req.query;
-    const { error } = votacionQueryValidation.validate({ id, nombre });
-    
+    const id = req.params.id;
+    const { error } = votacionQueryValidation.validate({ id }); // <-- validación correcta
+
     if (error) return handleErrorClient(res, 400, error.message);
 
-    const [votacion, errorVotacion] = await getVotacionService({ id, nombre });
+
+    const [votacion, errorVotacion] = await getVotacionService({ id});
 
     if (errorVotacion) return handleErrorClient(res, 404, errorVotacion);
 
@@ -94,9 +96,7 @@ export async function getVotaciones(req, res) {
     }
 
     const [votaciones, errorVotaciones] = await getVotacionesService();
-    const { error } = votacionQueryValidation.validate(votaciones);
 
-    if (error) return handleErrorClient(res, 400, error.message);
 
     if (errorVotaciones) return handleErrorClient(res, 404, errorVotaciones);
 
@@ -121,7 +121,7 @@ export async function updateVotacion(req, res) {
     const { id } = req.params;
     const { body } = req;
 
-    const { error } = votacionBodyValidation.validate(body);
+    const { error } = votacionUpdateBodyValidation.validate(body);
 
     if (error) return handleErrorClient(res, 400, error.message);
 
