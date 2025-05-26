@@ -18,8 +18,8 @@ const EstudianteSchema = new EntitySchema({
             length: 12, 
             nullable: false, 
             unique: true },
-        email: { 
-            type: "varchar", 
+        email: {
+            type: "varchar",
             length: 255, 
             nullable: false, 
             unique: true },
