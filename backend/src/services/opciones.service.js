@@ -20,7 +20,7 @@ export async function deleteOpcion(id, votacionId) {
     try {
         const opcionesRepository = AppDataSource.getRepository(opcionesSchema);
         const opcionToDelete = await opcionesRepository.findOneBy({
-            where:{id, votacion:{id:votacionId}}
+            id, votacion:{id:votacionId}
         });
         if (!opcionToDelete) return [null, "Opción no encontrada"];
         await opcionesRepository.remove(opcionToDelete);
@@ -62,12 +62,12 @@ export async function getOpciones(votacionId) {
     }
 }
 
-export async function updateOpcion(id, votacionId, body) {
+export async function updateOpcion(votacionId, id, body) {
     try {
         const opcionesRepository = AppDataSource.getRepository(opcionesSchema);
         const opcionToUpdate = await opcionesRepository.findOneBy(
             { 
-            where: {id, votacion:{id:votacionId}}
+            id, votacion:{id:votacionId}
             }
         );
         if (!opcionToUpdate) return [null, "Opción no encontrada"];
