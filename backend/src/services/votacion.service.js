@@ -1,6 +1,6 @@
 "use strict"
 import votacionSchema from "../entity/votacion.entity.js";
-import opcionesSchema from "../entity/opcionVotacion.entity.js";
+import opcionesSchema from "../entity/opciones.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 
 export async function postVotacion(body) {

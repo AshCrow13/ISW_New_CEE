@@ -1,5 +1,5 @@
-import votosSchema from "../entity/votos.entity";
-import { AppDataSource } from "../config/configDb";
+import votosSchema from "../entity/votos.entity.js";
+import { AppDataSource } from "../config/configDb.js";
 
 export async function postVoto(usuarioId, votacionId, opcionId) {
     try {

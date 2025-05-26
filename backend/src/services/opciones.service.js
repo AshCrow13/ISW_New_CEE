@@ -1,5 +1,5 @@
 "use strict"
-import {opcionesSchema} from "../entity/opciones.entity.js";
+import  opcionesSchema  from "../entity/opciones.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 
 

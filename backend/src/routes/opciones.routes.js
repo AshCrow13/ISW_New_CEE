@@ -6,7 +6,7 @@ import {
     getOpcion,
     getOpciones,
     updateOpcion,
-} from "../controllers/opcion.controller.js"
+} from "../controllers/opciones.controller.js"
 
 const router = Router()
 
@@ -16,4 +16,4 @@ router.get("/votacion/:votacionid/:id", getOpcion);
 router.patch("/votacion/:votacionid/:id", updateOpcion);
 router.delete("/votacion/:votacionid/:id", deleteOpcion);
 
-export default router
+export default router;
