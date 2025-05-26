@@ -8,7 +8,8 @@ import{
 } from "../services/opciones.service.js";
 import {
     opcionesBodyValidation,
-    opcionesQueryValidation
+    opcionesQueryValidation,
+    opcionesVotacionIdValidation
 } from "../validations/opciones.validation.js";
 import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers/responseHandlers.js";
 
@@ -91,11 +92,12 @@ export async function getOpciones(req, res) {
             return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden ver las opciones");
         }
         const { votacionId } = req.params;
-        const { error } = opcionesQueryValidation.validate({ votacionId });
+        console.log("VotacionId", votacionId);
+        const { error } = opcionesVotacionIdValidation.validate({ votacionId });
         if (error) return handleErrorClient(res, 400, error.message);
 
 
-        const [opciones, errorOpciones] = await getOpcionesService( {votacionId: Number(votacionId)});
+        const [opciones, errorOpciones] = await getOpcionesService(Number(votacionId));
     
         if (errorOpciones) return handleErrorClient(res, 404, errorOpciones);
     

@@ -11,8 +11,8 @@ import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 
 const router = Router()
 
-router.post("/:votacionId/", authenticateJwt, postOpcion);
-router.get("/:votacionId/op", authenticateJwt, getOpciones);
+router.post("/:votacionId", authenticateJwt, postOpcion);
+router.get("/:votacionId", authenticateJwt, getOpciones);
 router.get("/:votacionId/:id", authenticateJwt, getOpcion);
 router.patch("/:votacionId/:id", authenticateJwt, updateOpcion);
 router.delete("/:votacionId/:id", authenticateJwt, deleteOpcion);
