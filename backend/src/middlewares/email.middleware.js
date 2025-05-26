@@ -18,20 +18,21 @@ transporter.verify((error) => {
     }
 });
 
-export async function NotificarAsamblea(destinatario, tematicas) {
+export async function NotificarAsamblea(destinatario,body) {
     const mailOptions = {
         from: '"Vinculate Cee" omarcatrileo20@gmail.com', // dirección del remitente
-        // to: destinatario, // dirección del destinatario, pasada en la solicitud
-        to: "prozero133@gmail.com",
+        to: destinatario, // dirección del destinatario, pasada en la solicitud
         subject: "CEE",
         text: "Tematicas de la asamblea : ",
-        html:`<b>Tematicas de la asamblea :</b> ${tematicas}`
+        html: `<b>Temás de la asamblea:</b> ${body.Temas}<br>
+        <b>Lugar:</b> ${body.Fecha} ${body.Sala}`
     };
 
     try {
-        let info = await transporter.sendMail(mailOptions);
-        handleSuccess( 201, "Email enviado correctamente", info);
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Correo enviado con exito")
     } catch (error) {
-        handleErrorServer( 500, error.message);
+        console.log("Error al enviar el mensaje ", error);
+
     }
 };

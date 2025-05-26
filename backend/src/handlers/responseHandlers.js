@@ -17,6 +17,8 @@ export function handleErrorClient(res, statusCode, message, details= {}) {
 }
 
 export function handleErrorServer(res, statusCode, message) {
+  console.log("Tipo de res:", typeof res);
+  console.log("res:", res);
   return res.status(statusCode).json({
     status: "Server error",
     message,
