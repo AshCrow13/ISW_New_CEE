@@ -1,5 +1,5 @@
 
-/*import getInstancia from "../controllers/instancias.controller.js"
+import getInstancia from "../controllers/instancias.controller.js"
 import getEstudiante from "../controllers/estudiante.controller.js"
 
 
@@ -39,16 +39,4 @@ export async function registrarAsistencia(req, res) {
   }
 }
 
-// READ (Uno)
-export async function getAsistencia(req, res, correo, idInstancia) {
-    try {
-        
-        if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
 
-        const [instancia, err] = await getInstanciaService(req.query);
-        if (err) return handleErrorClient(res, 404, err);
-        handleSuccess(res, 200, "Instancia encontrada", instancia);
-    } catch (error) {
-        handleErrorServer(res, 500, error.message);
-    }
-}*/

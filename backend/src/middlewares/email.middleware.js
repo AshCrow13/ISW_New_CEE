@@ -13,8 +13,6 @@ const transporter = nodemailer.createTransport({
 transporter.verify((error) => {
     if (error) {
         console.error('Error al verificar el transporte:', error);
-    } else {
-        console.log('Transporte listo para enviar correos');
     }
 });
 
