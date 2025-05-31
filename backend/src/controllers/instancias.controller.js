@@ -20,22 +20,21 @@ import {
     handleErrorServer,
     handleSuccess,
 } from "../handlers/responseHandlers.js";
-
+// Correos hardocdeados
 const listaEmails = ["as0etrius@gmail.com", "prozero133@gmail.com", "matias.cartes2001@alumnos.ubiobio"]
-// CREATE
+
+// Create
 export async function createInstancia(req, res) {
 
     try {
-
         const { error } = instanciaSchema.validate(req.body);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
 
         const [instancia, err] = await createInstanciaService(req.body);
         if (err) return handleErrorClient(res, 400, err);
-
         handleSuccess(res, 201, "Instancia creada correctamente", instancia);
-// const listadoestudiantes = getEstudiantes();
-    // print(listadoestudiantes);
+
+        // const listadoestudiantes = getEstudiantes();
         for (const email in listaEmails){
             NotificarAsamblea(listaEmails[email],req.body);
         }   
@@ -45,37 +44,8 @@ export async function createInstancia(req, res) {
     }
 
 }
-/*
-export async function createInstancia(req, res) {
-  try {
-    const { error } = instanciaSchema.validate(req.body);
-    if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
 
-    // Generar clave de 6 dígitos aleatoria
-    const claveAsistencia = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Inyectar campos adicionales a la data
-    const instanciaData = {
-      ...req.body,
-      claveAsistencia,
-      asistenciaAbierta: false,
-    };
-
-    const [instancia, err] = await createInstanciaService(instanciaData);
-    if (err) return handleErrorClient(res, 400, err);
-
-    // Notificación a alumnos
-    for (const email of listaEmails) {
-      NotificarAsamblea(listaEmails[email],req.body);
-    }
-
-    handleSuccess(res, 201, "Instancia creada correctamente", instancia);
-  } catch (error) {
-    handleErrorServer(res, 500, error.message);
-  }
-}*/
-
-// READ (Todos - con filtro)
+// Read all
 export async function getInstancias(req, res) {
     try {
         const [instancias, err] = await getInstanciasService(req.query);
@@ -86,7 +56,7 @@ export async function getInstancias(req, res) {
     }
 }
 
-// READ (Uno)
+// Read one
 export async function getInstancia(req, res) {
     try {
         const { error } = instanciaQuerySchema.validate(req.query);
@@ -100,7 +70,7 @@ export async function getInstancia(req, res) {
     }
 }
 
-// UPDATE
+// Update
 export async function updateInstancia(req, res) {
     try {
         const { error: queryError } = instanciaQuerySchema.validate(req.query);
@@ -118,7 +88,7 @@ export async function updateInstancia(req, res) {
     }
 }
 
-// DELETE
+// Delete
 export async function deleteInstancia(req, res) {
     try {
         const { error } = instanciaQuerySchema.validate(req.query);

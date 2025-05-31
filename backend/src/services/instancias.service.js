@@ -6,7 +6,12 @@ import { AppDataSource } from "../config/configDb.js";
 export async function createInstanciaService(data) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
-        const instancia = repo.create(data);
+        const claveAleatoria = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+        const instancia = repo.create({
+            ...data,
+            ClaveAsistencia: claveAleatoria,
+            AsistenciaAbierta: false,
+        });
         await repo.save(instancia);
         return [instancia, null];
     }catch (error) {
