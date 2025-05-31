@@ -1,4 +1,4 @@
-
+/*
 import getInstancia from "../controllers/instancias.controller.js"
 import getEstudiante from "../controllers/estudiante.controller.js"
 
@@ -39,4 +39,4 @@ export async function registrarAsistencia(req, res) {
   }
 }
 
-
+*/
