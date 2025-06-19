@@ -13,40 +13,40 @@ async function createEstudiantes() {
     await Promise.all([
       estudianteRepository.save(
         estudianteRepository.create({
-          nombreCompleto: "Diego Alexis Salazar Jara",
-          rut: "21.308.770-3",
-          email: "administrador2024@gmail.cl",
-          password: await encryptPassword("admin1234"),
+          nombreCompleto: "Etrius",
+          rut: "20.101.700-9",
+          email: "matias.cartes2001@alumnos.ubiobio.cl",
+          password: await encryptPassword("Etrius"),
           rol: "administrador",
           carrera: "Ingeniería en Computación e Informática",
         }),
       ),
       estudianteRepository.save(
         estudianteRepository.create({
-          nombreCompleto: "Diego Sebastián Ampuero Belmar",
-          rut: "21.151.897-9",
-          email: "usuario1.2024@gmail.cl",
-          password: await encryptPassword("user1234"),
+          nombreCompleto: "Crow",
+          rut: "19.088.998-0",
+          email: "omar.castro2001@alumnos.ubiobio.cl",
+          password: await encryptPassword("Crow"),
           rol: "usuario",
           carrera: "Ingeniería en Computación e Informática",
         })
       ),
       estudianteRepository.save(
         estudianteRepository.create({
-          nombreCompleto: "Alexander Benjamín Marcelo Carrasco Fuentes",
-          rut: "20.630.735-8",
-          email: "usuario2.2024@gmail.cl",
-          password: await encryptPassword("user1234"),
+          nombreCompleto: "Chitopan",
+          rut: "20.943.041-0",
+          email: "Francisco.catrileo2020@alumnos.ubiobio.cl",
+          password: await encryptPassword("Chitopan"),
           rol: "usuario",
           carrera: "Ingeniería en Minas",
         }),
       ),
       estudianteRepository.save(
         estudianteRepository.create({
-          nombreCompleto: "Pablo Andrés Castillo Fernández",
-          rut: "20.738.450-K",
-          email: "usuario3.2024@gmail.cl",
-          password: await encryptPassword("user1234"),
+          nombreCompleto: "Prozero",
+          rut: "20.487.563-4",
+          email: "prozero133@gmail.com",
+          password: await encryptPassword("Prozero"),
           rol: "usuario",
           carrera: "Ingeniería en Computación e Informática",
         }),
@@ -63,10 +63,10 @@ async function createEstudiantes() {
       ),
       estudianteRepository.save(
         estudianteRepository.create({
-          nombreCompleto: "Diego Alexis Meza Ortega",
-          rut: "21.172.447-1",
-          email: "usuario5.2024@gmail.cl",
-          password: await encryptPassword("user1234"),
+          nombreCompleto: "Calibre",
+          rut: "20.101.700-0",
+          email: "as0etrius@gmail.com",
+          password: await encryptPassword("Calibre"),
           rol: "usuario",
           carrera: "Ingeniería en Computación e Informática",
         }),

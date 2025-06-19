@@ -19,7 +19,7 @@ export async function createInstanciaService(data) {
     }
 }
 
-// Get
+// Read all 
 export async function getInstanciasService(filtro = {}) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
@@ -33,7 +33,7 @@ export async function getInstanciasService(filtro = {}) {
     }
 }
 
-// Get one
+// Read one
 export async function getInstanciaService(query) {
     try {
         const repo = AppDataSource.getRepository(Instancia);

@@ -1,4 +1,4 @@
-/*import { EntitySchema } from "typeorm";
+import { EntitySchema } from "typeorm";
 
 const AsistenciaSchema = new EntitySchema({
   name: "Asistencia",
@@ -30,4 +30,4 @@ const AsistenciaSchema = new EntitySchema({
   },
 });
 
-export default AsistenciaSchema;*/
+export default AsistenciaSchema;

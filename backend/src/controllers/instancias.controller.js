@@ -1,8 +1,6 @@
 "use strict";
-import {NotificarAsamblea
-} from "../middlewares/email.middleware.js";
-import { getEstudiantes    
-} from "./estudiante.controller.js";
+import {NotificarAsamblea} from "../middlewares/email.middleware.js";
+import { getEstudiantesService} from "../services/estudiante.service.js";
 import {
     createInstanciaService, 
     deleteInstanciaService, 
@@ -20,6 +18,7 @@ import {
     handleErrorServer,
     handleSuccess,
 } from "../handlers/responseHandlers.js";
+
 // Correos hardocdeados
 const listaEmails = ["as0etrius@gmail.com", "prozero133@gmail.com", "matias.cartes2001@alumnos.ubiobio"]
 
@@ -34,7 +33,7 @@ export async function createInstancia(req, res) {
         if (err) return handleErrorClient(res, 400, err);
         handleSuccess(res, 201, "Instancia creada correctamente", instancia);
 
-        // const listadoestudiantes = getEstudiantes();
+        const listaEmails = getEstudiantesService.Service();
         for (const email in listaEmails){
             NotificarAsamblea(listaEmails[email],req.body);
         }   
