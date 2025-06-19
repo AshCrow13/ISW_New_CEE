@@ -1,6 +1,7 @@
 "use strict";
 import Actividad from "../entity/actividad.entity.js";
 import { AppDataSource } from "../config/configDb.js";
+import Historial from "../entity/historial.entity.js";
 
 // CREATE
 export async function createActividadService(data) {
