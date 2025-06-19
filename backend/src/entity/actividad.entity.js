@@ -33,7 +33,7 @@ const ActividadSchema = new EntitySchema({
             length: 50,
             nullable: false,
         },
-        responsable: { // nombre del responsable de la actividad
+        responsable: { // nombre del responsable de la actividad, ** relacionar con un usuario **
             type: "varchar",
             length: 100,
             nullable: false,

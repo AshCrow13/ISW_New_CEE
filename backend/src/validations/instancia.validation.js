@@ -36,15 +36,15 @@ export const instanciaUpdateSchema = Joi.object({
     .min(2)
     .max(300),
     Fechas: Joi.date ()
-        .iso(),
+    .iso(),
     Sala: Joi.string()
     .min(2)
     .max(100),
 }).unknown(false);
 
 export const instanciaQuerySchema = Joi.object({
-  id: Joi.number().integer().positive(), // permite buscar por ID
-  Fecha: Joi.date().iso(),               // permite buscar por fecha ISO (ej: 2025-06-01)
-  Sala: Joi.string().min(2).max(100),    // permite buscar por sala
-  Temas: Joi.string().min(2).max(300),   // permite buscar por tema si lo necesitas
+  id: Joi.number().integer().positive(),
+  Fecha: Joi.date().iso(), 
+  Sala: Joi.string().min(2).max(100),
+  Temas: Joi.string().min(2).max(300),
 }).unknown(false);

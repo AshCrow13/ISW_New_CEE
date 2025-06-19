@@ -7,15 +7,19 @@ import {
     getActividades,    
     updateActividad,    
 } from "../controllers/actividad.controller.js";
+import { authenticateJwt } from "../middlewares/authentication.middleware.js";
+import { hasRoles } from "../middlewares/roles.middleware.js";
 
 const router = Router();
 
 router
-    .get("/", getActividades) // Lista todas o filtra por categoria/fecha
-    .get("/detail", getActividad) // Busca una por id, categoria o fecha
-    .post("/", createActividad) // Crea una nueva actividad
-    .patch("/detail", updateActividad) // Actualiza una actividad existente
-    .delete("/detail", deleteActividad); // Elimina una actividad
+    .get("/", authenticateJwt, getActividades) // Lista todas o filtra por categoria/fecha
+    .get("/detail", authenticateJwt, getActividad); // Busca una por id, categoria o fecha
+
+router
+    .post("/", authenticateJwt, hasRoles(["admin", "vocalia"]), createActividad) // Crea una nueva actividad
+    .patch("/detail", authenticateJwt, hasRoles(["admin", "vocalia"]), updateActividad) // Actualiza una actividad
+    .delete("/detail", authenticateJwt, hasRoles(["admin", "vocalia"]), deleteActividad); // Elimina una actividad
 
 export default router;
 

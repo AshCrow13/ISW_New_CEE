@@ -1,7 +1,20 @@
-/*import { Router } from "express";
-import { registrarAsistencia } from "../controllers/asistencia.controller.js";
+"use strict";
+import { Router } from "express";
+import {
+  createAsistencia,
+  getAsistencias,
+  getAsistencia,
+  updateAsistencia,
+  deleteAsistencia
+} from "../controllers/asistencia.controller.js";
 
 const router = Router();
-router.post("/", registrarAsistencia);
 
-export default router;*/
+router
+  .get("/", getAsistencias)
+  .get("/detail", getAsistencia)
+  .post("/", createAsistencia)
+  .patch("/detail", updateAsistencia)
+  .delete("/detail", deleteAsistencia);
+
+export default router;
