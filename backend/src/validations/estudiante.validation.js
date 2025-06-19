@@ -46,10 +46,11 @@ export const estudianteSchema = Joi.object({
             "string.pattern.base": "La contraseña solo puede contener letras y números.",
         }),
     rol: Joi.string()
-        .valid("administrador", "usuario")
-        .default("usuario")
-        .messages({
-            "any.only": "El rol debe ser 'administrador' o 'usuario'.", })
+    .valid("admin", "vocalia", "estudiante")
+    .default("estudiante")
+    .messages({
+        "any.only": "El rol debe ser 'admin', 'vocalia' o 'estudiante'."
+    }),
 }).unknown(false);
 
 // Validación para actualizar estudiante
