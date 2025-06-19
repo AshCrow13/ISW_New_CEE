@@ -6,7 +6,12 @@ import { AppDataSource } from "../config/configDb.js";
 export async function createInstanciaService(data) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
-        const instancia = repo.create(data);
+        const claveAleatoria = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+        const instancia = repo.create({
+            ...data,
+            ClaveAsistencia: claveAleatoria,
+            AsistenciaAbierta: false,
+        });
         await repo.save(instancia);
         return [instancia, null];
     }catch (error) {
@@ -14,7 +19,7 @@ export async function createInstanciaService(data) {
     }
 }
 
-// Get
+// Read all 
 export async function getInstanciasService(filtro = {}) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
@@ -28,7 +33,7 @@ export async function getInstanciasService(filtro = {}) {
     }
 }
 
-// Get one
+// Read one
 export async function getInstanciaService(query) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
@@ -58,7 +63,7 @@ export async function updateInstanciaService(query, data) {
 export async function deleteInstanciaService(query) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
-        const instancia = await repo.findOne({ where: query });
+        const instancia = await repo.findOneBy({id:query});
         if (!instancia) return [null, "instancia no encontrada"];
         await repo.remove(instancia);
         return [instancia, null];

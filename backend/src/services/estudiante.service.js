@@ -32,7 +32,7 @@ export async function getEstudiantesService() {
         const repo = AppDataSource.getRepository(Estudiante);
         const estudiantes = await repo.find({ order: { createdAt: "DESC" } });
         const result = estudiantes.map(({ password, ...rest }) => rest);
-        return [result, null];
+        return result;
     } catch (error) {
         return [null, "Error al obtener estudiantes: " + error.message];
     }
