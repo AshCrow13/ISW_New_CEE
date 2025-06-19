@@ -63,7 +63,7 @@ export async function updateInstanciaService(query, data) {
 export async function deleteInstanciaService(query) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
-        const instancia = await repo.findOne({ where: query });
+        const instancia = await repo.findOneBy({id:query});
         if (!instancia) return [null, "instancia no encontrada"];
         await repo.remove(instancia);
         return [instancia, null];
