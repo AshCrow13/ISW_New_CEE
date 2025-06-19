@@ -1,27 +1,25 @@
 import nodemailer from "nodemailer";
 
-const transporter = nodemailer.createTransport({
+const mensaje = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
-    secure: true, // true para 465, false para otros puertos
+    secure: true,
     auth: {
         user: "omarcatrileo20@gmail.com",
         pass: "smyf jxux xrou jhnq"
     }
 });
 
-transporter.verify((error) => {
+mensaje.verify((error) => {
     if (error) {
         console.error('Error al verificar el transporte:', error);
-    } else {
-        console.log('Transporte listo para enviar correos');
     }
 });
 
 export async function NotificarAsamblea(destinatario,body) {
     const mailOptions = {
         from: '"Vinculate Cee" omarcatrileo20@gmail.com', // dirección del remitente
-        to: destinatario, // dirección del destinatario, pasada en la solicitud
+        to: destinatario, // dirección del destinatario
         subject: "CEE",
         text: "Tematicas de la asamblea : ",
         html: `<b>Temás de la asamblea:</b> ${body.Temas}<br>
@@ -29,7 +27,7 @@ export async function NotificarAsamblea(destinatario,body) {
     };
 
     try {
-        const info = await transporter.sendMail(mailOptions);
+        const info = await mensaje.sendMail(mailOptions);
         console.log("Correo enviado con exito")
     } catch (error) {
         console.log("Error al enviar el mensaje ", error);
