@@ -22,10 +22,10 @@ const EstudianteSchema = new EntitySchema({
             type: "varchar",
             length: 255, 
             nullable: false, 
-            unique: true },
+            unique: true },        
         rol:{
             type: "varchar", 
-            length: 50, 
+            length: 20, 
             nullable: false, 
             default: "estudiante"
         },

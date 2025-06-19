@@ -13,6 +13,7 @@ async function createEstudiantes() {
     await Promise.all([
       estudianteRepository.save(
         estudianteRepository.create({
+
           nombreCompleto: "Etrius",
           rut: "20.101.700-9",
           email: "matias.cartes2001@alumnos.ubiobio.cl",
@@ -23,6 +24,7 @@ async function createEstudiantes() {
       ),
       estudianteRepository.save(
         estudianteRepository.create({
+
           nombreCompleto: "Crow",
           rut: "19.088.998-0",
           email: "omar.castro2001@alumnos.ubiobio.cl",
@@ -33,6 +35,7 @@ async function createEstudiantes() {
       ),
       estudianteRepository.save(
         estudianteRepository.create({
+
           nombreCompleto: "Chitopan",
           rut: "20.943.041-0",
           email: "Francisco.catrileo2020@alumnos.ubiobio.cl",
@@ -43,6 +46,7 @@ async function createEstudiantes() {
       ),
       estudianteRepository.save(
         estudianteRepository.create({
+
           nombreCompleto: "Prozero",
           rut: "20.487.563-4",
           email: "prozero133@gmail.com",
@@ -63,6 +67,7 @@ async function createEstudiantes() {
       ),
       estudianteRepository.save(
         estudianteRepository.create({
+
           nombreCompleto: "Calibre",
           rut: "20.101.700-0",
           email: "as0etrius@gmail.com",
