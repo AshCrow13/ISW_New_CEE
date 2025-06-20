@@ -10,7 +10,7 @@ import {
 } from "../controllers/documento.controller.js";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 import { hasRoles } from "../middlewares/roles.middleware.js";
-import { upload } from "../middlewares/upload.middleware.js";
+import upload from "../middlewares/upload.middleware.js";
 
 const router = Router();
 
