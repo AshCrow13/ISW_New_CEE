@@ -1,13 +1,24 @@
 "use strict";
 import Documento from "../entity/documento.entity.js";
 import { AppDataSource } from "../config/configDb.js";
+import Historial from "../entity/historial.entity.js";
 
 // CREATE
-export async function createDocumentoService(data) {
+export async function createDocumentoService(data, usuario) {
     try {
         const repo = AppDataSource.getRepository(Documento);
         const documento = repo.create(data);
         await repo.save(documento);
+
+        // Registrar en historial
+        const historialRepo = AppDataSource.getRepository(Historial);
+        await historialRepo.save({
+            usuario: usuario?.email || "Sistema",
+            accion: "crear",
+            tipo: "documento",
+            referenciaId: documento.id
+        });
+
         return [documento, null];
     } catch (error) {
         return [null, "Error al crear documento: " + error.message];
@@ -25,7 +36,7 @@ export async function getDocumentosService(filtro = {}) {
         return [documentos, null];
     } catch (error) {
         return [null, "Error al obtener documentos: " + error.message];
-    }  
+    }
 }
 
 // READ (Uno)
@@ -41,13 +52,23 @@ export async function getDocumentoService(query) {
 }
 
 // UPDATE
-export async function updateDocumentoService(query, data) {
+export async function updateDocumentoService(query, data, usuario) {
     try {
         const repo = AppDataSource.getRepository(Documento);
         const documento = await repo.findOne({ where: query });
         if (!documento) return [null, "Documento no encontrado"];
         Object.assign(documento, data);
         await repo.save(documento);
+
+        // Registrar en historial
+        const historialRepo = AppDataSource.getRepository(Historial);
+        await historialRepo.save({
+            usuario: usuario?.email || "Sistema",
+            accion: "editar",
+            tipo: "documento",
+            referenciaId: documento.id
+        });
+
         return [documento, null];
     } catch (error) {
         return [null, "Error al actualizar documento: " + error.message];
@@ -55,12 +76,22 @@ export async function updateDocumentoService(query, data) {
 }
 
 // DELETE
-export async function deleteDocumentoService(query) {
+export async function deleteDocumentoService(query, usuario) {
     try {
         const repo = AppDataSource.getRepository(Documento);
         const documento = await repo.findOne({ where: query });
         if (!documento) return [null, "Documento no encontrado"];
         await repo.remove(documento);
+
+        // Registrar en historial
+        const historialRepo = AppDataSource.getRepository(Historial);
+        await historialRepo.save({
+            usuario: usuario?.email || "Sistema",
+            accion: "eliminar",
+            tipo: "documento",
+            referenciaId: documento.id
+        });
+
         return [documento, null];
     } catch (error) {
         return [null, "Error al eliminar documento: " + error.message];
