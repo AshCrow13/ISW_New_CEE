@@ -15,16 +15,6 @@ import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers
 
 export async function postVotacion(req, res) {
     try {
-        if (!req.user) {
-          return handleErrorClient(res, 401, "Debes estar autenticado para crear una votación");
-        }
-        if (req.user.rol !== "administrador") {
-          return handleErrorClient(res, 403, "No tienes permisos para crear una votación");
-        }
-        //Nos aseguramos que solo creen estudiantes de "Ingeniería en Computación e Informática"
-        if (req.user.carrera !== "Ingeniería en Computación e Informática") {
-            return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden crear votaciones");
-        }
         const { nombre, duracion, opciones, estado} = req.body;
         const { errorb } = votacionBodyValidation.validate({ nombre, duracion, opciones, estado });
         if (errorb) return handleErrorClient(res, 400, error.message);
@@ -52,14 +42,6 @@ export async function postVotacion(req, res) {
 
 export async function deleteVotacion(req, res) {
     try {
-        //Verificamos que lo elimine solamente un admin
-        if (!req.user || req.user.rol !== "administrador") {
-        return handleErrorClient(res, 403, "No tienes permisos para eliminar una votación");
-        }
-        //Verificamos que solo elimine estudiantes de "Ingeniería en Computación e Informática"
-        if (req.user.carrera !== "Ingeniería en Computación e Informática") {
-        return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden eliminar votaciones");
-        }
         const { id } = req.params;
         const { error } = votacionQueryValidation.validate({ id });
 
@@ -100,12 +82,7 @@ export async function getVotacion(req, res) {
 
 export async function getVotaciones(req, res) {
   try {
-    if (req.user.carrera !== "Ingeniería en Computación e Informática") {
-      return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden buscar votaciones");
-    }
-
     const [votaciones, errorVotaciones] = await getVotacionesService();
-
 
     if (errorVotaciones) return handleErrorClient(res, 404, errorVotaciones);
 
@@ -119,14 +96,6 @@ export async function getVotaciones(req, res) {
 
 export async function updateVotacion(req, res) {
   try {
-    //Solo lo puede modificar un admin
-    if (!req.user || req.user.rol !== "administrador") {
-      return handleErrorClient(res, 403, "No tienes permisos para modificar una votación");
-    }
-    if (req.user.carrera !== "Ingeniería en Computación e Informática") {
-      return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden modificar votaciones");
-    }
-
     const { id } = req.params;
     const { body } = req;
 
