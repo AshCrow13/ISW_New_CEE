@@ -1,37 +1,47 @@
-
-/*import cron from "node-cron";
+/*
+import cron from "node-cron";
 import { AppDataSource } from "../config/configDb.js";
 import Actividad from "../entity/actividad.entity.js";
-import Estudiante from "../entity/estudiante.entity.js";
 import { enviarCorreoEstudiantes } from "../helpers/email.helper.js";
+import Estudiante from "../entity/estudiante.entity.js";
 
-// Todos los días a las 08:00 AM revisa actividades de las próximas 24h
+// Programar tarea diaria
 cron.schedule("0 8 * * *", async () => {
     try {
         const repo = AppDataSource.getRepository(Actividad);
+        const ahora = new Date();
+        const manana = new Date();
+        manana.setDate(ahora.getDate() + 1);
+
+        // Buscar actividades entre ahora y mañana
+        const actividades = await repo.createQueryBuilder("actividad")
+            .where("actividad.fecha >= :hoy AND actividad.fecha < :manana", {
+                hoy: ahora.toISOString().slice(0, 10), // "YYYY-MM-DD"
+                manana: manana.toISOString().slice(0, 10)
+            })
+            .getMany();
+
+        if (actividades.length === 0) return;
+
+        // Aquí se obtiene la lista de estudiantes y para enviar el correo
         const estudiantes = await AppDataSource.getRepository(Estudiante).find();
         const emails = estudiantes.map(e => e.email);
 
-        // Calcula la fecha actual y la de +24h
-        const now = new Date();
-        const in24h = new Date(now.getTime() + 24*60*60*1000);
-        const actividades = await repo.find({
-            where: {
-                fecha: Between(now, in24h),
-                estado: "publicada"
-            }
-        });
-        if (actividades.length > 0) {
-            for (const act of actividades) {
-                await enviarCorreoEstudiantes(
-                    `Recordatorio: Actividad ${act.titulo}`,
-                    `La actividad "${act.titulo}" se realizará el ${act.fecha} en ${act.lugar}.`,
-                    emails
-                );
-            }
+        for (const act of actividades) {
+            await enviarCorreoEstudiantes(
+                `Recordatorio: Actividad "${act.titulo}" es pronto`,
+                `
+                <p>Recuerda que la actividad <b>${act.titulo}</b> será el <b>${act.fecha}</b> en <b>${act.lugar}</b>.</p>
+                <p>No faltes.</p>
+                `,
+                emails
+            );
         }
-    } catch (e) {
-        console.log("Error en recordatorio automático:", e.message);
+
+        
+        console.log(`[CRON] ${actividades.length} actividades notificadas para las próximas 24 horas`);
+    } catch (err) {
+        console.error("[CRON] Error en recordatorio de eventos:", err.message);
     }
 });
 */
