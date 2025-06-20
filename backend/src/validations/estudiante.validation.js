@@ -6,7 +6,9 @@ const rutRegex = /^(?:(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}|[1-9]\d{6}|[1-2]\d{7
 
 export const estudianteSchema = Joi.object({
     nombreCompleto: Joi.string()
-        .min(8).max(100).required()
+        .min(8)
+        .max(100)
+        .required()
         .messages({
             "string.empty": "El nombre completo no puede estar vacío.",
             "string.min": "El nombre debe tener al menos 8 caracteres.",
@@ -14,14 +16,23 @@ export const estudianteSchema = Joi.object({
             "any.required": "El nombre es obligatorio."
         }),
     rut: Joi.string()
-        .min(9).max(12).required().pattern(rutRegex)
+        .min(9)
+        .max(12)
+        .required()
+        .pattern(rutRegex)
         .messages({
             "string.empty": "El RUT no puede estar vacío.",
             "string.pattern.base": "Formato de RUT no válido.",
             "any.required": "El RUT es obligatorio."
         }),
-    email: Joi.string().email().min(10).max(255).required()
+    email: Joi.string()
+        .min(10)
+        .max(255)
+        .email({ tlds: { allow: false } })
+        .pattern(/@(alumnos\.)?ubiobio\.cl$/)
+        .required()
         .messages({
+            "string.pattern.base": "Solo se aceptan correos institucionales @ubiobio.cl o @alumnos.ubiobio.cl",
             "string.email": "El email debe ser válido.",
             "string.empty": "El email no puede estar vacío.",
             "any.required": "El email es obligatorio."
