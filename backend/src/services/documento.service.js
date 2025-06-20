@@ -44,21 +44,33 @@ export async function getDocumentosService(filtro = {}) {
             where.fechaSubida = LessThanOrEqual(filtro.fechaFin);
         }
 
-        // Búsqueda por texto en título o descripción
-        let documentos;
+        // Búsqueda textual
+        // Usar createQueryBuilder para mayor flexibilidad
+        let queryBuilder = repo.createQueryBuilder("documento").where(where);
+
         if (filtro.q) {
-            documentos = await repo
-                .createQueryBuilder("documento")
-                .where(where)
-                .andWhere(
-                    "(documento.titulo ILIKE :q OR documento.descripcion ILIKE :q)",
-                    { q: `%${filtro.q}%` }
-                )
-                .orderBy("documento.fechaSubida", "DESC")
-                .getMany();
-        } else {
-            documentos = await repo.find({ where, order: { fechaSubida: "DESC" } });
+            queryBuilder = queryBuilder.andWhere(
+                "(documento.titulo ILIKE :q OR documento.descripcion ILIKE :q)",
+                { q: `%${filtro.q}%` }
+            );
         }
+        
+        //Ordenamiento flexible
+        // Por defecto ordena por fecha de subida descendente
+        let order = { fechaSubida: "DESC" };
+        if (filtro.orderBy) {
+            const [campo, dir] = filtro.orderBy.split("_");
+            order = { [campo]: dir.toUpperCase() === "DESC" ? "DESC" : "ASC" };
+        }
+        queryBuilder = queryBuilder.orderBy(order);
+        
+        // Paginación
+        // Si no se especifica, por defecto toma 20 documentos y empieza desde el 0
+        const limit = filtro.limit ? parseInt(filtro.limit) : 20;
+        const offset = filtro.offset ? parseInt(filtro.offset) : 0;
+        queryBuilder = queryBuilder.skip(offset).take(limit);
+
+        const documentos = await queryBuilder.getMany();
         return [documentos, null];
     } catch (error) {
         return [null, "Error al obtener documentos: " + error.message];
