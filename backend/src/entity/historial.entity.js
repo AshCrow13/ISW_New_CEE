@@ -16,14 +16,14 @@ const HistorialSchema = new EntitySchema({
         accion: { 
             type: "varchar", 
             length: 50, 
-            nullable: false },   // crear, editar, eliminar
+            nullable: false }, // crear, editar, eliminar
         tipo: { 
             type: "varchar", 
             length: 30, 
-            nullable: false },     // actividad, documento, etc
+            nullable: false }, // actividad, documento, etc
         referenciaId: { 
             type: "int", 
-            nullable: true },              // ID del recurso modificado
+            nullable: true }, // id del recurso modificado
         fecha: { 
             type: "timestamp with time zone",
             default: () => "CURRENT_TIMESTAMP", 

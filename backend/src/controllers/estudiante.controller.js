@@ -6,7 +6,10 @@ import {
     getEstudiantesService,
     updateEstudianteService,
 } from "../services/estudiante.service.js";
-import { estudianteQuerySchema, estudianteSchema  } from "../validations/estudiante.validation.js";
+import { 
+    estudianteQuerySchema, 
+    estudianteSchema  
+} from "../validations/estudiante.validation.js";
 import {
     handleErrorClient,
     handleErrorServer,

@@ -22,7 +22,7 @@ async function setupServer() {
     app.use(
       cors({
         credentials: true,
-        origin: true, // Cambiar a la URL de tu frontend en producción***
+        origin: true, //* Cambiar a la URL de tu frontend en producción***
       }),
     );
 
