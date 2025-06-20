@@ -1,5 +1,5 @@
 "use strict"
-import feedbackSchema from "../entity/vfeedback.entity"
+import feedbackSchema from "../entity/vfeedback.entity.js"
 import { AppDataSource } from "../config/configDb.js";
 
 export async function postFeedback(body) {
@@ -17,7 +17,7 @@ export async function postFeedback(body) {
     }
 }
 
-export async function getFeeback(body) {
+export async function getFeedback(body) {
     try {
         const feedbackRepository = AppDataSource.getRepository(feedbackSchema);
         const { id, usuarioId } = body;
