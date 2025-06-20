@@ -1,5 +1,5 @@
-/*
-import cron from "node-cron";
+
+/*import cron from "node-cron";
 import { AppDataSource } from "../config/configDb.js";
 import Actividad from "../entity/actividad.entity.js";
 import Estudiante from "../entity/estudiante.entity.js";
