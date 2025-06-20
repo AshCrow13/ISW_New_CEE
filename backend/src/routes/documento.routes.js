@@ -3,10 +3,10 @@ import { Router } from "express";
 import {
   createDocumento, 
   deleteDocumento, 
+  downloadDocumento,
   getDocumento,
   getDocumentos,    
-  updateDocumento,
-  downloadDocumento,
+  updateDocumento
 } from "../controllers/documento.controller.js";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 import { hasRoles } from "../middlewares/roles.middleware.js";

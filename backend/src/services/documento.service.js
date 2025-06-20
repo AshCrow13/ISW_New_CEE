@@ -2,6 +2,7 @@
 import Documento from "../entity/documento.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import Historial from "../entity/historial.entity.js";
+import { Between, LessThanOrEqual, Like, MoreThanOrEqual,  } from "typeorm";
 
 // CREATE
 export async function createDocumentoService(data, usuario) {
@@ -30,9 +31,34 @@ export async function getDocumentosService(filtro = {}) {
     try {
         const repo = AppDataSource.getRepository(Documento);
         const where = {};
+
+        // Filtro por tipo
         if (filtro.tipo) where.tipo = filtro.tipo;
-        if (filtro.id_actividad) where.id_actividad = filtro.id_actividad;
-        const documentos = await repo.find({ where, order: { fechaSubida: "DESC" } });
+
+        // Filtro por rango de fechas de subida
+        if (filtro.fechaInicio && filtro.fechaFin) {
+            where.fechaSubida = Between(filtro.fechaInicio, filtro.fechaFin);
+        } else if (filtro.fechaInicio) {
+            where.fechaSubida = MoreThanOrEqual(filtro.fechaInicio);
+        } else if (filtro.fechaFin) {
+            where.fechaSubida = LessThanOrEqual(filtro.fechaFin);
+        }
+
+        // Búsqueda por texto en título o descripción
+        let documentos;
+        if (filtro.q) {
+            documentos = await repo
+                .createQueryBuilder("documento")
+                .where(where)
+                .andWhere(
+                    "(documento.titulo ILIKE :q OR documento.descripcion ILIKE :q)",
+                    { q: `%${filtro.q}%` }
+                )
+                .orderBy("documento.fechaSubida", "DESC")
+                .getMany();
+        } else {
+            documentos = await repo.find({ where, order: { fechaSubida: "DESC" } });
+        }
         return [documentos, null];
     } catch (error) {
         return [null, "Error al obtener documentos: " + error.message];

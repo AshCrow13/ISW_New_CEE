@@ -2,6 +2,7 @@
 import Actividad from "../entity/actividad.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import Historial from "../entity/historial.entity.js";
+import { Between, LessThanOrEqual, Like, MoreThanOrEqual,  } from "typeorm";
 
 // CREATE
 export async function createActividadService(data, usuario) {
@@ -30,9 +31,34 @@ export async function getActividadesService(filtro = {}) {
     try {
         const repo = AppDataSource.getRepository(Actividad);
         const where = {};
+
+        // Filtro por categoría
         if (filtro.categoria) where.categoria = filtro.categoria;
-        if (filtro.fecha) where.fecha = filtro.fecha;
-        const actividades = await repo.find({ where, order: { fecha: "ASC" } });
+
+        // Filtro por rango de fechas
+        if (filtro.fechaInicio && filtro.fechaFin) {
+            where.fecha = Between(filtro.fechaInicio, filtro.fechaFin);
+        } else if (filtro.fechaInicio) {
+            where.fecha = MoreThanOrEqual(filtro.fechaInicio);
+        } else if (filtro.fechaFin) {
+            where.fecha = LessThanOrEqual(filtro.fechaFin);
+        }
+
+        // Búsqueda por texto en título o descripción
+        let actividades;
+        if (filtro.q) {
+            actividades = await repo
+                .createQueryBuilder("actividad")
+                .where(where)
+                .andWhere(
+                    "(actividad.titulo ILIKE :q OR actividad.descripcion ILIKE :q)",
+                    { q: `%${filtro.q}%` }
+                )
+                .orderBy("actividad.fecha", "DESC")
+                .getMany();
+        } else {
+            actividades = await repo.find({ where, order: { fecha: "DESC" } });
+        }
         return [actividades, null];
     } catch (error) {
         return [null, "Error al obtener actividades: " + error.message];
