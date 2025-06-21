@@ -11,9 +11,6 @@ import { handleErrorClient, handleSuccess } from "../handlers/responseHandlers.j
   
 export async function postVoto(req, res){
     try{
-        if (req.user.carrera !== "Ingeniería en Computación e Informática") {
-            return res.status(403).json({ message: "Solo estudiantes de Ingeniería en Computación e Informática pueden votar" });
-        }
         const usuarioId = req.user.id;
         const { errorb } = votosBodyValidation.validate(req.body);
         if (errorb) return handleErrorClient(res, 400, "Error en el cuerpo de la solicitud: " + errorb.message);
@@ -38,10 +35,6 @@ export async function postVoto(req, res){
 
 export async function getVotos(req, res){
     try{
-        if (req.user.carrera !== "Ingeniería en Computación e Informática") {
-            return res.status(403).json({ message: "Solo estudiantes de Ingeniería en Computación e Informática pueden ver los votos" });
-        }
-
         const votacionId = req.params.votacionId;
         console.log("Votacion ID:", votacionId);
         const { errorq } = votosQueryValidation.validate({ id: votacionId });
@@ -61,10 +54,6 @@ export async function getVotos(req, res){
  
 export async function getConteo(req, res){
     try{
-        if (req.user.carrera !== "Ingeniería en Computación e Informática") {
-            return res.status(403).json({ message: "Solo estudiantes de Ingeniería en Computación e Informática pueden ver el conteo de votos" });
-        }
-
         const votacionId = req.params.votacionId;
         const { errorq } = votosQueryValidation.validate({ id: votacionId });
         if (errorq) return handleErrorClient(res, 400, errorq.message);

@@ -129,7 +129,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# Optional eslint cache
 package-lock.json
-package.json
 
+# Optional npm cache directory
 src/uploads

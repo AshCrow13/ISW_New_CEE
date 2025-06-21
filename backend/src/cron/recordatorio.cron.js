@@ -1,4 +1,4 @@
-/*
+
 import cron from "node-cron";
 import { AppDataSource } from "../config/configDb.js";
 import Actividad from "../entity/actividad.entity.js";
@@ -44,4 +44,3 @@ cron.schedule("0 8 * * *", async () => {
         console.error("[CRON] Error en recordatorio de eventos:", err.message);
     }
 });
-*/

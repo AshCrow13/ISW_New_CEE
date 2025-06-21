@@ -7,6 +7,7 @@ import { Between, LessThanOrEqual, Like, MoreThanOrEqual,  } from "typeorm";
 // CREATE
 export async function createDocumentoService(data, usuario) {
     try {
+        // Validar que el cuerpo de la solicitud cumpla con el esquema
         const repo = AppDataSource.getRepository(Documento);
         const documento = repo.create(data);
         await repo.save(documento);
@@ -92,10 +93,11 @@ export async function getDocumentoService(query) {
 // UPDATE
 export async function updateDocumentoService(query, data, usuario) {
     try {
+        // Validar que la consulta y el cuerpo de la solicitud cumplan con los esquemas
         const repo = AppDataSource.getRepository(Documento);
         const documento = await repo.findOne({ where: query });
         if (!documento) return [null, "Documento no encontrado"];
-        Object.assign(documento, data);
+        Object.assign(documento, data); // Actualizar solo los campos de texto
         await repo.save(documento);
 
         // Registrar en historial
@@ -116,9 +118,10 @@ export async function updateDocumentoService(query, data, usuario) {
 // DELETE
 export async function deleteDocumentoService(query, usuario) {
     try {
+        // Validar que la consulta cumpla con el esquema
         const repo = AppDataSource.getRepository(Documento);
         const documento = await repo.findOne({ where: query });
-        if (!documento) return [null, "Documento no encontrado"];
+        if (!documento) return [null, "Documento no encontrado"]; // Si no se encuentra el documento, retornar error
         await repo.remove(documento);
 
         // Registrar en historial
