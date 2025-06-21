@@ -7,6 +7,7 @@ import { Between, LessThanOrEqual, Like, MoreThanOrEqual,  } from "typeorm";
 // CREATE
 export async function createActividadService(data, usuario) {
     try {
+        // Validar que el cuerpo de la solicitud cumpla con el esquema
         const repo = AppDataSource.getRepository(Actividad);
         const actividad = repo.create(data);
         await repo.save(actividad);
@@ -29,6 +30,7 @@ export async function createActividadService(data, usuario) {
 // READ (Todos - con filtro)
 export async function getActividadesService(filtro = {}) {
     try {
+        // Validar que el filtro cumpla con el esquema
         const repo = AppDataSource.getRepository(Actividad);
         const where = {};
 
@@ -70,6 +72,7 @@ export async function getActividadesService(filtro = {}) {
         const offset = filtro.offset ? parseInt(filtro.offset) : 0; 
         queryBuilder = queryBuilder.skip(offset).take(limit);
 
+        // Ejecutar la consulta
         const actividades = await queryBuilder.getMany();
         return [actividades, null];
     } catch (error) {
@@ -92,10 +95,11 @@ export async function getActividadService(query) {
 // UPDATE
 export async function updateActividadService(query, data, usuario) {
     try {
+        // Validar que la consulta y el cuerpo de la solicitud cumplan con los esquemas
         const repo = AppDataSource.getRepository(Actividad);
         const actividad = await repo.findOne({ where: query });
         if (!actividad) return [null, "Actividad no encontrada"];
-        Object.assign(actividad, data, { updatedAt: new Date() });
+        Object.assign(actividad, data, { updatedAt: new Date() }); // Actualizar solo los campos permitidos
         await repo.save(actividad);
 
         // Registrar en historial
@@ -116,6 +120,7 @@ export async function updateActividadService(query, data, usuario) {
 // DELETE
 export async function deleteActividadService(query, usuario) {
     try {
+        // Validar que la consulta cumpla con el esquema
         const repo = AppDataSource.getRepository(Actividad);
         const actividad = await repo.findOne({ where: query });
         if (!actividad) return [null, "Actividad no encontrada"];

@@ -36,7 +36,18 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <Register/>
+  },
+  /*
+  {
+    path: '/actividades',
+    element: (
+      <ProtectedRoute allowedRoles={['admin', 'vocalia']}>
+        <Actividades />
+      </ProtectedRoute>
+    ),
   }
+  */
+
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
