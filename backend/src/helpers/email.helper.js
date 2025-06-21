@@ -1,4 +1,4 @@
-/*
+
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
@@ -28,4 +28,4 @@ export async function enviarCorreoEstudiantes(asunto, mensajeHtml, destinatarios
         throw error;
     }
 }
-*/
+
