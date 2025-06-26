@@ -53,6 +53,7 @@ export async function createDocumento(req, res) {
 // READ ALL
 export async function getDocumentos(req, res) {
     try {
+        // Validar que la consulta cumpla con el esquema
         const [documentos, err] = await getDocumentosService(req.query);
         if (err) return handleErrorClient(res, 404, err);
         handleSuccess(res, 200, "Documentos encontrados", documentos);
@@ -64,9 +65,11 @@ export async function getDocumentos(req, res) {
 // READ ONE
 export async function getDocumento(req, res) {
     try {
+        // Validar que la consulta cumpla con el esquema
         const { error } = documentoQuerySchema.validate(req.query);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
 
+        // Llamar al servicio para obtener el documento
         const [documento, err] = await getDocumentoService(req.query);
         if (err) return handleErrorClient(res, 404, err);
         handleSuccess(res, 200, "Documento encontrado", documento);
@@ -111,7 +114,7 @@ export async function deleteDocumento(req, res) {
         // borrar el archivo físico del servidor
         if (documento && documento.urlArchivo) {
             const filename = documento.urlArchivo.split("/").pop();
-            const filePath = path.join(process.cwd(), "uploads", filename);
+            const filePath = path.join(process.cwd(), "uploads", filename); // "uploads/filename.ext"
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
             }
