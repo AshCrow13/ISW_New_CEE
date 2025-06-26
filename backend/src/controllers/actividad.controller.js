@@ -54,6 +54,7 @@ export async function createActividad(req, res) {
 // READ (Todos - con filtro)
 export async function getActividades(req, res) {
     try {
+        // Validar que la consulta cumpla con el esquema
         const [actividades, err] = await getActividadesService(req.query);
         if (err) return handleErrorClient(res, 404, err);
         handleSuccess(res, 200, "Actividades encontradas", actividades);
@@ -65,9 +66,11 @@ export async function getActividades(req, res) {
 // READ (Uno)
 export async function getActividad(req, res) {
     try {
+        // Validar que la consulta cumpla con el esquema
         const { error } = actividadQuerySchema.validate(req.query);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
 
+        // Llamar al servicio para obtener la actividad
         const [actividad, err] = await getActividadService(req.query);
         if (err) return handleErrorClient(res, 404, err);
         handleSuccess(res, 200, "Actividad encontrada", actividad);
