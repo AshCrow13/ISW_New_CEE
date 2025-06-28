@@ -25,8 +25,9 @@ export const instanciaSchema = Joi.object({
 
 export const instanciaUpdateSchema = Joi.object({
     Temas: Joi.string().min(2).max(300),
-    Fechas: Joi.date ().iso(),
+    Fecha: Joi.date().iso(),
     Sala: Joi.string().min(2).max(100),
+    AsistenciaAbierta: Joi.boolean(),
 }).unknown(false);
 
 export const instanciaQuerySchema = Joi.object({

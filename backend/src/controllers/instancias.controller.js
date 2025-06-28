@@ -71,17 +71,27 @@ export async function getInstancia(req, res) {
 // Update
 export async function updateInstancia(req, res) {
     try {
+        console.log("Query recibida:", req.query);
+        console.log("Body recibido:", req.body);
+        
         const { error: queryError } = instanciaQuerySchema.validate(req.query);
-        if (queryError) return handleErrorClient(res, 400, "Error en la consulta", queryError.message);
+        if (queryError) {
+            console.log("Error en query:", queryError.message);
+            return handleErrorClient(res, 400, "Error en la consulta", queryError.message);
+        }
 
         const { error: bodyError } = instanciaUpdateSchema.validate(req.body);
-        if (bodyError) return handleErrorClient(res, 400, "Error en los datos", bodyError.message);
+        if (bodyError) {
+            console.log("Error en body:", bodyError.message);
+            return handleErrorClient(res, 400, "Error en los datos", bodyError.message);
+        }
 
         const [instancia, err] = await updateInstanciaService(req.query, req.body);
         if (err) return handleErrorClient(res, 400, err);
 
         handleSuccess(res, 200, "Instancia actualizada correctamente", instancia);
     } catch (error) {
+        console.log("Error general:", error.message);
         handleErrorServer(res, 500, error.message);
     }
 }
@@ -89,11 +99,15 @@ export async function updateInstancia(req, res) {
 // Delete
 export async function deleteInstancia(req, res) {
     try {
-        const idInstancia = req.body.id;
-        if (!idInstancia){
-            return handleErrorClient(res, 404, idInstancia);
-        }
-        const [instancia, err] = await deleteInstanciaService(idInstancia);
+        // const idInstancia = req.body.id;
+        // if (!idInstancia){
+        //     return handleErrorClient(res, 404, idInstancia);
+        // }
+        // const [instancia, err] = await deleteInstanciaService(idInstancia);
+        const { error } = instanciaQuerySchema.validate(req.query);
+        if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
+
+        const [instancia, err] = await deleteInstanciaService(req.query.id);
         if (err) return handleErrorClient(res, 404, err);
 
         handleSuccess(res, 200, "Instancia eliminada correctamente", instancia);
