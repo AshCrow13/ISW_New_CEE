@@ -7,8 +7,9 @@ import { getHistorialService } from "../services/historial.service.js";
 export async function getHistorial(req, res) {
     try {
         const [historial, err] = await getHistorialService(req.query);
-        if (err) return handleErrorClient(res, 404, err);
-        handleSuccess(res, 200, "Historial encontrado", historial);
+        if (err) return handleErrorClient(res, 400, err);
+
+        handleSuccess(res, 200, "Historial obtenido correctamente", historial);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
