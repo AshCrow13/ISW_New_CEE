@@ -6,10 +6,27 @@ import { AppDataSource } from "../config/configDb.js";
 export async function createAsistenciaService(data) {
     try {
         const repo = AppDataSource.getRepository(Asistencia);
+        
+        // Verificar si ya existe una asistencia con el mismo correo e idInstancia
+        const asistenciaExistente = await repo.findOne({
+            where: {
+                correo: data.correo,
+                idInstancia: data.idInstancia
+            }
+        });
+        
+        if (asistenciaExistente) {
+            return [null, "Ya existe una asistencia registrada para este estudiante en esta instancia"];
+        }
+        
         const asistencia = repo.create(data);
-        await repo.save(asistencia);
-        return [asistencia, null];
+        const resultado = await repo.save(asistencia);
+        return [resultado, null];
     } catch (error) {
+        console.error("Error en createAsistenciaService:", error);
+        if (error.code === '23505') { // Error de clave duplicada
+            return [null, "Ya existe una asistencia registrada para este estudiante en esta instancia"];
+        }
         return [null, "Error al crear asistencia: " + error.message];
     }
 }

@@ -14,17 +14,22 @@ const AsistenciaSchema = new EntitySchema({
     },
   },
   relations: {
-    estudiantes: {
+    estudiante: {
       target: "Estudiante",
       type: "many-to-one",
-      joinColumn: { name: "correo",          
-      referencedColumnName: "email"},
+      joinColumn: { 
+        name: "correo",          
+        referencedColumnName: "email"
+      },
       onDelete: "CASCADE",
     },
-    instancias: {
+    instancia: {
       target: "Instancia",
       type: "many-to-one",
-      joinColumn: { name: "idInstancia" },
+      joinColumn: { 
+        name: "idInstancia",
+        referencedColumnName: "id"
+      },
       onDelete: "CASCADE",
     },
   },

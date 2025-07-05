@@ -12,7 +12,6 @@ import feedbackRoutes from "./vfeedback.routes.js";
 import instanciaRoutes from "./instancias.routes.js";
 import historialRoutes from "./historial.routes.js";
 
-
 const router = Router();
 
 router.use("/auth", authRoutes);

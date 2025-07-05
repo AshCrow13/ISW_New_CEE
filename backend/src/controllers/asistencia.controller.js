@@ -17,27 +17,41 @@ import {
 export async function createAsistencia(req, res) {
   try {
     const { correo, idInstancia, clave } = req.body;
+    
     // Validar existencia de estudiante
     const [estudiante, errEst] = await getEstudianteService({ email: correo });
     if (errEst) return handleErrorClient(res, 404, errEst);
+    
     // Validar existencia de instancia
     const [instancia, errInst] = await getInstanciaService({ id: idInstancia });
     if (errInst) return handleErrorClient(res, 404, errInst);
+    
     // Verificar que esté habilitada y clave coincida
-    if (!instancia.AsistenciaAbierta)
+    if (!instancia.AsistenciaAbierta) {
       return handleErrorClient(res, 403, "La asistencia no está habilitada");
-    if (instancia.ClaveAsistencia !== clave)
+    }
+    
+    if (instancia.ClaveAsistencia !== clave) {
       return handleErrorClient(res, 403, "Clave incorrecta");
-    // Verificar que no esté ya registrada
-    const [asistenciaExistente] = await getAsistenciaService({ correo, idInstancia });
-    if (asistenciaExistente)
-      return handleErrorClient(res, 409, "Ya registrado en esta instancia");
+    }
+    
     // Registrar asistencia
-    const nuevaAsistencia = { correo, idInstancia };
+    const nuevaAsistencia = { 
+      correo, 
+      idInstancia 
+    };
+    
     const [asistencia, err] = await createAsistenciaService(nuevaAsistencia);
-    if (err) return handleErrorServer(res, 500, err);
+    if (err) {
+      if (err.includes("Ya existe")) {
+        return handleErrorClient(res, 409, err);
+      }
+      return handleErrorServer(res, 500, err);
+    }
+    
     handleSuccess(res, 201, "Asistencia registrada con éxito", asistencia);
   } catch (error) {
+    console.error("Error en createAsistencia:", error);
     handleErrorServer(res, 500, error.message);
   }
 }

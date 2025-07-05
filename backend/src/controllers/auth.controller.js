@@ -9,6 +9,7 @@ import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers
 // LOGIN
 export async function loginEstudiante(req, res) {
   try {
+    
     const { error } = estudianteLoginSchema.validate(req.body);
     if (error)
       return handleErrorClient(res, 400, "Error de validación", error.message);
