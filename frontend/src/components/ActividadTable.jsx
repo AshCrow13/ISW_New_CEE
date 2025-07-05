@@ -1,10 +1,8 @@
-// Tabla con lista de actividades
-/*
-import Table from './Table';
-import Search from './Search';
+import Table from '@components/Table';
+import Search from '@components/Search';
 import { useState } from 'react';
 
-const ActivityTable = ({ activities, onEdit, onDelete }) => {
+const ActivityTable = ({ activities, onEdit, onDelete }) => { //arreglaaar
     const [filter, setFilter] = useState('');
     const columns = [
         { title: "Título", field: "titulo" },
@@ -13,7 +11,7 @@ const ActivityTable = ({ activities, onEdit, onDelete }) => {
         { title: "Lugar", field: "lugar" },
         { title: "Categoría", field: "categoria" },
         { title: "Responsable", field: "responsable" },
-        // Agregar botones para editar/eliminar según permisos del usuario
+        // Agregar botones para editar/eliminar según permisos del usuario****
     ];
 
     return (
@@ -26,10 +24,11 @@ const ActivityTable = ({ activities, onEdit, onDelete }) => {
                 dataToFilter="titulo"
                 initialSortName="fecha"
             />
-            {} // agregar en {} botones para crear una nueva actividad ****
+            {// Renderizar botones de acción si se pasan las funciones onEdit y onDelete****
+
+            } 
         </div>
     );
 };
 
 export default ActivityTable;
-*/

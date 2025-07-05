@@ -1,69 +1,94 @@
-// Página principal de actividades 
-/*
-import useActivities from '@hooks/activity/useActivities.jsx';
-import ActivityTable from '@components/ActivityTable.jsx';
-import ActivityForm from '@components/ActivityForm.jsx';
-import { useState } from 'react';
-import { createActivity, updateActivity, deleteActivity } from '@services/activity.service.js';
-import { showSuccessAlert, showErrorAlert } from '@helpers/sweetAlert.js';
+import { useState, useEffect } from 'react';
+import { getActividades, createActividad, updateActividad, deleteActividad } from '@services/actividad.service.js';
+import ActividadTable from '@components/ActividadTable';
+import ActividadForm from '@components/ActividadForm';
+import { showSuccessAlert, showErrorAlert } from '@helpers/sweetAlert';
+import { useAuth } from '@context/AuthContext';
 
-const Activities = () => {
-    const { activities, fetchActivities } = useActivities();
-    const [showForm, setShowForm] = useState(false);
-    const [editing, setEditing] = useState(null);
+const Actividades = () => {
+    const [actividades, setActividades] = useState([]);
+    const [mostrarForm, setMostrarForm] = useState(false);
+    const [formData, setFormData] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const { user } = useAuth();
 
-    const handleCreate = async (data) => {
-        const res = await createActivity(data);
-        if (res.status === "Success") {
-            showSuccessAlert("Actividad creada", "");
-            setShowForm(false);
-            fetchActivities();
-        } else {
-            showErrorAlert("Error", res.message || "No se pudo crear la actividad");
+    // Cargar actividades
+    useEffect(() => {
+        fetchActividades();
+    }, []);
+
+    const fetchActividades = async () => {
+        const res = await getActividades();
+        setActividades(res);
+    };
+
+    const handleCrear = () => {
+        setFormData(null); // Formulario vacío
+        setMostrarForm(true);
+    };
+
+    const handleEditar = (actividad) => {
+        setFormData(actividad);
+        setMostrarForm(true);
+    };
+
+    const handleEliminar = async (id) => { // Confirmación antes de eliminar
+        if (window.confirm("¿Seguro que deseas eliminar esta actividad?")) {
+        try {
+            setLoading(true);
+            await deleteActividad(id);
+            showSuccessAlert('Eliminada', 'La actividad fue eliminada');
+            fetchActividades();
+        } catch (e) {
+            showErrorAlert('Error', e.message || 'Ocurrió un error');
+        } finally {
+            setLoading(false);
+        }
         }
     };
 
-    const handleEdit = async (data) => {
-        const res = await updateActivity(editing.id, data);
-        if (res.status === "Success") {
-            showSuccessAlert("Actividad actualizada", "");
-            setShowForm(false);
-            setEditing(null);
-            fetchActivities();
+    const onSubmit = async (data) => { // Manejo del formulario
+        try {
+        setLoading(true);
+        if (formData) {
+            await updateActividad(formData.id, data);
+            showSuccessAlert('Editada', 'Actividad editada con éxito');
         } else {
-            showErrorAlert("Error", res.message || "No se pudo editar la actividad");
+            await createActividad(data);
+            showSuccessAlert('Creada', 'Actividad creada con éxito');
+        }
+        setMostrarForm(false);
+        fetchActividades();
+        } catch (e) {
+        showErrorAlert('Error', e.message || 'Ocurrió un error');
+        } finally {
+        setLoading(false);
         }
     };
 
-    const handleDelete = async (id) => {
-        const res = await deleteActivity(id);
-        if (res.status === "Success") {
-            showSuccessAlert("Actividad eliminada", "");
-            fetchActivities();
-        } else {
-            showErrorAlert("Error", res.message || "No se pudo eliminar la actividad");
-        }
-    };
-
-    return (
-        <div>
-            <h1>Actividades</h1>
-            <button onClick={() => { setShowForm(true); setEditing(null); }}>Nueva Actividad</button>
-            {showForm && (
-                <ActivityForm
-                    onSubmit={editing ? handleEdit : handleCreate}
-                    initialData={editing || {}}
-                    isEdit={!!editing}
-                />
-            )}
-            <ActivityTable
-                activities={activities}
-                onEdit={setEditing}
-                onDelete={handleDelete}
+    return ( // Renderizado del componente
+        <div className="container">
+        <h1>Gestión de Actividades</h1>
+        {(user?.rol === 'admin' || user?.rol === 'vocalia') && (
+            <button onClick={handleCrear}>Nueva actividad</button>
+        )}
+        <ActividadTable
+            actividades={actividades}
+            onEdit={handleEditar}
+            onDelete={handleEliminar}
+            userRole={user?.rol}
+        />
+        {mostrarForm && ( // Mostrar formulario si se está creando o editando
+            <ActividadForm
+            initialData={formData}
+            onSubmit={onSubmit}
+            onCancel={() => setMostrarForm(false)}
+            isEditing={!!formData}
+            loading={loading}
             />
+        )}
         </div>
     );
 };
 
-export default Activities;
-*/
+export default Actividades;

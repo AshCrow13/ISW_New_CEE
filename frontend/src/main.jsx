@@ -8,6 +8,8 @@ import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
+import Actividades from '@pages/Actividades';
+
 
 const router = createBrowserRouter([
   {
@@ -22,11 +24,19 @@ const router = createBrowserRouter([
       {
         path: '/users',
         element: (
-        <ProtectedRoute allowedRoles={['administrador']}>
+        <ProtectedRoute allowedRoles={['admin', 'vocalia']}>
           <Users />
         </ProtectedRoute>
         ),
-    }
+      },
+      {
+        path: '/actividades',
+        element: (
+          <ProtectedRoute allowedRoles={['admin', 'vocalia', 'estudiante']}>
+            <Actividades />
+          </ProtectedRoute>
+        ),
+      }
     ]
   },
   {
@@ -37,17 +47,6 @@ const router = createBrowserRouter([
     path: '/register',
     element: <Register/>
   },
-  /*
-  {
-    path: '/actividades',
-    element: (
-      <ProtectedRoute allowedRoles={['admin', 'vocalia']}>
-        <Actividades />
-      </ProtectedRoute>
-    ),
-  }
-  */
-
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(

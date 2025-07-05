@@ -84,6 +84,15 @@ const Navbar = () => {
                             Cerrar sesión
                         </NavLink>
                     </li>
+                    <li>
+                        <NavLink 
+                            to="/actividades"
+                            onClick={() => { setMenuOpen(false); addActiveClass(); }}
+                            activeClassName="active"
+                        >
+                            Actividades
+                        </NavLink>
+                        </li>
                 </ul>
             </div>
             <div className="hamburger" onClick={toggleMenu}>

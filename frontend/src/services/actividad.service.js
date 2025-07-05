@@ -1,41 +1,41 @@
-// Lógica para consumir endpoints actividades
-/*
 import axios from './root.service.js';
 
-export async function getActivities(params) {
+// Obtener todas las actividades, con filtros opcionales
+export async function getActividades(filtros = {}) {
     try {
-        // params puede ser { categoria, fechaInicio, fechaFin, q }
-        const { data } = await axios.get('/actividades', { params }); 
-        return data.data;
+        const { data } = await axios.get('/actividades', { params: filtros });
+        return data.data; // ajustar respuesta al backend*********
     } catch (error) {
         return [];
     }
 }
 
-export async function createActivity(activityData) {
+// Crear actividad
+export async function createActividad(actividad) {
     try {
-        const { data } = await axios.post('/actividades', activityData);
+        const { data } = await axios.post('/actividades', actividad);
         return data;
     } catch (error) {
-        return error.response.data;
+        throw error.response?.data || { message: 'Error desconocido' };
     }
 }
 
-export async function updateActivity(id, activityData) {
+// Editar actividad
+export async function updateActividad(id, actividad) {
     try {
-        const { data } = await axios.patch(`/actividades/detail?id=${id}`, activityData);
+        const { data } = await axios.patch(`/actividades/detail?id=${id}`, actividad);
         return data;
     } catch (error) {
-        return error.response.data;
+        throw error.response?.data || { message: 'Error desconocido' };
     }
 }
 
-export async function deleteActivity(id) {
+// Eliminar actividad
+export async function deleteActividad(id) {
     try {
         const { data } = await axios.delete(`/actividades/detail?id=${id}`);
         return data;
     } catch (error) {
-        return error.response.data;
+        throw error.response?.data || { message: 'Error desconocido' };
     }
 }
-*/
