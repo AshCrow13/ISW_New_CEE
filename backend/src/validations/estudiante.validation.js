@@ -101,7 +101,7 @@ export const estudianteLoginSchema = Joi.object({
     rut: Joi.string()
         .pattern(rutRegex),
     password: Joi.string()
-        .min(8)
+        .min(4)
         .max(50)
         .required(),
 }).or("email", "rut").unknown(false);
