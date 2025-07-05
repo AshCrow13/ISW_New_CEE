@@ -37,7 +37,7 @@ export async function getInstanciasService(filtro = {}) {
 export async function getInstanciaService(query) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
-        const instancia = await repo.findOne({ where: query });
+        const instancia = await repo.findOneBy({id:query});
         if (!instancia) return [null, "Instancia no encontrada"];
         return [instancia, null];
     } catch (error) {
@@ -46,12 +46,23 @@ export async function getInstanciaService(query) {
 }
 
 // Update
+// export async function updateInstanciaService(query) {
 export async function updateInstanciaService(query, data) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
-        const instancia = await repo.findOne({ where: query });
+        // const instancia = await repo.findOneBy({id:query});
+        // if (!instancia) return [null, "instancia no encontrada"]
+        const instancia = await repo.findOneBy({id: query.id});
         if (!instancia) return [null, "Instancia no encontrada"];
-        Object.assign(instancia, data, { updatedAt: new Date() });
+        
+        // Solo actualizar los campos que se proporcionan
+        const camposActualizados = {};
+        if (data.Temas !== undefined) camposActualizados.Temas = data.Temas;
+        if (data.Fecha !== undefined) camposActualizados.Fecha = data.Fecha;
+        if (data.Sala !== undefined) camposActualizados.Sala = data.Sala;
+        if (data.AsistenciaAbierta !== undefined) camposActualizados.AsistenciaAbierta = data.AsistenciaAbierta;
+        
+        Object.assign(instancia, camposActualizados, { updatedAt: new Date() });
         await repo.save(instancia);
         return [instancia, null];
     } catch (error) {
@@ -60,11 +71,14 @@ export async function updateInstanciaService(query, data) {
 }
 
 // Delete
-export async function deleteInstanciaService(query) {
+// export async function deleteInstanciaService(query) {
+export async function deleteInstanciaService(id) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
-        const instancia = await repo.findOneBy({id:query});
-        if (!instancia) return [null, "instancia no encontrada"];
+        // const instancia = await repo.findOneBy({id:query});
+        // if (!instancia) return [null, "instancia no encontrada"];
+        const instancia = await repo.findOneBy({id: id});
+        if (!instancia) return [null, "Instancia no encontrada"];
         await repo.remove(instancia);
         return [instancia, null];
     } catch (error) {
