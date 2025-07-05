@@ -9,6 +9,8 @@ import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
 
+import Feedback from './pages/feedback';
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -36,7 +38,11 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <Register/>
-  }
+  },
+  {
+    path: '/feedback',
+    element: <Feedback/>
+  },
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
