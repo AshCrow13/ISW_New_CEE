@@ -1,10 +1,11 @@
 import axios from './root.service.js';
 
-export async function getFeedbacks(data) {
-    try{
-        const {data} = await axios.get('/feedback', data);
-        return data.data;
+export async function getFeedbacks() {
+    try {
+        const response = await axios.get('/feedback');
+        return response.data.data;
     } catch (error) {
+        console.error('Error al obtener feedbacks:', error);
         return [];
     }
 }

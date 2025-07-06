@@ -24,11 +24,15 @@ const router = createBrowserRouter([
       {
         path: '/users',
         element: (
-        <ProtectedRoute allowedRoles={['administrador']}>
+        <ProtectedRoute allowedRoles={['admin']}>
           <Users />
         </ProtectedRoute>
         ),
-    }
+      },
+      {
+        path: '/feedback',
+        element: <Feedback/>
+      }
     ]
   },
   {
@@ -38,11 +42,7 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <Register/>
-  },
-  {
-    path: '/feedback',
-    element: <Feedback/>
-  },
+  }
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
