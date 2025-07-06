@@ -35,17 +35,46 @@ const Navbar = () => {
                             Inicio
                         </NavLink>
                     </li>
-                    {userRole === 'administrador' && (
+                    <li>
+                        <NavLink 
+                            to="/actividades"
+                            onClick={() => setMenuOpen(false)}
+                            className={({ isActive }) => isActive ? "active" : ""}
+                        >
+                            Actividades
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink 
+                            to="/documentos"
+                            onClick={() => setMenuOpen(false)}
+                            className={({ isActive }) => isActive ? "active" : ""}
+                        >
+                            Documentos
+                        </NavLink>
+                    </li>
+                    {(userRole === 'admin' || userRole === 'vocalia') && (
+                    <li>
+                        <NavLink 
+                            to="/users" 
+                            onClick={() => setMenuOpen(false)}
+                            className={({ isActive }) => isActive ? 'active' : ''}
+                        >
+                            Usuarios
+                        </NavLink>
+                    </li>
+                    )}
+                    {userRole === 'admin' && (
                         <li>
                             <NavLink 
-                                to="/users" 
+                                to="/historial" 
                                 onClick={() => setMenuOpen(false)}
                                 className={({ isActive }) => isActive ? 'active' : ''}
                             >
-                                Usuarios
+                                Historial
                             </NavLink>
                         </li>
-                    )}
+                    )}                    
                     <li>
                         <NavLink 
                             to="/auth" 
@@ -57,29 +86,7 @@ const Navbar = () => {
                         >
                             Cerrar sesión
                         </NavLink>
-                    </li>
-                    <li>
-                        <NavLink 
-                            to="/actividades"
-                            onClick={() => { 
-                                setMenuOpen(false); 
-                                addActiveClass(); }}
-                            activeClassName="active"
-                        >
-                            Actividades
-                        </NavLink>
-                        </li>
-                    <li>
-                        <NavLink 
-                            to="/documentos"
-                            onClick={() => { 
-                                setMenuOpen(false); 
-                                addActiveClass(); }}
-                            activeClassName="active"
-                        >
-                            Documentos
-                        </NavLink>
-                    </li>
+                    </li>                    
                 </ul>
             </div>
             <div className="hamburger" onClick={toggleMenu}>
