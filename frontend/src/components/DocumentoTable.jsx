@@ -5,7 +5,7 @@ const columns = [ // Definición de columnas para la tabla
     { title: "Tipo", field: "tipo" },
     { title: "Archivo", field: "archivo", formatter: row =>
         row.archivo
-            ? <a href="#" onClick={e => { e.preventDefault(); row.onDownload(row.id); }}>Descargar</a>
+            ? <button type="button" onClick={() => row.onDownload(row.id)} aria-label="Descargar archivo">Descargar</button>
             : "Sin archivo"
     },
     { title: "Acciones", field: "acciones", formatter: row =>
