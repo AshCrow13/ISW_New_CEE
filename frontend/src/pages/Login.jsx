@@ -41,15 +41,12 @@ const Login = () => {
                         minLength: 15,
                         maxLength: 100,
                         errorMessageData: errorEmail,
-<<<<<<< HEAD
                         validate: {
-                            emailDomain: (value) => value.endsWith('ubiobio.cl') || 'El correo debe terminar en @gmail.cl'
+                            emailDomain: (value) =>
+                                value.endsWith('@ubiobio.cl') ||
+                                value.endsWith('@alumnos.ubiobio.cl') ||
+                                'El correo debe ser institucional'
                         },
-=======
-                        // validate: {
-                        //     emailDomain: (value) => value.endsWith('@gmail.cl') || 'El correo debe terminar en @gmail.cl'
-                        // },
->>>>>>> 6bc29d553b25cfdc9e0c778c40e7b1ab9e544be5
                         onChange: (e) => handleInputChange('email', e.target.value),
                     },
                     {
@@ -59,11 +56,7 @@ const Login = () => {
                         fieldType: 'input',
                         type: "password",
                         required: true,
-<<<<<<< HEAD
-                        minLength: 4,
-=======
-                        // minLength: 8,
->>>>>>> 6bc29d553b25cfdc9e0c778c40e7b1ab9e544be5
+                        minLength: 8,
                         maxLength: 26,
                         pattern: /^[a-zA-Z0-9]+$/,
                         patternMessage: "Debe contener solo letras y números",

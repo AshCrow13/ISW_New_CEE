@@ -34,7 +34,7 @@ const Actividades = () => {
 
     const handleEliminar = async (id) => { // Confirmación antes de eliminar
         if (window.confirm("¿Seguro que deseas eliminar esta actividad?")) {
-        try {
+        try { // Verifica si el usuario confirma la eliminación
             setLoading(true);
             await deleteActividad(id);
             showSuccessAlert('Eliminada', 'La actividad fue eliminada');
@@ -50,10 +50,10 @@ const Actividades = () => {
     const onSubmit = async (data) => { // Manejo del formulario
         try {
         setLoading(true);
-        if (formData) {
+        if (formData) { // Si hay datos de formulario, se trata de una edición
             await updateActividad(formData.id, data);
             showSuccessAlert('Editada', 'Actividad editada con éxito');
-        } else {
+        } else { // Si no hay datos, se trata de una creación
             await createActividad(data);
             showSuccessAlert('Creada', 'Actividad creada con éxito');
         }
