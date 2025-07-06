@@ -19,27 +19,42 @@ const DetalleVotacion = ({ votacionSeleccionada, loading, user, handleEliminar }
             <h3>{votacionSeleccionada.titulo}</h3>
             
             <div className="detail-meta">
-                <p><strong>ID:</strong> {votacionSeleccionada._id}</p>
+                <p><strong>ID:</strong> {votacionSeleccionada.id}</p>
+                <p><strong>Nombre:</strong> {votacionSeleccionada.nombre}</p>
                 <p><strong>Inicio:</strong> {new Date(votacionSeleccionada.inicio).toLocaleString()}</p>
                 <p><strong>Fin:</strong> {new Date(votacionSeleccionada.fin).toLocaleString()}</p>
-                <p><strong>Estado:</strong> {votacionSeleccionada.estado}</p>
+                <p><strong>Duración:</strong> {votacionSeleccionada.duracion} minutos</p>
+                <p><strong>Estado:</strong> 
+                    <span className={`estado-badge ${votacionSeleccionada.estado ? 'abierta' : 'cerrada'}`}>
+                        {votacionSeleccionada.estado ? '🟢 Abierta' : '🔴 Cerrada'}
+                    </span>
+                </p>
             </div>
             
-            {votacionSeleccionada.opciones && votacionSeleccionada.opciones.length > 0 && (
+            {votacionSeleccionada.opciones && votacionSeleccionada.opciones.length > 0 ? (
                 <div className="opciones-list">
-                    <h4>Opciones:</h4>
-                    <ul>
+                    <h4>📝 Opciones de votación:</h4>
+                    <div className="opciones-container">
                         {votacionSeleccionada.opciones.map((opcion, index) => (
-                            <li key={index}>{opcion}</li>
+                            <div key={opcion.id || index} className="opcion-item">
+                                <span className="opcion-numero">{index + 1}</span>
+                                <span className="opcion-texto">
+                                    {typeof opcion === 'string' ? opcion : opcion.texto}
+                                </span>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
+                </div>
+            ) : (
+                <div className="no-opciones">
+                    <p>⚠️ Esta votación no tiene opciones configuradas</p>
                 </div>
             )}
             
             {user && user.rol === 'admin' && (
                 <div className="card-actions">
                     <button
-                        onClick={() => handleEliminar(votacionSeleccionada._id)}
+                        onClick={() => handleEliminar(votacionSeleccionada.id)}
                         className="btn-danger"
                     >
                         🗑️ Eliminar

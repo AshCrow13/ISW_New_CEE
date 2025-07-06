@@ -52,6 +52,7 @@ export async function getVotacion(query) {
         const votacionRepository = AppDataSource.getRepository(votacionSchema);
         const votacionFound = await votacionRepository.findOne({
             where: [{ id: id }, { nombre: nombre }],
+            relations: ["opciones"], // Incluir las opciones relacionadas
         });
         if (!votacionFound) return [null, "Votación no encontrada"];
         return [votacionFound, null];
@@ -64,7 +65,9 @@ export async function getVotacion(query) {
 export async function getVotaciones() {
     try {
         const votacionRepository = AppDataSource.getRepository(votacionSchema);
-        const votaciones = await votacionRepository.find();
+        const votaciones = await votacionRepository.find({
+            relations: ["opciones"], // Incluir las opciones relacionadas
+        });
         if (!votaciones || votaciones.length === 0) return [null, "No hay votaciones"];
         return [votaciones, null];
     } catch (error) {
