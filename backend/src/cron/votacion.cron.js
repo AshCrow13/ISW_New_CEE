@@ -3,8 +3,10 @@ import cron from "node-cron";
 import { AppDataSource } from "../config/configDb.js";
 import votacionSchema from "../entity/votacion.entity.js";
 
-// Tarea programada para cerrar votaciones automáticamente
-cron.schedule("* * * * *", async () => {
+let isRunning = false; // Flag para evitar ejecuciones simultáneas
+
+// Tarea programada para cerrar votaciones automáticamente - Cada 5 minutos
+cron.schedule("*/5 * * * *", async () => {
     try {
         const votacionRepository = AppDataSource.getRepository(votacionSchema);
         const ahora = new Date();
@@ -14,6 +16,7 @@ cron.schedule("* * * * *", async () => {
             .createQueryBuilder("votacion")
             .where("votacion.estado = :estado", { estado: true })
             .andWhere("votacion.fin < :ahora", { ahora })
+            .limit(50) // Procesar máximo 50 votaciones por vez
             .getMany();
 
         for (const votacion of votaciones) {

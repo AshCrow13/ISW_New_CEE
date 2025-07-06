@@ -17,13 +17,13 @@ export async function postFeedback(body) {
     }
 }
 
-export async function getFeedback(body) {
+export async function getFeedback(query) {
     try {
         const feedbackRepository = AppDataSource.getRepository(feedbackSchema);
-        const { id, usuarioId } = body;
+        const id  = query;
 
         const feedbackFound = await feedbackRepository.findOne({
-            where: [{ id: id }, { usuarioId: usuarioId }],
+            where: [{ id: id }]
         });
 
         if (!feedbackFound) return [null, "Feedback no encontrado"];

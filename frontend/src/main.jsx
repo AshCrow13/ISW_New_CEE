@@ -12,6 +12,8 @@ import Actividades from '@pages/Actividades';
 import Documentos from '@pages/Documentos';
 import Historial from '@pages/Historial';
 
+import Feedback from './pages/feedback';
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -29,6 +31,10 @@ const router = createBrowserRouter([
             <Users />
           </ProtectedRoute>
         ),
+      },
+      {
+        path: '/feedback',
+        element: <Feedback/>
       },
       {
         path: '/actividades',
