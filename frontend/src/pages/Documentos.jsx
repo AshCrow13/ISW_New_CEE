@@ -28,7 +28,7 @@ const Documentos = () => { // Componente principal para la gestión de documento
     };
 
     const handleCrear = () => { // Función para manejar la creación de un nuevo documento
-        setFormData(null);
+        setFormData({});
         setMostrarForm(true);
     };
 

@@ -23,7 +23,7 @@ const Actividades = () => {
     };
 
     const handleCrear = () => {
-        setFormData(null); // Formulario vacío
+        setFormData({}); // Formulario vacío
         setMostrarForm(true);
     };
 

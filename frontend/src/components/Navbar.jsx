@@ -53,16 +53,16 @@ const Navbar = () => {
                             Documentos
                         </NavLink>
                     </li>
-                    {userRole === 'admin' && (
-                        <li>
-                            <NavLink 
-                                to="/users" 
-                                onClick={() => setMenuOpen(false)}
-                                className={({ isActive }) => isActive ? 'active' : ''}
-                            >
-                                Usuarios
-                            </NavLink>
-                        </li>
+                    {(userRole === 'admin' || userRole === 'vocalia') && (
+                    <li>
+                        <NavLink 
+                            to="/users" 
+                            onClick={() => setMenuOpen(false)}
+                            className={({ isActive }) => isActive ? 'active' : ''}
+                        >
+                            Usuarios
+                        </NavLink>
+                    </li>
                     )}
                     {userRole === 'admin' && (
                         <li>

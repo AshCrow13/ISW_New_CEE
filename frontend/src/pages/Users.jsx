@@ -10,10 +10,13 @@ import { useCallback, useState } from 'react';
 import '@styles/users.css';
 import useEditUser from '@hooks/users/useEditUser';
 import useDeleteUser from '@hooks/users/useDeleteUser';
+import { useAuth } from '@context/AuthContext';
 
-const Users = () => {
+const Users = () => { // Página de usuarios
   const { users, fetchUsers, setUsers } = useUsers();
   const [filterRut, setFilterRut] = useState('');
+  const { user } = useAuth(); // usuario autenticado
+  const userRole = user?.rol;
 
   const {
     handleClickUpdate,
@@ -49,20 +52,25 @@ const Users = () => {
           <h1 className='title-table'>Usuarios</h1>
           <div className='filter-actions'>
             <Search value={filterRut} onChange={handleRutFilterChange} placeholder={'Filtrar por rut'} />
-            <button onClick={handleClickUpdate} disabled={dataUser.length === 0}>
-              {dataUser.length === 0 ? (
-                <img src={UpdateIconDisable} alt="edit-disabled" />
-              ) : (
-                <img src={UpdateIcon} alt="edit" />
-              )}
-            </button>
-            <button className='delete-user-button' disabled={dataUser.length === 0} onClick={() => handleDelete(dataUser)}>
-              {dataUser.length === 0 ? (
-                <img src={DeleteIconDisable} alt="delete-disabled" />
-              ) : (
-                <img src={DeleteIcon} alt="delete" />
-              )}
-            </button>
+            {/* Solo admin puede editar/eliminar */}
+            {userRole === 'admin' && ( // Comprobación del rol de usuario
+              <>
+                <button onClick={handleClickUpdate} disabled={dataUser.length === 0}>
+                  {dataUser.length === 0 ? (
+                    <img src={UpdateIconDisable} alt="edit-disabled" />
+                  ) : (
+                    <img src={UpdateIcon} alt="edit" />
+                  )}
+                </button>
+                <button className='delete-user-button' disabled={dataUser.length === 0} onClick={() => handleDelete(dataUser)}>
+                  {dataUser.length === 0 ? (
+                    <img src={DeleteIconDisable} alt="delete-disabled" />
+                  ) : (
+                    <img src={DeleteIcon} alt="delete" />
+                  )}
+                </button>
+              </>
+            )}
           </div>
         </div>
         <Table
@@ -74,7 +82,10 @@ const Users = () => {
           onSelectionChange={handleSelectionChange}
         />
       </div>
-      <Popup show={isPopupOpen} setShow={setIsPopupOpen} data={dataUser} action={handleUpdate} />
+      {/* Popup solo para admin */}
+      {userRole === 'admin' && ( // Comprobación del rol de usuario
+        <Popup show={isPopupOpen} setShow={setIsPopupOpen} data={dataUser} action={handleUpdate} />
+      )}
     </div>
   );
 };
