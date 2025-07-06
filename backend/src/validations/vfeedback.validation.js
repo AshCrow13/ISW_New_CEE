@@ -22,6 +22,8 @@ export const feedbackBodyValidation = Joi.object({
             "string.max": "El nombre de usuario debe tener como máximo 100caracteres.",
         }),
     anonimo: Joi.boolean()
+        .truthy("true")
+        .falsy("false")
         .default(false)
         .messages({
             "boolean.base": "El campo 'anonimo' debe ser un valor booleano.",
