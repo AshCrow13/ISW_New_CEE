@@ -1,6 +1,6 @@
 // Formulario crear/editar actividad
-/*
-import Form from './Form';
+import Form from '@components/Form';
+import { useState, useEffect } from 'react';
 
 const ActivityForm = ({ onSubmit, initialData = {}, isEdit = false }) => {
     return (
@@ -25,4 +25,3 @@ const ActivityForm = ({ onSubmit, initialData = {}, isEdit = false }) => {
 };
 
 export default ActivityForm;
-*/
