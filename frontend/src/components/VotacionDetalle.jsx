@@ -17,7 +17,6 @@ const DetalleVotacion = ({ votacionSeleccionada, loading, user, handleEliminar }
     return (
         <div className="detail-card">
             <h3>{votacionSeleccionada.titulo}</h3>
-            <p>{votacionSeleccionada.descripcion}</p>
             
             <div className="detail-meta">
                 <p><strong>ID:</strong> {votacionSeleccionada._id}</p>

@@ -24,7 +24,6 @@ const ListaVotaciones = ({ votaciones, loading, user, handleEliminar }) => {
                 return (
                     <div key={votacion.id || votacion._id || index} className="votacion-card">
                         <h3>{votacion.nombre || votacion.titulo || 'Sin título'}</h3>
-                        <p>{votacion.descripcion || 'Sin descripción'}</p>
                         
                         <div className="votacion-meta">
                             <strong>ID:</strong> {votacion.id || votacion._id || 'No disponible'}

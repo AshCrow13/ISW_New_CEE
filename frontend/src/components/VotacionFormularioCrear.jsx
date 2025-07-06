@@ -6,7 +6,6 @@ import '@styles/votacion.css';
 const FormularioCrearVotacion = ({ onSubmit, onSuccess, onCancel }) => {
     const [formData, setFormData] = useState({
         titulo: '',
-        descripcion: '',
         fechaInicio: '',
         fechaFin: '',
         opciones: ['', ''] // Mínimo 2 opciones
@@ -59,10 +58,6 @@ const FormularioCrearVotacion = ({ onSubmit, onSuccess, onCancel }) => {
 
         if (!formData.titulo.trim()) {
             newErrors.titulo = 'El título es obligatorio';
-        }
-
-        if (!formData.descripcion.trim()) {
-            newErrors.descripcion = 'La descripción es obligatoria';
         }
 
         if (!formData.fechaInicio) {
@@ -182,25 +177,6 @@ const FormularioCrearVotacion = ({ onSubmit, onSuccess, onCancel }) => {
                     {errors.titulo && (
                         <span className="error-message">
                             {errors.titulo}
-                        </span>
-                    )}
-                </div>
-
-                {/* Descripción */}
-                <div className="form-group">
-                    <label className="form-label">
-                        Descripción *
-                    </label>
-                    <textarea
-                        className={`form-textarea ${errors.descripcion ? 'error' : ''}`}
-                        value={formData.descripcion}
-                        onChange={(e) => handleInputChange('descripcion', e.target.value)}
-                        placeholder="Describe la votación, candidatos, propósito, etc."
-                        rows="4"
-                    />
-                    {errors.descripcion && (
-                        <span className="error-message">
-                            {errors.descripcion}
                         </span>
                     )}
                 </div>
