@@ -1,107 +1,122 @@
+// src/pages/Register.jsx
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Paper, Container, TextField, Button, Typography, Box, Alert, InputAdornment } from '@mui/material';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import { register } from '@services/auth.service.js';
-import Form from "@components/Form";
-import useRegister from '@hooks/auth/useRegister.jsx';
-import { showErrorAlert, showSuccessAlert } from '@helpers/sweetAlert.js';
-import '@styles/form.css';
+
+const patternRut = /^[0-9]{1,2}\.[0-9]{3}\.[0-9]{3}-[\dkK]$/;
 
 const Register = () => {
-	const navigate = useNavigate();
-	const {
-        errorEmail,
-        errorRut,
-        errorData,
-        handleInputChange
-    } = useRegister();
+    const navigate = useNavigate();
+    const [form, setForm] = useState({
+        nombreCompleto: '',
+        email: '',
+        rut: '',
+        password: ''
+    });
+    const [errorMsg, setErrorMsg] = useState('');
 
-const registerSubmit = async (data) => {
-    try {
-        const response = await register(data);
-        if (response.status === 'Success') {
-            showSuccessAlert('¡Registrado!','Usuario registrado exitosamente.');
-            setTimeout(() => {
-                navigate('/auth');
-            }, 3000)
-        } else if (response.status === 'Client error') {
-            errorData(response.details);
+    const handleChange = (e) => {
+        setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const registerSubmit = async (e) => {
+        e.preventDefault();
+        // Validaciones extra opcionales
+        if (!patternRut.test(form.rut)) {
+        setErrorMsg('El RUT debe tener formato xx.xxx.xxx-x');
+        return;
         }
-    } catch (error) {
-        console.error("Error al registrar un usuario: ", error);
-        showErrorAlert('Cancelado', 'Ocurrió un error al registrarse.');
-    }
-}
+        if (form.nombreCompleto.length < 8) {
+        setErrorMsg('El nombre completo es demasiado corto');
+        return;
+        }
+        try {
+        const response = await register(form);
+        if (response.status === 'Success') {
+            navigate('/auth');
+        } else {
+            setErrorMsg('No se pudo registrar. ¿El correo o rut ya están en uso?');
+        }
+        } catch {
+        setErrorMsg('Ocurrió un error al registrar.');
+        }
+    };
 
-const patternRut = new RegExp(/^(?:(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}|[1-9]\d{6}|[1-2]\d{7}|29\.999\.999|29999999)-[\dkK]$/)
-
-	return (
-		<main className="container">
-			<Form
-				title="Crea tu cuenta"
-				fields={[
-					{
-						label: "Nombre completo",
-						name: "nombreCompleto",
-						placeholder: "Diego Alexis Salazar Jara",
-                        fieldType: 'input',
-						type: "text",
-						required: true,
-						minLength: 15,
-						maxLength: 50,
-                        pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
-						patternMessage: "Debe contener solo letras y espacios",
-					},
-                    {
-                        label: "Correo electrónico",
-                        name: "email",
-                        placeholder: "example@gmail.cl",
-                        fieldType: 'input',
-                        type: "email",
-                        required: true,
-                        minLength: 15,
-                        maxLength: 35,
-                        errorMessageData: errorEmail,
-                        // validate: {
-                        //     emailDomain: (value) => value.endsWith('@gmail.cl') || 'El correo debe terminar en @gmail.cl'
-                        // },
-                        onChange: (e) => handleInputChange('email', e.target.value)
-                    },
-                    {
-						label: "Rut",
-                        name: "rut",
-                        placeholder: "23.770.330-1",
-                        fieldType: 'input',
-                        type: "text",
-						minLength: 9,
-						maxLength: 12,
-						pattern: patternRut,
-						patternMessage: "Debe ser xx.xxx.xxx-x o xxxxxxxx-x",
-						required: true,
-                        errorMessageData: errorRut,
-                        onChange: (e) => handleInputChange('rut', e.target.value)
-                    },
-                    {
-                        label: "Contraseña",
-                        name: "password",
-                        placeholder: "**********",
-                        fieldType: 'input',
-                        type: "password",
-                        required: true,
-                        // minLength: 8,
-                        maxLength: 26,
-                        pattern: /^[a-zA-Z0-9]+$/,
-                        patternMessage: "Debe contener solo letras y números",
-                    },
-				]}
-				buttonText="Registrarse"
-				onSubmit={registerSubmit}
-				footerContent={
-					<p>
-						¿Ya tienes cuenta?, <a href="/auth">¡Inicia sesión aquí!</a>
-					</p>
-				}
-			/>
-		</main>
-	);
-};
+    return (
+        <Container maxWidth="xs" sx={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+        }}>
+        <Paper elevation={8} sx={{ p: 4, borderRadius: 4, width: 1 }}>
+            <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
+            <PersonAddAltIcon sx={{ fontSize: 48, color: "primary.main" }} />
+            <Typography variant="h5" mb={1}>Registrarse</Typography>
+            </Box>
+            <form onSubmit={registerSubmit}>
+            <TextField
+                label="Nombre completo"
+                name="nombreCompleto"
+                value={form.nombreCompleto}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                required
+                inputProps={{ maxLength: 50 }}
+            />
+            <TextField
+                label="Correo institucional"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                required
+                type="email"
+                inputProps={{ maxLength: 100 }}
+            />
+            <TextField
+                label="RUT"
+                name="rut"
+                value={form.rut}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                required
+                inputProps={{ maxLength: 12 }}
+                placeholder="12.345.678-9"
+            />
+            <TextField
+                label="Contraseña"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                required
+                type="password"
+                inputProps={{ maxLength: 26 }}
+            />
+            {errorMsg && <Alert severity="error" sx={{ mt: 2 }}>{errorMsg}</Alert>}
+            <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ mt: 3, mb: 1 }}
+            >
+                Registrarse
+            </Button>
+            <Typography align="center" sx={{ mt: 1 }}>
+                ¿Ya tienes cuenta? <Button variant="text" onClick={() => navigate('/auth')}>Inicia sesión</Button>
+            </Typography>
+            </form>
+        </Paper>
+        </Container>
+    );
+    };
 
 export default Register;

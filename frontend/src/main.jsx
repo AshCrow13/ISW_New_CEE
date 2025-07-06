@@ -1,5 +1,7 @@
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import theme from './theme'; // Importa theme
 import Login from '@pages/Login';
 import Home from '@pages/Home';
 import Users from '@pages/Users';
@@ -11,10 +13,9 @@ import '@styles/styles.css';
 import Actividades from '@pages/Actividades';
 import Documentos from '@pages/Documentos';
 import Historial from '@pages/Historial';
-
 import Feedback from './pages/feedback';
 
-const router = createBrowserRouter([
+const router = createBrowserRouter([ // Define las rutas de la aplicación
   {
     path: '/',
     element: <Root/>,
@@ -72,6 +73,9 @@ const router = createBrowserRouter([
   },
 ])
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <RouterProvider router={router}/>
+ReactDOM.createRoot(document.getElementById('root')).render( // Renderiza la aplicación en el elemento con id 'root'
+  <ThemeProvider theme={theme}>
+    <CssBaseline />
+    <RouterProvider router={router}/>
+  </ThemeProvider>
 )
