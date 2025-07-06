@@ -1,3 +1,12 @@
+//* En postgres usar DELETE FROM estudiantes;
+//* Luego ejecutar npm run dev del backend para crear los estudiantes nuevamente
+//* Revisar si la tabla estudiantes está vacía antes de ejecutar este script
+//* En caso de que no esté vacía, no se crearán los estudiantes nuevamente
+//* Si tabla estudiantes está vacía, se crearán los estudiantes con los datos de prueba
+//* Usando el comando npm run dev del backend
+//* Si quieren agregar más estudiantes para pruebas
+//* sigan el formato de los estudiantes ya creados
+
 "use strict";
 import Estudiante from "../entity/estudiante.entity.js";
 import { AppDataSource } from "./configDb.js";
@@ -13,44 +22,50 @@ async function createEstudiantes() {
     await Promise.all([
       estudianteRepository.save(
         estudianteRepository.create({
-
-          nombreCompleto: "Etrius",
-          rut: "20.101.700-9",
-          email: "matias.cartes2001@alumnos.ubiobio.cl",
-          password: await encryptPassword("Etrius"),
+          nombreCompleto: "Ana María González Soto",
+          rut: "20.123.456-7",
+          email: "ana.gonzalez@ubiobio.cl",
+          password: await encryptPassword("Admin1234"),
           rol: "admin",
-          carrera: "Ingeniería en Computación e Informática",
+          carrera: "Ingeniería Civil Informática",
         }),
       ),
       estudianteRepository.save(
         estudianteRepository.create({
-
-          nombreCompleto: "Crow",
-          rut: "19.088.998-0",
-          email: "omar.castro2001@alumnos.ubiobio.cl",
-          password: await encryptPassword("Crow"),
+          nombreCompleto: "Pedro Javier Rivas Lira",
+          rut: "20.234.567-8",
+          email: "pedro.rivas@alumnos.ubiobio.cl",
+          password: await encryptPassword("Vocalia2024"),
           rol: "vocalia",
-          carrera: "Ingeniería en Computación e Informática",
-        })
-      ),
-      estudianteRepository.save(
-        estudianteRepository.create({
-
-          nombreCompleto: "Chitopan",
-          rut: "20.943.041-0",
-          email: "Francisco.catrileo2020@alumnos.ubiobio.cl",
-          password: await encryptPassword("Chitopan"),
-          rol: "vocalia",
-          carrera: "Ingeniería en Minas",
+          carrera: "Ingeniería Civil Informática",
         }),
       ),
       estudianteRepository.save(
         estudianteRepository.create({
-
-          nombreCompleto: "Prozero",
-          rut: "20.487.563-4",
-          email: "prozero133@gmail.com",
-          password: await encryptPassword("Prozero"),
+          nombreCompleto: "Valentina Fuentes Pérez",
+          rut: "20.345.678-9",
+          email: "valentina.fuentes@alumnos.ubiobio.cl",
+          password: await encryptPassword("Vocalia2024"),
+          rol: "vocalia",
+          carrera: "Ingeniería Civil Eléctrica",
+        }),
+      ),
+      estudianteRepository.save(
+        estudianteRepository.create({
+          nombreCompleto: "Carlos Ignacio Torres Vidal",
+          rut: "20.456.789-0",
+          email: "carlos.torres@alumnos.ubiobio.cl",
+          password: await encryptPassword("Estudiante1"),
+          rol: "estudiante",
+          carrera: "Ingeniería Civil Informática",
+        }),
+      ),
+      estudianteRepository.save(
+        estudianteRepository.create({
+          nombreCompleto: "Paula Andrea Mella Ruiz",
+          rut: "20.567.890-1",
+          email: "paula.mella@alumnos.ubiobio.cl",
+          password: await encryptPassword("Estudiante2"),
           rol: "estudiante",
           carrera: "Ingeniería en Computación e Informática",
         }),
@@ -58,32 +73,21 @@ async function createEstudiantes() {
       estudianteRepository.save(
         estudianteRepository.create({
           nombreCompleto: "Felipe Andrés Henríquez Zapata",
-          rut: "20.976.635-3",
-          email: "usuario4.2024@gmail.cl",
-          password: await encryptPassword("user1234"),
+          rut: "20.678.901-2",
+          email: "felipe.henriquez@alumnos.ubiobio.cl",
+          password: await encryptPassword("Estudiante3"),
           rol: "estudiante",
-          carrera: "Ingeniería en Computación e Informática",
+          carrera: "Ingeniería Civil Informática",
         }),
       ),
       estudianteRepository.save(
         estudianteRepository.create({
-
-          nombreCompleto: "Calibre",
-          rut: "20.101.700-0",
-          email: "as0etrius@gmail.com",
-          password: await encryptPassword("Calibre"),
+          nombreCompleto: "María José Salazar Vera",
+          rut: "20.789.012-3",
+          email: "mariajose.salazar@alumnos.ubiobio.cl",
+          password: await encryptPassword("Vocalia2024"),
           rol: "vocalia",
-          carrera: "Ingeniería en Computación e Informática",
-        }),
-      ),
-      estudianteRepository.save(
-        estudianteRepository.create({
-          nombreCompleto: "Juan Pablo Rosas Martin",
-          rut: "20.738.415-1",
-          email: "usuario6.2024@gmail.cl",
-          password: await encryptPassword("user1234"),
-          rol: "admin",
-          carrera: "Ingeniería en Computación e Informática",
+          carrera: "Ingeniería Civil Industrial",
         }),
       ),
     ]);
