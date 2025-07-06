@@ -36,8 +36,8 @@ const Form = ({ title, fields, buttonText, onSubmit, footerContent, backgroundCo
                         <input
                             {...register(field.name, {
                                 required: field.required ? 'Este campo es obligatorio' : false,
-                                minLength: field.minLength ? { value: field.minLength, message: `Debe tener al menos ${field.minLength} caracteres` } : false,
-                                maxLength: field.maxLength ? { value: field.maxLength, message: `Debe tener máximo ${field.maxLength} caracteres` } : false,
+                                // minLength: field.minLength ? { value: field.minLength, message: `Debe tener al menos ${field.minLength} caracteres` } : false,
+                                // maxLength: field.maxLength ? { value: field.maxLength, message: `Debe tener máximo ${field.maxLength} caracteres` } : false,
                                 pattern: field.pattern ? { value: field.pattern, message: field.patternMessage || 'Formato no válido' } : false,
                                 validate: field.validate || {},
                             })}
@@ -55,8 +55,8 @@ const Form = ({ title, fields, buttonText, onSubmit, footerContent, backgroundCo
                         <textarea
                             {...register(field.name, {
                                 required: field.required ? 'Este campo es obligatorio' : false,
-                                minLength: field.minLength ? { value: field.minLength, message: `Debe tener al menos ${field.minLength} caracteres` } : false,
-                                maxLength: field.maxLength ? { value: field.maxLength, message: `Debe tener máximo ${field.maxLength} caracteres` } : false,
+                                // minLength: field.minLength ? { value: field.minLength, message: `Debe tener al menos ${field.minLength} caracteres` } : false,
+                                // maxLength: field.maxLength ? { value: field.maxLength, message: `Debe tener máximo ${field.maxLength} caracteres` } : false,
                                 pattern: field.pattern ? { value: field.pattern, message: field.patternMessage || 'Formato no válido' } : false,
                                 validate: field.validate || {},
                             })}

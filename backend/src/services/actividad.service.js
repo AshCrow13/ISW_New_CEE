@@ -1,14 +1,23 @@
 "use strict";
 import Actividad from "../entity/actividad.entity.js";
+import Estudiante from "../entity/estudiante.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import Historial from "../entity/historial.entity.js";
-import { Between, LessThanOrEqual, Like, MoreThanOrEqual,  } from "typeorm";
+import { Between, LessThanOrEqual, Like, MoreThanOrEqual } from "typeorm";
 
 // CREATE
 export async function createActividadService(data, usuario) {
     try {
+        // Validar que el cuerpo de la solicitud cumpla con el esquema
         const repo = AppDataSource.getRepository(Actividad);
-        const actividad = repo.create(data);
+        const estudianteRepo = AppDataSource.getRepository(Estudiante);
+
+        // Buscar responsable 
+        const responsable = await estudianteRepo.findOne({ where: { id: data.responsableId } });
+        if (!responsable) return [null, "Responsable no encontrado"];
+
+        // Validar que la fecha sea válida
+        const actividad = repo.create({ ...data, responsable });
         await repo.save(actividad);
 
         // Registrar en historial
@@ -20,7 +29,9 @@ export async function createActividadService(data, usuario) {
             referenciaId: actividad.id
         });
 
-        return [actividad, null];
+        // Devuelve actividad con responsable incluido
+        const actividadCompleta = await repo.findOne({ where: { id: actividad.id }, relations: ["responsable"] });
+        return [actividadCompleta, null];
     } catch (error) {
         return [null, "Error al crear actividad: " + error.message];
     }
@@ -29,13 +40,11 @@ export async function createActividadService(data, usuario) {
 // READ (Todos - con filtro)
 export async function getActividadesService(filtro = {}) {
     try {
+        // Validar que el filtro cumpla con el esquema
         const repo = AppDataSource.getRepository(Actividad);
         const where = {};
-
-        // Filtro por categoría
+        // Filtros básicos
         if (filtro.categoria) where.categoria = filtro.categoria;
-
-        // Filtro por rango de fechas
         if (filtro.fechaInicio && filtro.fechaFin) {
             where.fecha = Between(filtro.fechaInicio, filtro.fechaFin);
         } else if (filtro.fechaInicio) {
@@ -43,11 +52,10 @@ export async function getActividadesService(filtro = {}) {
         } else if (filtro.fechaFin) {
             where.fecha = LessThanOrEqual(filtro.fechaFin);
         }
+        
+        let queryBuilder = repo.createQueryBuilder("actividad").where(where); // Construir consulta
 
-        // Búsqueda textual
-        // Usar createQueryBuilder para mayor flexibilidad
-        let queryBuilder = repo.createQueryBuilder("actividad").where(where); 
-
+        // Filtro de búsqueda por texto
         if (filtro.q) {
             queryBuilder = queryBuilder.andWhere(
                 "(actividad.titulo ILIKE :q OR actividad.descripcion ILIKE :q)",
@@ -55,20 +63,21 @@ export async function getActividadesService(filtro = {}) {
             );
         }
 
-        // Ordenamiento flexible
-        // Por defecto ordena por fecha descendente
-        let order = { fecha: "DESC" }; // Por defecto
+        // Ordenamiento
+        let order = { fecha: "DESC" };
         if (filtro.orderBy) {
             const [campo, dir] = filtro.orderBy.split("_");
             order = { [campo]: dir.toUpperCase() === "DESC" ? "DESC" : "ASC" };
         }
-        queryBuilder = queryBuilder.orderBy(order);
+        queryBuilder = queryBuilder.orderBy(order); // Ordenar resultados
 
         // Paginación
-        // Si no se especifica, por defecto toma 20 registros y empieza desde el 0        
-        const limit = filtro.limit ? parseInt(filtro.limit) : 20; 
-        const offset = filtro.offset ? parseInt(filtro.offset) : 0; 
+        const limit = filtro.limit ? parseInt(filtro.limit) : 20;
+        const offset = filtro.offset ? parseInt(filtro.offset) : 0;
         queryBuilder = queryBuilder.skip(offset).take(limit);
+
+        // Relaciones
+        queryBuilder = queryBuilder.leftJoinAndSelect("actividad.responsable", "responsable");
 
         const actividades = await queryBuilder.getMany();
         return [actividades, null];
@@ -80,8 +89,9 @@ export async function getActividadesService(filtro = {}) {
 // READ (Uno)
 export async function getActividadService(query) {
     try {
+        // Validar que la consulta cumpla con el esquema
         const repo = AppDataSource.getRepository(Actividad);
-        const actividad = await repo.findOne({ where: query });
+        const actividad = await repo.findOne({ where: query, relations: ["responsable"] });
         if (!actividad) return [null, "Actividad no encontrada"];
         return [actividad, null];
     } catch (error) {
@@ -92,11 +102,21 @@ export async function getActividadService(query) {
 // UPDATE
 export async function updateActividadService(query, data, usuario) {
     try {
+        // Validar que la consulta y el cuerpo de la solicitud cumplan con los esquemas
         const repo = AppDataSource.getRepository(Actividad);
-        const actividad = await repo.findOne({ where: query });
+        const estudianteRepo = AppDataSource.getRepository(Estudiante);
+        const actividad = await repo.findOne({ where: query, relations: ["responsable"] });
         if (!actividad) return [null, "Actividad no encontrada"];
-        Object.assign(actividad, data, { updatedAt: new Date() });
-        await repo.save(actividad);
+
+        // Si cambia el responsable
+        if (data.responsableId) {
+            const responsable = await estudianteRepo.findOne({ where: { id: data.responsableId } });
+            if (!responsable) return [null, "Responsable no encontrado"];
+            actividad.responsable = responsable;
+        }
+        Object.assign(actividad, data, { updatedAt: new Date() }); // Actualizar datos
+
+        await repo.save(actividad); // Guardar cambios
 
         // Registrar en historial
         const historialRepo = AppDataSource.getRepository(Historial);
@@ -107,7 +127,9 @@ export async function updateActividadService(query, data, usuario) {
             referenciaId: actividad.id
         });
 
-        return [actividad, null];
+        // Devolver con relaciones
+        const actividadCompleta = await repo.findOne({ where: { id: actividad.id }, relations: ["responsable"] });
+        return [actividadCompleta, null];
     } catch (error) {
         return [null, "Error al actualizar actividad: " + error.message];
     }
@@ -116,8 +138,9 @@ export async function updateActividadService(query, data, usuario) {
 // DELETE
 export async function deleteActividadService(query, usuario) {
     try {
+        // Validar que la consulta cumpla con el esquema
         const repo = AppDataSource.getRepository(Actividad);
-        const actividad = await repo.findOne({ where: query });
+        const actividad = await repo.findOne({ where: query, relations: ["responsable"] });
         if (!actividad) return [null, "Actividad no encontrada"];
         await repo.remove(actividad);
 

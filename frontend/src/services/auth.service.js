@@ -19,7 +19,15 @@ export async function login(dataUser) {
             return response.data
         }
     } catch (error) {
-        return error.response.data;
+        if (error.response && error.response.data) {
+            return error.response.data;
+        } else if (error.request) {
+            // El backend no respondió, pero la petición fue enviada
+            return { status: "Network Error", message: "No hay respuesta del servidor." };
+        } else {
+            // Error inesperado en el código frontend
+            return { status: "Client Error", message: error.message || "Error desconocido." };
+        }
     }
 }
 
@@ -35,7 +43,15 @@ export async function register(data) {
         });
         return response.data;
     } catch (error) {
-        return error.response.data;
+        if (error.response && error.response.data) {
+            return error.response.data;
+        } else if (error.request) {
+            // El backend no respondió, pero la petición fue enviada
+            return { status: "Network Error", message: "No hay respuesta del servidor." };
+        } else {
+            // Error inesperado en el código frontend
+            return { status: "Client Error", message: error.message || "Error desconocido." };
+        }
     }
 }
 

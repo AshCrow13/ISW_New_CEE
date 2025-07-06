@@ -8,6 +8,9 @@ import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
+import Actividades from '@pages/Actividades';
+import Documentos from '@pages/Documentos';
+
 
 import Feedback from './pages/feedback';
 
@@ -24,7 +27,7 @@ const router = createBrowserRouter([
       {
         path: '/users',
         element: (
-        <ProtectedRoute allowedRoles={['admin']}>
+        <ProtectedRoute allowedRoles={['admin', 'vocalia']}>
           <Users />
         </ProtectedRoute>
         ),
@@ -32,6 +35,22 @@ const router = createBrowserRouter([
       {
         path: '/feedback',
         element: <Feedback/>
+      },
+      {
+        path: '/actividades',
+        element: (
+          <ProtectedRoute allowedRoles={['admin', 'vocalia', 'estudiante']}>
+            <Actividades />
+          </ProtectedRoute>
+        )
+      },
+      {
+      path: '/documentos',
+      element: (
+          <ProtectedRoute allowedRoles={['admin', 'vocalia', 'estudiante']}>
+            <Documentos />
+          </ProtectedRoute>
+        )
       }
     ]
   },
@@ -42,7 +61,7 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <Register/>
-  }
+  },
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(

@@ -1,14 +1,32 @@
 "use strict";
 import Documento from "../entity/documento.entity.js";
+import Actividad from "../entity/actividad.entity.js";
+import Estudiante from "../entity/estudiante.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import Historial from "../entity/historial.entity.js";
-import { Between, LessThanOrEqual, Like, MoreThanOrEqual,  } from "typeorm";
+import { Between, LessThanOrEqual, Like, MoreThanOrEqual } from "typeorm";
 
 // CREATE
 export async function createDocumentoService(data, usuario) {
     try {
+        // Validar que el cuerpo de la solicitud cumpla con el esquema
         const repo = AppDataSource.getRepository(Documento);
-        const documento = repo.create(data);
+        const estudianteRepo = AppDataSource.getRepository(Estudiante);
+        const actividadRepo = AppDataSource.getRepository(Actividad);
+
+        // Relacionar subidoPor (obligatorio)
+        const subidoPor = await estudianteRepo.findOne({ where: { id: data.subidoPorId } });
+        if (!subidoPor) return [null, "Usuario que sube el documento no existe"];
+
+        // Relacionar actividad (opcional)
+        let actividad = null;
+        if (data.id_actividad) {
+            actividad = await actividadRepo.findOne({ where: { id: data.id_actividad } });
+            if (!actividad) return [null, "Actividad no existe"];
+        }
+
+        // Validar que la fecha sea válida
+        const documento = repo.create({ ...data, subidoPor, actividad });
         await repo.save(documento);
 
         // Registrar en historial
@@ -20,7 +38,9 @@ export async function createDocumentoService(data, usuario) {
             referenciaId: documento.id
         });
 
-        return [documento, null];
+        // Devolver documento con relaciones
+        const docCompleto = await repo.findOne({ where: { id: documento.id }, relations: ["subidoPor", "actividad"] });
+        return [docCompleto, null];
     } catch (error) {
         return [null, "Error al crear documento: " + error.message];
     }
@@ -29,13 +49,11 @@ export async function createDocumentoService(data, usuario) {
 // READ (Todos)
 export async function getDocumentosService(filtro = {}) {
     try {
+        // Validar que el filtro cumpla con el esquema
         const repo = AppDataSource.getRepository(Documento);
         const where = {};
-
-        // Filtro por tipo
+        // Filtros básicos
         if (filtro.tipo) where.tipo = filtro.tipo;
-
-        // Filtro por rango de fechas de subida
         if (filtro.fechaInicio && filtro.fechaFin) {
             where.fechaSubida = Between(filtro.fechaInicio, filtro.fechaFin);
         } else if (filtro.fechaInicio) {
@@ -44,32 +62,34 @@ export async function getDocumentosService(filtro = {}) {
             where.fechaSubida = LessThanOrEqual(filtro.fechaFin);
         }
 
-        // Búsqueda textual
-        // Usar createQueryBuilder para mayor flexibilidad
+        // Construir consulta
         let queryBuilder = repo.createQueryBuilder("documento").where(where);
-
         if (filtro.q) {
             queryBuilder = queryBuilder.andWhere(
                 "(documento.titulo ILIKE :q OR documento.descripcion ILIKE :q)",
                 { q: `%${filtro.q}%` }
             );
         }
-        
-        //Ordenamiento flexible
-        // Por defecto ordena por fecha de subida descendente
+
+        // Ordenamiento
         let order = { fechaSubida: "DESC" };
         if (filtro.orderBy) {
             const [campo, dir] = filtro.orderBy.split("_");
             order = { [campo]: dir.toUpperCase() === "DESC" ? "DESC" : "ASC" };
         }
-        queryBuilder = queryBuilder.orderBy(order);
-        
+        queryBuilder = queryBuilder.orderBy(order); // Ordenar resultados
+
         // Paginación
-        // Si no se especifica, por defecto toma 20 documentos y empieza desde el 0
         const limit = filtro.limit ? parseInt(filtro.limit) : 20;
         const offset = filtro.offset ? parseInt(filtro.offset) : 0;
         queryBuilder = queryBuilder.skip(offset).take(limit);
 
+        // Relaciones
+        queryBuilder = queryBuilder
+            .leftJoinAndSelect("documento.subidoPor", "subidoPor")
+            .leftJoinAndSelect("documento.actividad", "actividad");
+
+        // Ejecutar consulta
         const documentos = await queryBuilder.getMany();
         return [documentos, null];
     } catch (error) {
@@ -80,8 +100,10 @@ export async function getDocumentosService(filtro = {}) {
 // READ (Uno)
 export async function getDocumentoService(query) {
     try {
+        // Validar que la consulta cumpla con el esquema
         const repo = AppDataSource.getRepository(Documento);
-        const documento = await repo.findOne({ where: query });
+        // Buscar documento con relaciones
+        const documento = await repo.findOne({ where: query, relations: ["subidoPor", "actividad"] }); 
         if (!documento) return [null, "Documento no encontrado"];
         return [documento, null];
     } catch (error) {
@@ -92,9 +114,28 @@ export async function getDocumentoService(query) {
 // UPDATE
 export async function updateDocumentoService(query, data, usuario) {
     try {
+        // Validar que la consulta y el cuerpo de la solicitud cumplan con los esquemas
         const repo = AppDataSource.getRepository(Documento);
-        const documento = await repo.findOne({ where: query });
+        const estudianteRepo = AppDataSource.getRepository(Estudiante);
+        const actividadRepo = AppDataSource.getRepository(Actividad);
+        // Buscar documento con relaciones
+        const documento = await repo.findOne({ where: query, relations: ["subidoPor", "actividad"] });
         if (!documento) return [null, "Documento no encontrado"];
+
+        // Si cambia el subidoPor
+        if (data.subidoPorId) {
+            const subidoPor = await estudianteRepo.findOne({ where: { id: data.subidoPorId } });
+            if (!subidoPor) return [null, "Usuario subidor no encontrado"];
+            documento.subidoPor = subidoPor;
+        }
+        // Si cambia la actividad
+        if (data.id_actividad) {
+            const actividad = await actividadRepo.findOne({ where: { id: data.id_actividad } });
+            if (!actividad) return [null, "Actividad no encontrada"];
+            documento.actividad = actividad;
+        }
+
+        // Actualizar otros campos
         Object.assign(documento, data);
         await repo.save(documento);
 
@@ -107,7 +148,9 @@ export async function updateDocumentoService(query, data, usuario) {
             referenciaId: documento.id
         });
 
-        return [documento, null];
+        // Devolver con relaciones
+        const docCompleto = await repo.findOne({ where: { id: documento.id }, relations: ["subidoPor", "actividad"] });
+        return [docCompleto, null];
     } catch (error) {
         return [null, "Error al actualizar documento: " + error.message];
     }
@@ -116,8 +159,10 @@ export async function updateDocumentoService(query, data, usuario) {
 // DELETE
 export async function deleteDocumentoService(query, usuario) {
     try {
+        // Validar que la consulta cumpla con el esquema
         const repo = AppDataSource.getRepository(Documento);
-        const documento = await repo.findOne({ where: query });
+        // Buscar documento con relaciones
+        const documento = await repo.findOne({ where: query, relations: ["subidoPor", "actividad"] });
         if (!documento) return [null, "Documento no encontrado"];
         await repo.remove(documento);
 

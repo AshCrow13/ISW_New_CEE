@@ -24,19 +24,23 @@ import Documento from "../entity/documento.entity.js";
 // CREATE - Subida de archivo
 export async function createDocumento(req, res) {
     try {
+        // Validar que el cuerpo de la solicitud cumpla con el esquema
         if (!req.file) {
             return handleErrorClient(res, 400, "Debe adjuntar un archivo válido.");
         }
 
+        // Validar que el usuario tenga el rol adecuado
         const documentoData = { // Extraemos los datos del archivo y los campos adicionales
             ...req.body,
             urlArchivo: `/api/documentos/download/${req.file.filename}`,
             subidoPor: req.user.email
         };
 
+        // Validar el esquema del documento
         const { error } = documentoSchema.validate(documentoData);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
-
+        
+        // Crear el documento en la base de datos
         const [documento, err] = await createDocumentoService(documentoData, req.user);
         if (err) return handleErrorClient(res, 400, err);
 
@@ -49,6 +53,7 @@ export async function createDocumento(req, res) {
 // READ ALL
 export async function getDocumentos(req, res) {
     try {
+        // Validar que la consulta cumpla con el esquema
         const [documentos, err] = await getDocumentosService(req.query);
         if (err) return handleErrorClient(res, 404, err);
         handleSuccess(res, 200, "Documentos encontrados", documentos);
@@ -60,9 +65,11 @@ export async function getDocumentos(req, res) {
 // READ ONE
 export async function getDocumento(req, res) {
     try {
+        // Validar que la consulta cumpla con el esquema
         const { error } = documentoQuerySchema.validate(req.query);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
 
+        // Llamar al servicio para obtener el documento
         const [documento, err] = await getDocumentoService(req.query);
         if (err) return handleErrorClient(res, 404, err);
         handleSuccess(res, 200, "Documento encontrado", documento);
@@ -74,12 +81,15 @@ export async function getDocumento(req, res) {
 // UPDATE - solo actualiza los datos de texto
 export async function updateDocumento(req, res) {
     try {
+        // Validar que la consulta y el cuerpo de la solicitud cumplan con los esquemas
         const { error: queryError } = documentoQuerySchema.validate(req.query);
         if (queryError) return handleErrorClient(res, 400, "Error en la consulta", queryError.message);
 
+        // Validar que el cuerpo de la solicitud cumpla con el esquema de actualización
         const { error: bodyError } = documentoUpdateSchema.validate(req.body);
         if (bodyError) return handleErrorClient(res, 400, "Error en los datos", bodyError.message);
 
+        // Verificar si se está intentando actualizar el archivo
         const [documento, err] = await updateDocumentoService(req.query, req.body, req.user);
         if (err) return handleErrorClient(res, 400, err);
 
@@ -92,16 +102,19 @@ export async function updateDocumento(req, res) {
 // DELETE
 export async function deleteDocumento(req, res) {
     try {
+        // Validar que la consulta cumpla con el esquema
         const { error } = documentoQuerySchema.validate(req.query);
         if (error) return handleErrorClient(res, 400, "Error en la consulta", error.message);
 
+        // Llamar al servicio para eliminar el documento
+        // y registrar en el historial
         const [documento, err] = await deleteDocumentoService(req.query, req.user);
         if (err) return handleErrorClient(res, 404, err);
 
         // borrar el archivo físico del servidor
         if (documento && documento.urlArchivo) {
             const filename = documento.urlArchivo.split("/").pop();
-            const filePath = path.join(process.cwd(), "uploads", filename);
+            const filePath = path.join(process.cwd(), "uploads", filename); // "uploads/filename.ext"
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
             }
@@ -116,15 +129,18 @@ export async function deleteDocumento(req, res) {
 // DOWNLOAD 
 export async function downloadDocumento(req, res) {
     try {
+        // Validar que el ID del documento sea un número válido
         const { id } = req.params;
         const repo = AppDataSource.getRepository(Documento);
         const documento = await repo.findOne({ where: { id: parseInt(id) } });
         if (!documento) return handleErrorClient(res, 404, "Documento no encontrado");
 
+        // Validar que el documento tenga una URL de archivo
         const url = documento.urlArchivo; // "/api/documentos/download/filename"
         const filename = url.split("/").pop();
         const filePath = path.join(process.cwd(), "uploads", filename);
 
+        // Verificar si el archivo existe en el servidor
         if (!fs.existsSync(filePath)) {
             return handleErrorClient(res, 404, "Archivo no encontrado en el servidor");
         }
