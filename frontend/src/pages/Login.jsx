@@ -29,43 +29,45 @@ const Login = () => {
     return (
         <main className="container">
             <Form
-                title="Iniciar sesión"
-                fields={[
-                    {
-                        label: "Correo electrónico",
-                        name: "email",
-                        placeholder: "example@gmail.cl",
-                        fieldType: 'input',
-                        type: "email",
-                        required: true,
-                        minLength: 15,
-                        maxLength: 100,
-                        errorMessageData: errorEmail,
-                        validate: {
-                            emailDomain: (value) =>
-                                value.endsWith('@ubiobio.cl') ||
-                                value.endsWith('@alumnos.ubiobio.cl') ||
-                                'El correo debe ser institucional'
-                        },
-                        onChange: (e) => handleInputChange('email', e.target.value),
-                    },
-                    {
-                        label: "Contraseña",
-                        name: "password",
-                        placeholder: "**********",
-                        fieldType: 'input',
-                        type: "password",
-                        required: true,
-                        minLength: 8,
-                        maxLength: 26,
-                        pattern: /^[a-zA-Z0-9]+$/,
-                        patternMessage: "Debe contener solo letras y números",
-                        errorMessageData: errorPassword,
-                        onChange: (e) => handleInputChange('password', e.target.value)
-                    },
-                ]}
-                buttonText="Iniciar sesión"
-                onSubmit={loginSubmit}
+            title="Iniciar sesión"
+            fields={[
+                {
+                label: "Correo electrónico *",
+                name: "email",
+                placeholder: "Ejemplo: nombre.apellido@ubiobio.cl",
+                fieldType: 'input',
+                type: "email",
+                required: true,
+                minLength: 15,
+                maxLength: 100,
+                errorMessageData: errorEmail,
+                validate: {
+                    emailDomain: (value) =>
+                    value.endsWith('@ubiobio.cl') ||
+                    value.endsWith('@alumnos.ubiobio.cl') ||
+                    'El correo debe ser institucional'
+                },
+                onChange: (e) => handleInputChange('email', e.target.value),
+                help: "Debe ser correo institucional (ej: nombre.apellido@ubiobio.cl)"
+                },
+                {
+                label: "Contraseña *",
+                name: "password",
+                placeholder: "**********",
+                fieldType: 'input',
+                type: "password",
+                required: true,
+                minLength: 8,
+                maxLength: 26,
+                pattern: /^[a-zA-Z0-9]+$/,
+                patternMessage: "Debe contener solo letras y números",
+                errorMessageData: errorPassword,
+                onChange: (e) => handleInputChange('password', e.target.value),
+                help: "Mínimo 8 caracteres, solo letras y números."
+                },
+            ]}
+            buttonText="Iniciar sesión"
+            onSubmit={loginSubmit}
                 footerContent={
                     <p>
                         ¿No tienes cuenta?, <a href="/register">¡Regístrate aquí!</a>
