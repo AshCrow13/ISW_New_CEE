@@ -4,7 +4,7 @@ import axios from './root.service.js';
 export async function getHistorial(filtros = {}) { // Filtros opcionales para la consulta
     try {
         const { data } = await axios.get('/historial', { params: filtros });
-        return data.data; // Ajusta según respuesta real del backend
+        return data.data; // Ajustar segun respuesta del backend
     } catch (error) {
         return [];
     }

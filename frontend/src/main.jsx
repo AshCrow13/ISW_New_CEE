@@ -49,13 +49,11 @@ const router = createBrowserRouter([
       {
         path: '/historial',
         element: (
-          <ProtectedRoute allowedRoles={['administrador']}>
+          <ProtectedRoute allowedRoles={['admin']}>
             <Historial />
           </ProtectedRoute>
         )
       }
-
-
     ]
   },
   {
