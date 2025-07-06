@@ -1,12 +1,13 @@
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
+import '../styles/home.css';
 
 const Home = () => {
   return (
-    <main className="container">
+    <main className="container center-list-container">
       <h1>Bienvenido</h1>
-      <ul>
+      <ul className='center-list'>
         <li>
-          <Link to="/feedback">Ver Feedback</Link>
+          <Link to="/feedback">Feedback</Link>
         </li>
         {/* Agrega aquí más enlaces a otras páginas nuevas */}
       </ul>
