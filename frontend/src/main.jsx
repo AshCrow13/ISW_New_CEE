@@ -13,6 +13,7 @@ import Documentos from '@pages/Documentos';
 
 
 import Feedback from './pages/feedback';
+import Votacion from './pages/Votacion';
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,14 @@ const router = createBrowserRouter([
       {
         path: '/feedback',
         element: <Feedback/>
+      },
+      {
+        path: '/votacion',
+        element: (
+          <ProtectedRoute allowedRoles={['admin', 'vocalia']}>
+            <Votacion/>
+          </ProtectedRoute>
+        )
       },
       {
         path: '/actividades',

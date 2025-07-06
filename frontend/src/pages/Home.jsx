@@ -9,6 +9,7 @@ const Home = () => {
         <li>
           <Link to="/feedback">Feedback</Link>
         </li>
+        <Link to="/votacion">Votaciones</Link>
         {/* Agrega aquí más enlaces a otras páginas nuevas */}
       </ul>
     </main>
