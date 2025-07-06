@@ -2,6 +2,8 @@
 import React from 'react';
 
 const ListaVotaciones = ({ votaciones, loading, user, handleEliminar }) => {
+    console.log('📋 Votaciones recibidas en ListaVotaciones:', votaciones);
+    
     if (loading) {
         return <p className="loading-message">🔄 Cargando votaciones...</p>;
     }
@@ -16,36 +18,46 @@ const ListaVotaciones = ({ votaciones, loading, user, handleEliminar }) => {
 
     return (
         <div className="votaciones-grid">
-            {votaciones.map((votacion) => (
-                <div key={votacion._id} className="votacion-card">
-                    <h3>{votacion.titulo}</h3>
-                    <p>{votacion.descripcion}</p>
-                    
-                    <div className="votacion-meta">
-                        <strong>ID:</strong> {votacion._id}
-                    </div>
-                    <div className="votacion-meta">
-                        <strong>Inicio:</strong> {new Date(votacion.inicio).toLocaleString()}
-                    </div>
-                    <div className="votacion-meta">
-                        <strong>Fin:</strong> {new Date(votacion.fin).toLocaleString()}
-                    </div>
-                    <div className="votacion-meta">
-                        <strong>Estado:</strong> {votacion.estado}
-                    </div>
-                    
-                    {user && user.rol === 'admin' && (
-                        <div className="card-actions">
-                            <button
-                                onClick={() => handleEliminar(votacion._id)}
-                                className="btn-danger"
-                            >
-                                🗑️ Eliminar
-                            </button>
+            {votaciones.map((votacion, index) => {
+                console.log(`📝 Votación ${index}:`, votacion);
+                
+                return (
+                    <div key={votacion.id || votacion._id || index} className="votacion-card">
+                        <h3>{votacion.nombre || votacion.titulo || 'Sin título'}</h3>
+                        <p>{votacion.descripcion || 'Sin descripción'}</p>
+                        
+                        <div className="votacion-meta">
+                            <strong>ID:</strong> {votacion.id || votacion._id || 'No disponible'}
                         </div>
-                    )}
-                </div>
-            ))}
+                        <div className="votacion-meta">
+                            <strong>Estado:</strong> 
+                            <span className={`estado-badge ${votacion.estado ? 'activo' : 'inactivo'}`}>
+                                {votacion.estado === true || votacion.estado === 'true' ? '🟢 Activa' : '🔴 Inactiva'}
+                            </span>
+                        </div>
+                        <div className="votacion-meta">
+                            <strong>Inicio:</strong> {votacion.inicio ? new Date(votacion.inicio).toLocaleString() : 'No definido'}
+                        </div>
+                        <div className="votacion-meta">
+                            <strong>Fin:</strong> {votacion.fin ? new Date(votacion.fin).toLocaleString() : 'No definido'}
+                        </div>
+                        <div className="votacion-meta">
+                            <strong>Duración:</strong> {votacion.duracion ? `${votacion.duracion} minutos` : 'No definida'}
+                        </div>
+                        
+                        {user && (user.rol === 'admin' || user.rol === 'vocalia') && (
+                            <div className="card-actions">
+                                <button
+                                    onClick={() => handleEliminar(votacion.id || votacion._id)}
+                                    className="btn-danger"
+                                >
+                                    🗑️ Eliminar
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
         </div>
     );
 };

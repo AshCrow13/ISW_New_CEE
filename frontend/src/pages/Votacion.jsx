@@ -29,6 +29,7 @@ const Votacion = () => {
         setView('ver-todas');
         try {
             const data = await getVotaciones();
+            console.log('📊 Datos recibidos del servicio getVotaciones:', data);
             setVotaciones(data || []);
         } catch (error) {
             console.error('Error al cargar votaciones:', error);
