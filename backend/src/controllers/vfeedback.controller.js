@@ -34,7 +34,7 @@ export async function postFeedback(req, res) {
 
 export async function deleteFeedback(req, res) {
     try {
-        const { id } = req.params;
+        const { id } = req.params.id;
         const [feedback, errorFeedback] = await deleteFeedbackService(id);
         if (errorFeedback) return handleErrorClient(res, 400, errorFeedback);
         handleSuccess(res, 200, "Feedback eliminado", feedback);
@@ -45,7 +45,7 @@ export async function deleteFeedback(req, res) {
 
 export async function getFeedback(req, res) {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
         const [feedback, errorFeedback] = await getFeedbackService(id);
         if (errorFeedback) return handleErrorClient(res, 400, errorFeedback);
         handleSuccess(res, 200, "Feedback encontrado", feedback);

@@ -12,6 +12,8 @@ import Actividades from '@pages/Actividades';
 import Documentos from '@pages/Documentos';
 
 
+import Feedback from './pages/feedback';
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -31,6 +33,10 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: '/feedback',
+        element: <Feedback/>
+      },
+      {
         path: '/actividades',
         element: (
           <ProtectedRoute allowedRoles={['admin', 'vocalia', 'estudiante']}>
@@ -46,7 +52,6 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         )
       }
-
     ]
   },
   {

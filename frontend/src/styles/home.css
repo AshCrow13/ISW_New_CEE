@@ -1,0 +1,30 @@
+
+.center-list-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.center-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.center-list li {
+  margin: 1rem 0;
+}
+
+.center-list a {
+  text-decoration: none;
+  color: #1976d2;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.center-list a:hover {
+  color: #1565c0;
+}
