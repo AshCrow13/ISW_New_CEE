@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export const AuthContext = createContext(); // eslint-disable-line no-unused-vars
+export const AuthContext = createContext();
 
-// eslint-disable-next-line react-refresh/only-export-components
-const useAuth = () => useContext(AuthContext);
+// Exporta el hook personalizado
+export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }) {
     const navigate = useNavigate();
