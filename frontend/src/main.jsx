@@ -10,7 +10,7 @@ import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
 import Actividades from '@pages/Actividades';
 import Documentos from '@pages/Documentos';
-
+import Historial from '@pages/Historial';
 
 const router = createBrowserRouter([
   {
@@ -25,9 +25,9 @@ const router = createBrowserRouter([
       {
         path: '/users',
         element: (
-        <ProtectedRoute allowedRoles={['admin', 'vocalia']}>
-          <Users />
-        </ProtectedRoute>
+          <ProtectedRoute allowedRoles={['admin', 'vocalia']}>
+            <Users />
+          </ProtectedRoute>
         ),
       },
       {
@@ -39,13 +39,22 @@ const router = createBrowserRouter([
         )
       },
       {
-      path: '/documentos',
-      element: (
-          <ProtectedRoute allowedRoles={['admin', 'vocalia', 'estudiante']}>
-            <Documentos />
+        path: '/documentos',
+        element: (
+            <ProtectedRoute allowedRoles={['admin', 'vocalia', 'estudiante']}>
+              <Documentos />
+            </ProtectedRoute>
+          )
+      },
+      {
+        path: '/historial',
+        element: (
+          <ProtectedRoute allowedRoles={['administrador']}>
+            <Historial />
           </ProtectedRoute>
         )
       }
+
 
     ]
   },
