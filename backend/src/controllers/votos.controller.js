@@ -12,15 +12,11 @@ import { handleErrorClient, handleSuccess } from "../handlers/responseHandlers.j
 export async function postVoto(req, res){
     try{
         const usuarioId = req.user.id;
-        const { errorb } = votosBodyValidation.validate(req.body);
-        if (errorb) return handleErrorClient(res, 400, "Error en el cuerpo de la solicitud: " + errorb.message);
-
         const { error: errorQuery } = votosQueryValidation.validate({votacionId: req.params.votacionId});
         if (errorQuery) return handleErrorClient(res, 400, "El parametro de la votacion es invalido" + errorQuery.message);
 
         const votacionId = Number(req.params.votacionId);
-        const {opcionId } = req.body;
-        
+        const opcionId  = Number(req.params.opcionId);
         const [voto, error] = await postVotoService(usuarioId, votacionId, opcionId);
 
         if (error) {
