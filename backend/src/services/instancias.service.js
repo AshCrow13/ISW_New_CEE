@@ -6,11 +6,18 @@ import { AppDataSource } from "../config/configDb.js";
 export async function createInstanciaService(data) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
-        const claveAleatoria = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+        
+        // Generar clave alfanumérica de 6 caracteres
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let claveAleatoria = '';
+        for (let i = 0; i < 6; i++) {
+            claveAleatoria += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        
         const instancia = repo.create({
             ...data,
-            ClaveAsistencia: claveAleatoria,
-            AsistenciaAbierta: false,
+            ClaveAsistencia: data.ClaveAsistencia || claveAleatoria,
+            AsistenciaAbierta: data.AsistenciaAbierta || false,
         });
         await repo.save(instancia);
         return [instancia, null];
@@ -61,6 +68,7 @@ export async function updateInstanciaService(query, data) {
         if (data.Fecha !== undefined) camposActualizados.Fecha = data.Fecha;
         if (data.Sala !== undefined) camposActualizados.Sala = data.Sala;
         if (data.AsistenciaAbierta !== undefined) camposActualizados.AsistenciaAbierta = data.AsistenciaAbierta;
+        if (data.ClaveAsistencia !== undefined) camposActualizados.ClaveAsistencia = data.ClaveAsistencia;
         
         Object.assign(instancia, camposActualizados, { updatedAt: new Date() });
         await repo.save(instancia);
