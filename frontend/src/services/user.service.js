@@ -1,21 +1,19 @@
-import axios from './root.service.js';
-import { formatUserData } from '@helpers/formatData.js';
+import api from './root.service.js';
 
-export async function getUsers() {
+// ✅ FUNCIÓN: Obtener usuarios
+export const getUsers = async () => {
     try {
-        // ✅ Usar la ruta correcta
-        const { data } = await axios.get('/estudiantes');
+        const response = await api.get('/estudiantes');
         
-        console.log('Response data structure:', data);
+        console.log('Response data structure:', response.data);
         
-        if (data && data.data && Array.isArray(data.data)) {
-            const formattedData = data.data.map(formatUserData);
-            return formattedData;
+        if (response.data && response.data.data && Array.isArray(response.data.data)) {
+            return response.data.data;
         } else {
             throw new Error('Estructura de respuesta inválida');
         }
     } catch (error) {
-        console.error('Error in getUsers service:', error);
+        console.error('Error en el servicio getUsers:', error);
         
         if (error.response) {
             throw new Error(`Error del servidor: ${error.response.status}`);
@@ -25,26 +23,41 @@ export async function getUsers() {
             throw new Error(error.message || 'Error desconocido');
         }
     }
-}
+};
 
-export async function updateUser(data, rut) {
+// ✅ CORREGIR: Actualizar usuario - Cambiar PUT por PATCH y ruta correcta
+export const updateUser = async (userData, rut) => {
     try {
-        // ✅ Actualizar con la ruta correcta
-        const response = await axios.patch(`/estudiantes/detail/?rut=${rut}`, data);
-        console.log(response);
-        return response.data.data;
+        console.log('🔄 Enviando actualización:', userData, 'para RUT:', rut); // ✅ DEBUG
+        
+        // ✅ LIMPIAR: Remover campos no permitidos en actualización
+        const { email, id, createdAt, updatedAt, rut: userRut, ...cleanUserData } = userData;
+        //                                                     ^^^^^ ✅ AGREGAR: También remover rut
+        
+        // ✅ LIMPIAR: Remover newPassword si está vacío
+        if (!cleanUserData.newPassword || cleanUserData.newPassword.trim() === '') {
+            delete cleanUserData.newPassword;
+        }
+        
+        console.log('📤 Datos limpios a enviar:', cleanUserData); // ✅ DEBUG
+        
+        // ✅ USAR: PATCH en lugar de PUT y ruta /detail
+        const response = await api.patch(`/estudiantes/detail?rut=${rut}`, cleanUserData);
+        
+        console.log('✅ Respuesta del backend:', response.data); // ✅ DEBUG
+        return response.data;
     } catch (error) {
-        console.log(error);
-        throw new Error(error.response?.data?.message || 'Error al actualizar usuario');
+        console.error('❌ Error en updateUser:', error); // ✅ DEBUG
+        throw error;
     }
-}
+};
 
-export async function deleteUser(rut) {
+// ✅ FUNCIÓN: Eliminar usuario
+export const deleteUser = async (rut) => {
     try {
-        // ✅ Actualizar con la ruta correcta
-        const response = await axios.delete(`/estudiantes/detail/?rut=${rut}`);
+        const response = await api.delete(`/estudiantes/detail?rut=${rut}`);
         return response.data;
     } catch (error) {
         throw new Error(error.response?.data?.message || 'Error al eliminar usuario');
     }
-}
+};
