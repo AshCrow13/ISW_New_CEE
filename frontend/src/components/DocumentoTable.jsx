@@ -1,42 +1,89 @@
-import Table from '@components/Table';
+import { DataGrid } from "@mui/x-data-grid";
+import { Button, Stack, Box } from "@mui/material";
 
-const columns = [ // Definición de columnas para la tabla
-    { title: "Título", field: "titulo" },
-    { title: "Tipo", field: "tipo" },
-    { title: "Archivo", field: "archivo", formatter: row =>
-        row.archivo
-            ? <button type="button" onClick={() => row.onDownload(row.id)} aria-label="Descargar archivo">Descargar</button>
-            : "Sin archivo"
-    },
-    { title: "Acciones", field: "acciones", formatter: row =>
-        <>
-            {row.onEdit && <button onClick={() => row.onEdit(row)}>Editar</button>}
-            {row.onDelete && <button onClick={() => row.onDelete(row.id)}>Eliminar</button>}
-        </>
-    }
-];
-
-const DocumentoTable = ({ // Props para la tabla de documentos
+const DocumentoTable = ({
     documentos = [],
     onEdit,
     onDelete,
     onDownload,
-    userRole
-    }) => {
-    // datos con funciones
-    const data = documentos.map(doc => ({
+    userRole,
+}) => {
+  // Prepara las filas
+    const rows = documentos.map((doc, idx) => ({
+        id: doc.id || idx,
         ...doc,
-        onEdit: (userRole === 'admin' || userRole === 'vocalia') ? onEdit : null,
-        onDelete: (userRole === 'admin' || userRole === 'vocalia') ? onDelete : null,
-        onDownload
     }));
 
-    return ( // Renderiza la tabla con los datos y columnas definidas
-        <Table
-        data={data}
-        columns={columns}
+    // Define columnas MUI DataGrid
+    const columns = [
+        { field: "titulo", headerName: "Título", flex: 1 },
+        { field: "tipo", headerName: "Tipo", flex: 1 },
+        {
+        field: "archivo",
+        headerName: "Archivo",
+        flex: 1,
+        renderCell: (params) =>
+            params.row.archivo ? (
+            <Button
+                variant="outlined"
+                size="small"
+                onClick={() => onDownload(params.row.id)}
+            >
+                Descargar
+            </Button>
+            ) : (
+            "Sin archivo"
+            ),
+        sortable: false,
+        filterable: false,
+        },
+        ...(userRole === "admin" || userRole === "vocalia"
+        ? [
+            {
+                field: "acciones",
+                headerName: "Acciones",
+                flex: 1,
+                renderCell: (params) => (
+                <Stack direction="row" spacing={1}>
+                    <Button
+                    variant="outlined"
+                    size="small"
+                    color="primary"
+                    onClick={() => onEdit(params.row)}
+                    >
+                    Editar
+                    </Button>
+                    <Button
+                    variant="outlined"
+                    size="small"
+                    color="error"
+                    onClick={() => onDelete(params.row.id)}
+                    >
+                    Eliminar
+                    </Button>
+                </Stack>
+                ),
+                sortable: false,
+                filterable: false,
+            },
+            ]
+        : []),
+    ];
+
+    return (
+        <Box sx={{ height: 500, width: "100%", my: 2 }}>
+        <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={8}
+            rowsPerPageOptions={[8]}
+            disableRowSelectionOnClick
+            autoHeight
         />
+        </Box>
     );
 };
 
 export default DocumentoTable;
+
+

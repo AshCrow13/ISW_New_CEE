@@ -1,92 +1,110 @@
+/*
 import Table from '@components/Table';
-import useUsers from '@hooks/users/useGetUsers.jsx';
 import Search from '../components/Search';
-import Popup from '../components/Popup';
 import DeleteIcon from '../assets/deleteIcon.svg';
 import UpdateIcon from '../assets/updateIcon.svg';
 import UpdateIconDisable from '../assets/updateIconDisabled.svg';
 import DeleteIconDisable from '../assets/deleteIconDisabled.svg';
-import { useCallback, useState } from 'react';
-import '@styles/users.css';
 import useEditUser from '@hooks/users/useEditUser';
-import useDeleteUser from '@hooks/users/useDeleteUser';
+import useDeleteUser from '@hooks/users/useDeleteUser'; 
+*/
+import '@styles/users.css';
+import { DataGrid } from '@mui/x-data-grid';
+import { Box, Typography, Button, Stack, TextField } from '@mui/material';
+import { useCallback, useState, useMemo } from 'react';
+import useUsers from '@hooks/users/useGetUsers.jsx';
+import Popup from '../components/Popup';
 import { useAuth } from '@context/AuthContext';
 
-const Users = () => { // Página de usuarios
+const Users = () => {
   const { users, fetchUsers, setUsers } = useUsers();
   const [filterRut, setFilterRut] = useState('');
-  const { user } = useAuth(); // usuario autenticado
+  const { user } = useAuth();
   const userRole = user?.rol;
 
-  const {
-    handleClickUpdate,
-    handleUpdate,
-    isPopupOpen,
-    setIsPopupOpen,
-    dataUser,
-    setDataUser
-  } = useEditUser(setUsers);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
 
-  const { handleDelete } = useDeleteUser(fetchUsers, setDataUser);
+  // Mapea los datos de usuarios a filas
+  const rows = useMemo(() => users.map((u, i) => ({
+    id: u.id || i, // tener un id único
+    ...u
+  })), [users]);
 
-  const handleRutFilterChange = (e) => {
-    setFilterRut(e.target.value);
-  };
-
-  const handleSelectionChange = useCallback((selectedUsers) => {
-    setDataUser(selectedUsers);
-  }, [setDataUser]);
-
+  // Define columnas para DataGrid
   const columns = [
-    { title: "Nombre", field: "nombreCompleto", width: 350, responsive: 0 },
-    { title: "Correo electrónico", field: "email", width: 300, responsive: 3 },
-    { title: "Rut", field: "rut", width: 150, responsive: 2 },
-    { title: "Rol", field: "rol", width: 200, responsive: 2 },
-    { title: "Creado", field: "createdAt", width: 200, responsive: 2 }
+    { field: "nombreCompleto", headerName: "Nombre", flex: 1 },
+    { field: "email", headerName: "Correo electrónico", flex: 1 },
+    { field: "rut", headerName: "Rut", flex: 0.7 },
+    { field: "rol", headerName: "Rol", flex: 0.6 },
+    { field: "createdAt", headerName: "Creado", flex: 1 },
+    // Si el usuario es admin, muestra la columna de acciones
+    ...(userRole === 'admin'
+      ? [
+        {
+          field: 'acciones',
+          headerName: 'Acciones',
+          sortable: false,
+          renderCell: (params) => (
+            <Stack direction="row" spacing={1}>
+              <Button
+                size="small"
+                variant="outlined"
+                color="primary"
+                onClick={() => {
+                  setSelectedRow(params.row);
+                  setIsPopupOpen(true);
+                }}
+              >
+                Editar
+              </Button>
+              {/* Puedes agregar un boton */}
+            </Stack>
+          ),
+          flex: 1
+        }
+      ] : [])
   ];
 
+  // Filtrado por rut
+  const filteredRows = useMemo(
+    () =>
+      filterRut
+        ? rows.filter((r) => r.rut.toLowerCase().includes(filterRut.toLowerCase()))
+        : rows,
+    [rows, filterRut]
+  );
+
   return (
-    <div className='main-container'>
-      <div className='table-container'>
-        <div className='top-table'>
-          <h1 className='title-table'>Usuarios</h1>
-          <div className='filter-actions'>
-            <Search value={filterRut} onChange={handleRutFilterChange} placeholder={'Filtrar por rut'} />
-            {/* Solo admin puede editar/eliminar */}
-            {userRole === 'admin' && ( // Comprobación del rol de usuario
-              <>
-                <button onClick={handleClickUpdate} disabled={dataUser.length === 0}>
-                  {dataUser.length === 0 ? (
-                    <img src={UpdateIconDisable} alt="edit-disabled" />
-                  ) : (
-                    <img src={UpdateIcon} alt="edit" />
-                  )}
-                </button>
-                <button className='delete-user-button' disabled={dataUser.length === 0} onClick={() => handleDelete(dataUser)}>
-                  {dataUser.length === 0 ? (
-                    <img src={DeleteIconDisable} alt="delete-disabled" />
-                  ) : (
-                    <img src={DeleteIcon} alt="delete" />
-                  )}
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-        <Table
-          data={users}
-          columns={columns}
-          filter={filterRut}
-          dataToFilter={'rut'}
-          initialSortName={'nombreCompleto'}
-          onSelectionChange={handleSelectionChange}
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" gutterBottom>Usuarios</Typography>
+      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+        <TextField
+          label="Filtrar por rut"
+          value={filterRut}
+          onChange={e => setFilterRut(e.target.value)}
+          size="small"
         />
-      </div>
+      </Stack>
+      <Box sx={{ height: 500, width: '100%' }}>
+        <DataGrid
+          rows={filteredRows}
+          columns={columns}
+          pageSize={8}
+          rowsPerPageOptions={[8]}
+          disableRowSelectionOnClick
+        />
+      </Box>
       {/* Popup solo para admin */}
-      {userRole === 'admin' && ( // Comprobación del rol de usuario
-        <Popup show={isPopupOpen} setShow={setIsPopupOpen} data={dataUser} action={handleUpdate} />
+      {userRole === 'admin' && (
+        <Popup
+          show={isPopupOpen}
+          setShow={setIsPopupOpen}
+          data={selectedRow ? [selectedRow] : []}
+          action={() => {/* Implementar edicion */}}
+        />
       )}
-    </div>
+    </Box>
   );
 };
 
