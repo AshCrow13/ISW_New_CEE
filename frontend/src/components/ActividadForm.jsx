@@ -1,6 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const ActividadForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false, loading = false }) => {
+const ActividadForm = ({ // Props del componente
+  initialData = {},
+  onSubmit,
+  onCancel,
+  isEditing = false,
+  loading = false,
+}) => { // Estado del formulario
   const [form, setForm] = useState({
     titulo: initialData.titulo || "",
     descripcion: initialData.descripcion || "",
@@ -9,7 +15,22 @@ const ActividadForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false
     categoria: initialData.categoria || "",
     error: {},
   });
+  
+  // Contador de caracteres para la descripción
   const [charCount, setCharCount] = useState(form.descripcion.length);
+
+  // Resetea el formulario cuando cambian los datos iniciales
+  useEffect(() => {
+    setForm({
+      titulo: initialData.titulo || "",
+      descripcion: initialData.descripcion || "",
+      fecha: initialData.fecha || "",
+      lugar: initialData.lugar || "",
+      categoria: initialData.categoria || "",
+      error: {},
+    });
+    setCharCount(initialData.descripcion?.length || 0);
+  }, [initialData]);
 
   // Validación sencilla
   const validate = () => {
@@ -22,6 +43,7 @@ const ActividadForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false
     return error;
   };
 
+  // Maneja los cambios en los campos del formulario
   const handleChange = e => {
     const { name, value } = e.target;
     setForm(prev => ({
@@ -32,6 +54,7 @@ const ActividadForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false
     if (name === "descripcion") setCharCount(value.length);
   };
 
+  // Maneja el envío del formulario
   const handleSubmit = e => {
     e.preventDefault();
     const errors = validate();
@@ -40,6 +63,7 @@ const ActividadForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false
       return;
     }
     
+    // Normalizar datos antes de enviar
     const normalizado = { ...form, titulo: form.titulo.trim(), descripcion: form.descripcion.trim() };
     onSubmit(normalizado);
   };
