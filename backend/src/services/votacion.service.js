@@ -79,11 +79,61 @@ export async function getVotaciones() {
 export async function updateVotacion(id, body) {
     try {
         const votacionRepository = AppDataSource.getRepository(votacionSchema);
-        const votacionToUpdate = await votacionRepository.findOneBy({ id });
+        const opcionesRepository = AppDataSource.getRepository(opcionesSchema);
+        
+        // Buscar la votación existente con sus opciones
+        const votacionToUpdate = await votacionRepository.findOne({
+            where: { id },
+            relations: ["opciones"]
+        });
+        
         if (!votacionToUpdate) return [null, "Votación no encontrada"];
-        const updatedVotacion = { ...votacionToUpdate, ...body };
-        await votacionRepository.save(updatedVotacion);
-        return [updatedVotacion, null];
+
+        // Extraer opciones del body para manejarlas por separado
+        const { opciones, duracion, ...otrosDataos } = body;
+        
+        // Actualizar campos básicos de la votación
+        Object.assign(votacionToUpdate, otrosDataos);
+        
+        // Si se proporciona duración, recalcular fecha de fin
+        if (duracion !== undefined) {
+            votacionToUpdate.duracion = duracion;
+            const fechaInicio = new Date(votacionToUpdate.inicio);
+            votacionToUpdate.fin = new Date(fechaInicio.getTime() + duracion * 60000);
+        }
+
+        // Guardar la votación actualizada
+        const votacionActualizada = await votacionRepository.save(votacionToUpdate);
+
+        // Si se proporcionan nuevas opciones, actualizar
+        if (opciones && Array.isArray(opciones)) {
+            // Eliminar opciones existentes
+            if (votacionToUpdate.opciones && votacionToUpdate.opciones.length > 0) {
+                await opcionesRepository.remove(votacionToUpdate.opciones);
+            }
+
+            // Crear nuevas opciones
+            const nuevasOpciones = await Promise.all(
+                opciones.map(texto =>
+                    opcionesRepository.save(
+                        opcionesRepository.create({
+                            texto,
+                            votacion: votacionActualizada,
+                        })
+                    )
+                )
+            );
+
+            votacionActualizada.opciones = nuevasOpciones;
+        }
+
+        // Recargar la votación con las opciones actualizadas
+        const votacionFinal = await votacionRepository.findOne({
+            where: { id },
+            relations: ["opciones"]
+        });
+
+        return [votacionFinal, null];
     } catch (error) {
         console.error("Error al actualizar la votación:", error);
         return [null, "Error interno del servidor"];

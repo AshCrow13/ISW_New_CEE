@@ -2,8 +2,6 @@
 import React from 'react';
 
 const ListaVotaciones = ({ votaciones, loading, user, handleEliminar }) => {
-    console.log('📋 Votaciones recibidas en ListaVotaciones:', votaciones);
-    
     if (loading) {
         return <p className="loading-message">🔄 Cargando votaciones...</p>;
     }
@@ -19,8 +17,6 @@ const ListaVotaciones = ({ votaciones, loading, user, handleEliminar }) => {
     return (
         <div className="votaciones-grid">
             {votaciones.map((votacion, index) => {
-                console.log(`📝 Votación ${index}:`, votacion);
-                
                 return (
                     <div key={votacion.id || votacion._id || index} className="votacion-card">
                         <h3>{votacion.nombre || votacion.titulo || 'Sin título'}</h3>

@@ -1,11 +1,12 @@
 // Componente para mostrar los detalles de una votación específica
 import React from 'react';
+import { useVotacionDetalle } from '@hooks/useVotacionDetalle.jsx';
 
-const DetalleVotacion = ({ votacionSeleccionada, loading, user, handleEliminar }) => {
-    if (loading) {
+const DetalleVotacion = (props) => {
+    const { votacionSeleccionada, user, handleEliminar } = useVotacionDetalle(props);
+    if (props.loading) {
         return <p className="loading-message">🔄 Buscando votación...</p>;
     }
-
     if (!votacionSeleccionada) {
         return (
             <p className="error-message-page">
@@ -13,11 +14,9 @@ const DetalleVotacion = ({ votacionSeleccionada, loading, user, handleEliminar }
             </p>
         );
     }
-
     return (
         <div className="detail-card">
             <h3>{votacionSeleccionada.titulo}</h3>
-            
             <div className="detail-meta">
                 <p><strong>ID:</strong> {votacionSeleccionada.id}</p>
                 <p><strong>Nombre:</strong> {votacionSeleccionada.nombre}</p>
@@ -30,7 +29,6 @@ const DetalleVotacion = ({ votacionSeleccionada, loading, user, handleEliminar }
                     </span>
                 </p>
             </div>
-            
             {votacionSeleccionada.opciones && votacionSeleccionada.opciones.length > 0 ? (
                 <div className="opciones-list">
                     <h4>📝 Opciones de votación:</h4>
@@ -50,7 +48,6 @@ const DetalleVotacion = ({ votacionSeleccionada, loading, user, handleEliminar }
                     <p>⚠️ Esta votación no tiene opciones configuradas</p>
                 </div>
             )}
-            
             {user && user.rol === 'admin' && (
                 <div className="card-actions">
                     <button

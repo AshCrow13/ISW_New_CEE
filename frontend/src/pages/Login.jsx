@@ -45,6 +45,7 @@ const Login = () => {
                             emailDomain: (value) =>
                                 value.endsWith('@ubiobio.cl') ||
                                 value.endsWith('@alumnos.ubiobio.cl') ||
+                                value.endsWith('@gmail.cl') ||
                                 'El correo debe ser institucional'
                         },
                         onChange: (e) => handleInputChange('email', e.target.value),

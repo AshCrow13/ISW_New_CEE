@@ -40,7 +40,7 @@ const router = createBrowserRouter([
       {
         path: '/votacion',
         element: (
-          <ProtectedRoute allowedRoles={['admin', 'vocalia']}>
+          <ProtectedRoute allowedRoles={['admin', 'vocalia','estudiante']}>
             <Votacion/>
           </ProtectedRoute>
         )

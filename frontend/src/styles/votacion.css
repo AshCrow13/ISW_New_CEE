@@ -611,70 +611,160 @@
     font-weight: 500;
 }
 
-/* Responsivo para móviles */
+/* Estilos específicos para el formulario de actualización */
+.actualizacion-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.buscar-votacion {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.buscar-votacion h3 {
+    color: #003366;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.search-group {
+    display: flex;
+    gap: 15px;
+    max-width: 400px;
+    margin: 0 auto 15px auto;
+}
+
+.search-group .form-input {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.btn-search {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: background-color 0.3s ease;
+}
+
+.btn-search:hover:not(:disabled) {
+    background-color: #0052a3;
+}
+
+.btn-search:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.help-text {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+}
+
+.editar-votacion {
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.votacion-info {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.votacion-info h3 {
+    color: #003366;
+    margin: 0 0 15px 0;
+    font-size: 22px;
+}
+
+.info-card {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #0066cc;
+    margin-bottom: 15px;
+}
+
+.info-card p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.info-card strong {
+    color: #003366;
+}
+
+.btn-back {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-back:hover {
+    background-color: #545b62;
+}
+
+.editar-votacion .votacion-form {
+    margin: 0;
+    background-color: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    max-width: none;
+}
+
+/* Estilos para errores */
+.error-container {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    text-align: center;
+}
+
+/* Responsive para actualización */
 @media (max-width: 768px) {
-    .form-group-row {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .votacion-form {
-        padding: 20px;
-        margin: 10px;
-    }
-    
-    .botones-form {
+    .search-group {
         flex-direction: column;
-        gap: 10px;
+        max-width: none;
     }
     
-    .opcion-item {
-        flex-wrap: wrap;
-        gap: 10px;
+    .btn-search {
+        width: 100%;
     }
     
-    .opcion-numero {
-        min-width: 25px;
+    .actualizacion-container {
+        padding: 0 10px;
     }
     
-    .votacion-container {
+    .buscar-votacion,
+    .editar-votacion {
+        margin: 0 0 20px 0;
+    }
+    
+    .votacion-info {
         padding: 15px;
     }
     
-    .votacion-title {
-        font-size: 2rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .menu-grid {
-        grid-template-columns: 1fr;
-        max-width: 400px;
-    }
-    
-    .content-container {
-        padding: 20px;
-        margin: 10px;
-    }
-    
-    .content-header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-    
-    .votaciones-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .search-container {
-        padding: 15px;
-    }
-    
-    .btn-floating {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-        bottom: 20px;
-        right: 20px;
+    .info-card {
+        padding: 12px;
     }
 }

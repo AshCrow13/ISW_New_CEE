@@ -32,7 +32,7 @@ export async function postVotacion(data) {
 
 export async function updateVotacion(id, data) {
     try {
-        const response = await axios.put(`/votacion/${id}`, data);
+        const response = await axios.patch(`/votacion/${id}`, data);
         return response.data;
     } catch (error) {
         console.error(`Error al actualizar votación con ID ${id}:`, error);
