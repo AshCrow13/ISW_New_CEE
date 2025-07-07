@@ -1,13 +1,22 @@
 import { useState, useEffect } from 'react';
 import '@styles/asamblea.css';
 
+const generateRandomKeyString = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+};
+
 const AsambleaForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false, loading = false }) => {
     const [form, setForm] = useState({
         Temas: initialData.Temas || "",
         Fecha: initialData.Fecha ? new Date(initialData.Fecha).toISOString().slice(0, 16) : "",
         Sala: initialData.Sala || "",
         AsistenciaAbierta: initialData.AsistenciaAbierta || false,
-        ClaveAsistencia: initialData.ClaveAsistencia || "",
+        ClaveAsistencia: initialData.ClaveAsistencia || (!isEditing ? generateRandomKeyString() : ""),
         error: {},
     });
 
@@ -17,17 +26,15 @@ const AsambleaForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false,
         setCharCount(form.Temas.length);
     }, [form.Temas]);
 
-    // Generar clave automáticamente si se habilita la asistencia y no hay clave
     useEffect(() => {
-        if (form.AsistenciaAbierta && !form.ClaveAsistencia) {
-            setForm(prev => ({ ...prev, ClaveAsistencia: generateRandomKeyString() }));
+        if (!form.AsistenciaAbierta) {
+            setForm(prev => ({ ...prev, ClaveAsistencia: prev.ClaveAsistencia || (!isEditing ? generateRandomKeyString() : "") }));
         }
-    }, [form.AsistenciaAbierta]);
+    }, [form.AsistenciaAbierta, isEditing]);
 
     // Validación
     const validate = () => {
         let error = {};
-        
         if (!form.Temas || form.Temas.length < 2) {
             error.Temas = "El tema debe tener al menos 2 caracteres.";
         }
@@ -52,7 +59,6 @@ const AsambleaForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false,
         if (form.AsistenciaAbierta && (!form.ClaveAsistencia || form.ClaveAsistencia.length !== 6)) {
             error.ClaveAsistencia = "Error en la generación de la clave de asistencia.";
         }
-        
         return error;
     };
 
@@ -64,17 +70,10 @@ const AsambleaForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false,
                 [name]: type === 'checkbox' ? checked : value,
                 error: { ...prev.error, [name]: undefined }
             };
-            
-            // Si se activa la asistencia y no hay clave, generar una automáticamente
-            if (name === 'AsistenciaAbierta' && checked && !newForm.ClaveAsistencia) {
-                newForm.ClaveAsistencia = generateRandomKeyString();
-            }
-            
             // Si se desactiva la asistencia, limpiar la clave
             if (name === 'AsistenciaAbierta' && !checked) {
-                newForm.ClaveAsistencia = "";
+                newForm.ClaveAsistencia = prev.ClaveAsistencia || (!isEditing ? generateRandomKeyString() : "");
             }
-            
             return newForm;
         });
     };
@@ -86,23 +85,20 @@ const AsambleaForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false,
             setForm(prev => ({ ...prev, error: errors }));
             return;
         }
-        
+        const fechaISO = form.Fecha ? new Date(form.Fecha).toISOString() : null;
         const normalizado = { 
-            ...form, 
-            Temas: form.Temas.trim(), 
+            ...form,
+            Temas: form.Temas.trim(),
             Sala: form.Sala.trim(),
-            ClaveAsistencia: form.AsistenciaAbierta ? form.ClaveAsistencia : null
+            Fecha: fechaISO
         };
-        onSubmit(normalizado);
-    };
-
-    const generateRandomKeyString = () => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let result = '';
-        for (let i = 0; i < 6; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        if (form.AsistenciaAbierta) {
+            normalizado.ClaveAsistencia = form.ClaveAsistencia;
+        } else {
+            delete normalizado.ClaveAsistencia;
         }
-        return result;
+        delete normalizado.error;
+        onSubmit(normalizado);
     };
 
     return (
