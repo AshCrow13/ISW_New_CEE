@@ -1,6 +1,13 @@
+
 import { useVotacionVistaActualizacion } from '@hooks/useVotacionVistaActualizacion.jsx';
-import '@styles/form.css';
-import '@styles/votacion.css';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
+import Alert from '@mui/material/Alert';
 
 const VistaActualizacion = ({ user, onActualizar }) => {
     const {
@@ -23,185 +30,196 @@ const VistaActualizacion = ({ user, onActualizar }) => {
 
     if (!user || user.rol !== 'admin') {
         return (
-            <div className="error-container">
-                <p>❌ No tienes permisos para actualizar votaciones</p>
-            </div>
+            <Alert severity="error" sx={{ mt: 3 }}>
+                No tienes permisos para actualizar votaciones
+            </Alert>
         );
     }
 
     return (
-        <div className="actualizacion-container">
+        <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto', mt: 3 }}>
             {/* Paso 1: Buscar votación */}
             {step === 'buscar' && (
-                <div className="buscar-votacion">
-                    <h3>🔍 Buscar Votación a Actualizar</h3>
-                    <div className="search-group">
-                        <input
-                            type="text"
-                            className="form-input"
+                <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                        Buscar Votación a Actualizar
+                    </Typography>
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" sx={{ mb: 2 }}>
+                        <TextField
+                            size="small"
+                            variant="outlined"
                             placeholder="Ingresa el ID de la votación"
                             value={searchId}
                             onChange={(e) => setSearchId(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && buscarVotacion()}
+                            onKeyDown={(e) => e.key === 'Enter' && buscarVotacion()}
+                            sx={{ minWidth: 180 }}
                         />
-                        <button
-                            type="button"
-                            className="btn-search"
+                        <Button
+                            variant="contained"
+                            color="info"
                             onClick={buscarVotacion}
                             disabled={loading}
+                            sx={{ fontWeight: 600 }}
                         >
-                            {loading ? "Buscando..." : "🔍 Buscar"}
-                        </button>
-                    </div>
-                    <p className="help-text">
-                        💡 Puedes obtener el ID desde la lista de "Ver Todas las Votaciones"
-                    </p>
-                </div>
+                            {loading ? 'Buscando...' : 'Buscar'}
+                        </Button>
+                    </Stack>
+                    <Typography variant="body2" color="text.secondary">
+                        Puedes obtener el ID desde la lista de "Ver Todas las Votaciones"
+                    </Typography>
+                </Paper>
             )}
 
             {/* Paso 2: Editar votación */}
             {step === 'editar' && votacionOriginal && (
-                <div className="editar-votacion">
-                    <div className="votacion-info">
-                        <h3>📝 Actualizando Votación</h3>
-                        <div className="info-card">
-                            <p><strong>ID:</strong> {votacionOriginal.id}</p>
-                            <p><strong>Estado:</strong> {votacionOriginal.estado ? '🟢 Activa' : '🔴 Inactiva'}</p>
-                            <p><strong>Creada:</strong> {
-                                (() => {
-                                    try {
-                                        const fechaCreacion = votacionOriginal.fecha_inicio || votacionOriginal.inicio;
-                                        return new Date(fechaCreacion).toLocaleString();
-                                    } catch (error) {
-                                        return 'Fecha no disponible';
-                                    }
-                                })()
-                            }</p>
-                        </div>
-                        <button
-                            type="button"
-                            className="btn-back"
+                <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
+                    <Box sx={{ mb: 2 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                            Actualizando Votación
+                        </Typography>
+                        <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2"><strong>ID:</strong> {votacionOriginal.id}</Typography>
+                            <Typography variant="body2">
+                                <strong>Estado:</strong>{' '}
+                                <Box component="span" sx={{
+                                    display: 'inline-block',
+                                    px: 1.2,
+                                    py: 0.3,
+                                    borderRadius: 2,
+                                    fontWeight: 600,
+                                    color: votacionOriginal.estado ? 'success.main' : 'error.main',
+                                    backgroundColor: votacionOriginal.estado ? 'success.light' : 'error.light',
+                                    fontSize: 14,
+                                    ml: 0.5
+                                }}>
+                                    {votacionOriginal.estado ? 'Activa' : 'Inactiva'}
+                                </Box>
+                            </Typography>
+                            <Typography variant="body2">
+                                <strong>Creada:</strong> {
+                                    (() => {
+                                        try {
+                                            const fechaCreacion = votacionOriginal.fecha_inicio || votacionOriginal.inicio;
+                                            return new Date(fechaCreacion).toLocaleString();
+                                        } catch (error) {
+                                            return 'Fecha no disponible';
+                                        }
+                                    })()
+                                }
+                            </Typography>
+                        </Box>
+                        <Button
+                            variant="outlined"
+                            color="inherit"
                             onClick={volverABuscar}
+                            sx={{ fontWeight: 600 }}
                         >
-                            ⬅️ Buscar Otra Votación
-                        </button>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="votacion-form">
-                        {/* Título */}
-                        <div className="form-group">
-                            <label className="form-label">
-                                Título de la Votación *
-                            </label>
-                            <input
-                                type="text"
-                                className={`form-input ${errors.titulo ? 'error' : ''}`}
+                            Buscar Otra Votación
+                        </Button>
+                    </Box>
+                    <form onSubmit={handleSubmit} autoComplete="off">
+                        <Stack spacing={2}>
+                            {/* Título */}
+                            <TextField
+                                label="Título de la Votación *"
                                 value={formData.titulo}
                                 onChange={(e) => handleInputChange('titulo', e.target.value)}
                                 placeholder="Título de la votación"
+                                error={Boolean(errors.titulo)}
+                                helperText={errors.titulo}
+                                fullWidth
                             />
-                            {errors.titulo && (
-                                <span className="error-message">{errors.titulo}</span>
-                            )}
-                        </div>
-
-                        {/* Fechas */}
-                        <div className="form-group-row">
-                            <div className="form-group">
-                                <label className="form-label">
-                                    Fecha y Hora de Inicio *
-                                </label>
-                                <input
+                            {/* Fechas */}
+                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                                <TextField
+                                    label="Fecha y Hora de Inicio *"
                                     type="datetime-local"
-                                    className={`form-input ${errors.fechaInicio ? 'error' : ''}`}
                                     value={formData.fechaInicio}
                                     onChange={(e) => handleInputChange('fechaInicio', e.target.value)}
+                                    error={Boolean(errors.fechaInicio)}
+                                    helperText={errors.fechaInicio}
+                                    InputLabelProps={{ shrink: true }}
+                                    fullWidth
                                 />
-                                {errors.fechaInicio && (
-                                    <span className="error-message">{errors.fechaInicio}</span>
-                                )}
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label">
-                                    Fecha y Hora de Fin *
-                                </label>
-                                <input
+                                <TextField
+                                    label="Fecha y Hora de Fin *"
                                     type="datetime-local"
-                                    className={`form-input ${errors.fechaFin ? 'error' : ''}`}
                                     value={formData.fechaFin}
                                     onChange={(e) => handleInputChange('fechaFin', e.target.value)}
+                                    error={Boolean(errors.fechaFin)}
+                                    helperText={errors.fechaFin}
+                                    InputLabelProps={{ shrink: true }}
+                                    fullWidth
                                 />
-                                {errors.fechaFin && (
-                                    <span className="error-message">{errors.fechaFin}</span>
+                            </Stack>
+                            {/* Opciones de votación */}
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                                    Opciones de Votación *
+                                </Typography>
+                                <Stack spacing={1}>
+                                    {formData.opciones.map((opcion, index) => (
+                                        <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Typography variant="body2" sx={{ minWidth: 20 }}>{index + 1}.</Typography>
+                                            <TextField
+                                                value={opcion}
+                                                onChange={(e) => handleOpcionChange(index, e.target.value)}
+                                                placeholder={`Opción ${index + 1}`}
+                                                size="small"
+                                                sx={{ flex: 1 }}
+                                            />
+                                            {formData.opciones.length > 2 && (
+                                                <IconButton
+                                                    aria-label="Eliminar opción"
+                                                    color="error"
+                                                    onClick={() => eliminarOpcion(index)}
+                                                    size="small"
+                                                >
+                                                    ×
+                                                </IconButton>
+                                            )}
+                                        </Box>
+                                    ))}
+                                </Stack>
+                                <Button
+                                    type="button"
+                                    variant="outlined"
+                                    color="primary"
+                                    onClick={agregarOpcion}
+                                    sx={{ mt: 1, fontWeight: 600 }}
+                                >
+                                    + Agregar Opción
+                                </Button>
+                                {errors.opciones && (
+                                    <Alert severity="error" sx={{ mt: 1 }}>{errors.opciones}</Alert>
                                 )}
-                            </div>
-                        </div>
-
-                        {/* Opciones de votación */}
-                        <div className="opciones-container">
-                            <label className="form-label">
-                                Opciones de Votación *
-                            </label>
-                            {formData.opciones.map((opcion, index) => (
-                                <div key={index} className="opcion-item">
-                                    <span className="opcion-numero">
-                                        {index + 1}.
-                                    </span>
-                                    <input
-                                        type="text"
-                                        className="opcion-input"
-                                        value={opcion}
-                                        onChange={(e) => handleOpcionChange(index, e.target.value)}
-                                        placeholder={`Opción ${index + 1}`}
-                                    />
-                                    {formData.opciones.length > 2 && (
-                                        <button
-                                            type="button"
-                                            className="btn-eliminar-opcion"
-                                            onClick={() => eliminarOpcion(index)}
-                                        >
-                                            ✕
-                                        </button>
-                                    )}
-                                </div>
-                            ))}
-                            <button
-                                type="button"
-                                className="btn-agregar-opcion"
-                                onClick={agregarOpcion}
-                            >
-                                + Agregar Opción
-                            </button>
-                            {errors.opciones && (
-                                <div className="error-message">
-                                    {errors.opciones}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Botones de acción */}
-                        <div className="botones-form">
-                            <button
-                                type="button"
-                                className="btn-cancelar"
-                                onClick={volverABuscar}
-                                disabled={submitting}
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                type="submit"
-                                className="btn-submit"
-                                disabled={submitting}
-                            >
-                                {submitting ? "Actualizando..." : "✅ Actualizar Votación"}
-                            </button>
-                        </div>
+                            </Box>
+                            {/* Botones de acción */}
+                            <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end' }}>
+                                <Button
+                                    type="button"
+                                    variant="outlined"
+                                    color="inherit"
+                                    onClick={volverABuscar}
+                                    disabled={submitting}
+                                >
+                                    Cancelar
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    color="success"
+                                    disabled={submitting}
+                                    sx={{ fontWeight: 600 }}
+                                >
+                                    {submitting ? 'Actualizando...' : 'Actualizar Votación'}
+                                </Button>
+                            </Stack>
+                        </Stack>
                     </form>
-                </div>
+                </Paper>
             )}
-        </div>
+        </Box>
     );
 };
 
