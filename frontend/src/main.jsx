@@ -11,6 +11,7 @@ import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
 import Actividades from '@pages/Actividades';
+import Asambleas from '@pages/Asambleas';
 import Documentos from '@pages/Documentos';
 import Historial from '@pages/Historial';
 import Feedback from './pages/feedback';
@@ -52,6 +53,14 @@ const router = createBrowserRouter([ // Define las rutas de la aplicación
               <Documentos />
             </ProtectedRoute>
           )
+      },
+      {
+        path: '/asambleas',
+        element: (
+          <ProtectedRoute allowedRoles={['admin', 'vocalia', 'estudiante']}>
+            <Asambleas />
+          </ProtectedRoute>
+        )
       },
       {
         path: '/historial',

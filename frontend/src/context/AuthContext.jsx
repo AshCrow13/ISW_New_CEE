@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 export const AuthContext = createContext();
 
-// Exporta el hook personalizado
+
 export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }) {
