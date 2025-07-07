@@ -13,10 +13,10 @@ import { hasRoles } from "../middlewares/roles.middleware.js";
 
 const router = Router()
 
-router.post("/:votacionId", authenticateJwt, hasCarreras(["Ingeniería en Computación e Informática"]), hasRoles(["admin","vocalia"]), postOpcion);
-router.get("/:votacionId", authenticateJwt, hasCarreras(["Ingeniería en Computación e Informática"]), hasRoles(["admin","vocalia","estudiante"]), getOpciones);
-router.get("/:votacionId/:id", authenticateJwt, hasCarreras(["Ingeniería en Computación e Informática"]), hasRoles(["admin","vocalia","estudiante"]), getOpcion);
-router.patch("/:votacionId/:id", authenticateJwt, hasCarreras(["Ingeniería en Computación e Informática"]),hasRoles(["admin","vocalia"]) , updateOpcion);
-router.delete("/:votacionId/:id", authenticateJwt, hasCarreras(["Ingeniería en Computación e Informática"]),hasRoles(["admin","vocalia"]) , deleteOpcion);
+router.post("/:votacionId", authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin","vocalia"]), postOpcion);
+router.get("/:votacionId", authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin","vocalia","estudiante"]), getOpciones);
+router.get("/:votacionId/:id", authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin","vocalia","estudiante"]), getOpcion);
+router.patch("/:votacionId/:id", authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]),hasRoles(["admin","vocalia"]) , updateOpcion);
+router.delete("/:votacionId/:id", authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]),hasRoles(["admin","vocalia"]) , deleteOpcion);
 
 export default router;

@@ -47,7 +47,7 @@ const Home = () => {
           </Grid>
 
           {/* Solo admin ve feedback */}
-          {userRole === 'admin' && (
+          {(
             <Grid item xs={12}>
               <Button 
                 fullWidth
@@ -57,6 +57,19 @@ const Home = () => {
                 sx={{ minHeight: 80 }}
               >
                 Enviar Feedback 
+              </Button>
+            </Grid>
+          )}
+          {(
+            <Grid item xs={12}>
+              <Button 
+                fullWidth
+                variant="contained"
+                color="primary"
+                onClick={() => navigate('/votacion')}
+                sx={{ minHeight: 80 }}
+              >
+                Votaciones
               </Button>
             </Grid>
           )}

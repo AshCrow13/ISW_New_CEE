@@ -8,7 +8,8 @@ import {
 } from "../services/estudiante.service.js";
 import { 
     estudianteQuerySchema, 
-    estudianteSchema  
+    estudianteSchema,
+    estudianteUpdateSchema  
 } from "../validations/estudiante.validation.js";
 import {
     handleErrorClient,
@@ -66,10 +67,11 @@ export async function updateEstudiante(req, res) {
         const { error: queryError } = estudianteQuerySchema.validate(query);
         if (queryError) return handleErrorClient(res, 400, "Error en la consulta", queryError.message);
 
-        const { error: bodyError } = estudianteSchema.validate(body);
+        const { error: bodyError } = estudianteUpdateSchema.validate(body);
         if (bodyError) return handleErrorClient(res, 400, "Error en los datos", bodyError.message);
 
-        const [estudiante, serviceError] = await updateEstudianteService(query, body);
+        // ✅ PASAR: Usuario que realiza la acción
+        const [estudiante, serviceError] = await updateEstudianteService(query, body, req.user);
         if (serviceError) return handleErrorClient(res, 400, serviceError);
 
         handleSuccess(res, 200, "Estudiante actualizado correctamente", estudiante);

@@ -68,16 +68,26 @@ export const estudianteSchema = Joi.object({
 export const estudianteUpdateSchema = Joi.object({
     nombreCompleto: Joi.string()
         .min(8)
-        .max(100),
+        .max(100)
+        .pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
+        .optional(),
     carrera: Joi.string()
         .min(3)
-        .max(100),
-    telefono: Joi.string()
-        .pattern(/^[0-9+]{9,20}$/)
-        .allow(null, ""),
-    password: Joi.string()
+        .max(100)
+        .optional(),
+    rol: Joi.string()
+        .valid("admin", "vocalia", "estudiante")
+        .optional(), // ✅ AGREGAR: Permitir actualización de rol
+    newPassword: Joi.string()
         .min(8)
-        .max(50),
+        .max(26)
+        .pattern(/^[a-zA-Z0-9]+$/)
+        .optional()
+        .messages({
+            "string.min": "La nueva contraseña debe tener al menos 8 caracteres.",
+            "string.max": "La nueva contraseña debe tener como máximo 26 caracteres.",
+            "string.pattern.base": "La nueva contraseña solo puede contener letras y números.",
+        }),
 }).unknown(false);
 
 // Validación para eliminar estudiante

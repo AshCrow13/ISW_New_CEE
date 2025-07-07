@@ -8,11 +8,14 @@ const ActividadForm = ({ // Props del componente
   loading = false,
 }) => { // Estado del formulario
   const [form, setForm] = useState({
-    titulo: initialData.titulo || "",
-    descripcion: initialData.descripcion || "",
-    fecha: initialData.fecha || "",
-    lugar: initialData.lugar || "",
-    categoria: initialData.categoria || "",
+    titulo: "",
+    descripcion: "",
+    fecha: "",
+    lugar: "",
+    categoria: "",
+    responsableId: 1, // ✅ AGREGAR: Campo obligatorio con valor por defecto
+    recursos: "",
+    estado: "publicada",
     error: {},
   });
   
@@ -22,12 +25,15 @@ const ActividadForm = ({ // Props del componente
   // Resetea el formulario cuando cambian los datos iniciales
   useEffect(() => {
     setForm({
-      titulo: initialData.titulo || "",
-      descripcion: initialData.descripcion || "",
-      fecha: initialData.fecha || "",
-      lugar: initialData.lugar || "",
-      categoria: initialData.categoria || "",
-      error: {},
+        titulo: initialData.titulo || "",
+        descripcion: initialData.descripcion || "",
+        fecha: initialData.fecha || "",
+        lugar: initialData.lugar || "",
+        categoria: initialData.categoria || "",
+        responsableId: initialData.responsableId || 1, // ✅ AGREGAR
+        recursos: initialData.recursos || "",
+        estado: initialData.estado || "publicada",
+        error: {},
     });
     setCharCount(initialData.descripcion?.length || 0);
   }, [initialData]);
@@ -40,6 +46,7 @@ const ActividadForm = ({ // Props del componente
     if (!form.fecha) error.fecha = "Debe ingresar una fecha.";
     if (!form.lugar) error.lugar = "Campo obligatorio.";
     if (!form.categoria) error.categoria = "Seleccione una categoría.";
+    if (!form.responsableId) error.responsableId = "Debe seleccionar un responsable."; // ✅ AGREGAR
     return error;
   };
 
@@ -63,9 +70,19 @@ const ActividadForm = ({ // Props del componente
       return;
     }
     
-    // Normalizar datos antes de enviar
-    const normalizado = { ...form, titulo: form.titulo.trim(), descripcion: form.descripcion.trim() };
-    onSubmit(normalizado);
+    const cleanData = {
+        titulo: form.titulo.trim(),
+        descripcion: form.descripcion.trim(),
+        fecha: form.fecha,
+        lugar: form.lugar.trim(),
+        categoria: form.categoria,
+        responsableId: parseInt(form.responsableId) || 1, // ✅ ASEGURAR que sea número
+        recursos: form.recursos || "",
+        estado: form.estado || "publicada"
+    };
+    
+    console.log('📊 Datos limpios a enviar:', cleanData); // ✅ DEBUG
+    onSubmit(cleanData);
   };
 
   return (

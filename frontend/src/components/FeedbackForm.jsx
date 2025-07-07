@@ -1,5 +1,7 @@
-import {useState} from 'react';
-import '../styles/feedform.css';
+
+import { useState } from 'react';
+import { Container, Paper, Typography, Box, Button, Checkbox, FormControlLabel, Alert, TextField } from '@mui/material';
+import FeedbackIcon from '@mui/icons-material/Feedback';
 import { postFeedback } from '../services/feedback.service';
 
 const FeedbackForm = ({ onSuccess }) => {
@@ -22,29 +24,59 @@ const FeedbackForm = ({ onSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="feedback-form">
-        <h2>Enviar Feedback</h2>
-        <textarea
+    <Container maxWidth="sm" sx={{ py: 7 }}>
+      <Paper elevation={6} sx={{ p: 5, borderRadius: 4 }}>
+        <Box display="flex" alignItems="center" mb={2}>
+          <FeedbackIcon color="primary" sx={{ fontSize: 40, mr: 2 }} />
+          <Typography variant="h4" color="primary.main" fontWeight={700}>
+            Enviar Feedback
+          </Typography>
+        </Box>
+        <Typography sx={{ mb: 3, color: 'text.secondary' }}>
+          Tu opinión es importante para mejorar el centro de estudiantes. ¡Gracias por tu aporte!
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit}>
+          <TextField
+            label="Comentario"
             value={comentario}
             onChange={e => setComentario(e.target.value)}
             placeholder="Escribe tu comentario..."
-            minLength={5}
-            maxLength={500}
+            multiline
+            minRows={4}
+            maxRows={8}
+            fullWidth
             required
-        />
-        <div>
-            <label>
-            <input
-                type="checkbox"
+            inputProps={{ minLength: 5, maxLength: 500 }}
+            sx={{ mb: 2 }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
                 checked={anonimo}
                 onChange={e => setAnonimo(e.target.checked)}
-            />
-            Enviar como anónimo
-            </label>
-        </div>
-        <button type="submit">Enviar</button>
-        {mensaje && <div className="mensaje">{mensaje}</div>}
-        </form>
+                color="primary"
+              />
+            }
+            label="Enviar como anónimo"
+            sx={{ mb: 2 }}
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ minHeight: 48, fontWeight: 700, fontSize: 18 }}
+          >
+            Enviar
+          </Button>
+          {mensaje && (
+            <Alert severity={res.status === 'Success' ? 'success' : 'info'} sx={{ mt: 2 }}>
+              {mensaje}
+            </Alert>
+          )}
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 

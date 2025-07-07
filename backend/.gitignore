@@ -133,4 +133,4 @@ dist
 package-lock.json
 
 # Optional npm cache directory
-src/uploads
+uploads

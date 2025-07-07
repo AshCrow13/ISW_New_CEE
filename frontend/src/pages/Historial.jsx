@@ -17,33 +17,75 @@ const Historial = () => {
 
     const fetchHistorial = async () => {
         setLoading(true);
-        const data = await getHistorial();
-        setHistorial(data);
+        try {
+            const data = await getHistorial();
+            // ✅ VALIDAR que data sea un array
+            setHistorial(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error('Error al cargar historial:', error);
+            setHistorial([]);
+        }
         setLoading(false);
     };
 
-    // Define columnas para DataGrid (ajusta los nombres de campo según tu backend)
+    // ✅ SIMPLIFICAR: Columnas más directas
     const columns = [
         { field: 'id', headerName: 'ID', width: 80 },
-        { field: 'usuario', headerName: 'Usuario', flex: 1, valueGetter: (params) => params.row.usuario?.nombreCompleto || params.row.usuario || '-' },
-        { field: 'accion', headerName: 'Acción', flex: 1 },
-        { field: 'detalle', headerName: 'Detalle', flex: 2 },
-        { field: 'fecha', headerName: 'Fecha', flex: 1 }
+        { 
+            field: 'fecha', 
+            headerName: 'Fecha', 
+            flex: 1,
+            renderCell: (params) => {
+                if (!params.row.fecha) return '-';
+                return new Date(params.row.fecha).toLocaleString('es-ES', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        },
+        { 
+            field: 'usuario', 
+            headerName: 'Usuario', 
+            flex: 1
+            // ✅ USAR directamente el campo, sin valueGetter
+        },
+        { field: 'accion', headerName: 'Acción', flex: 0.8 },
+        { field: 'tipo', headerName: 'Tipo', flex: 0.8 },
+        { 
+            field: 'detalle', 
+            headerName: 'Detalle', 
+            flex: 2
+            // ✅ USAR directamente el campo, sin valueGetter
+        }
     ];
 
-    // Filtra filas según lo que escriba el usuario (por nombre o acción)
+    // ✅ MEJORAR: Filtrado más seguro
     const filteredRows = useMemo(() => {
         if (!filter) return historial;
-        return historial.filter(row =>
-            (row.usuario?.nombreCompleto || row.usuario || '').toLowerCase().includes(filter.toLowerCase()) ||
-            (row.accion || '').toLowerCase().includes(filter.toLowerCase()) ||
-            (row.detalle || '').toLowerCase().includes(filter.toLowerCase())
-        );
+        return historial.filter(row => {
+            if (!row || typeof row !== 'object') return false;
+            
+            const usuario = typeof row.usuario === 'string' ? row.usuario : row.usuario?.nombreCompleto || '';
+            const accion = row.accion || '';
+            const detalle = row.detalle || '';
+            
+            return usuario.toLowerCase().includes(filter.toLowerCase()) ||
+                   accion.toLowerCase().includes(filter.toLowerCase()) ||
+                   detalle.toLowerCase().includes(filter.toLowerCase());
+        });
     }, [historial, filter]);
 
-    // Añade campo `id` si tus registros no lo tienen (DataGrid lo exige)
+    // ✅ SIMPLIFICAR: Usar directamente los datos del backend
     const rows = useMemo(
-        () => filteredRows.map((row, idx) => ({ ...row, id: row.id ?? idx })),
+        () => filteredRows
+            .filter(row => row && typeof row === 'object')
+            .map((row, idx) => ({ 
+                ...row, // ✅ Usar todos los campos del backend
+                id: row.id ?? idx
+            })),
         [filteredRows]
     );
 
