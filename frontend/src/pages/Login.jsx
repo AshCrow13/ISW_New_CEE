@@ -63,6 +63,7 @@ const Login = () => {
                 type="password"
                 required
                 inputProps={{ maxLength: 26 }}
+
             />
             {errorMsg && <Alert severity="error" sx={{ mt: 2 }}>{errorMsg}</Alert>}
             <Button

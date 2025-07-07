@@ -89,5 +89,13 @@ export const votacionUpdateBodyValidation = Joi.object({
         "string.min": "El texto de la opción debe tener como mínimo 2 caracteres.",
         "string.max": "El texto de la opción debe tener como máximo 255 caracteres.",
       }
-    ).optional()
+    ).optional(),
+  duracion: Joi.number()
+    .integer()
+    .positive()
+    .messages({
+      "number.base": "La duración debe ser un número.",
+      "number.integer": "La duración debe ser un número entero.",
+      "number.positive": "La duración debe ser un número positivo.",
+    }).optional()
 });
