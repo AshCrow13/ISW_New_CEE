@@ -47,7 +47,7 @@ const Home = () => {
           </Grid>
 
           {/* Solo admin ve feedback */}
-          {userRole === 'admin' && (
+          {(
             <Grid item xs={12}>
               <Button 
                 fullWidth
@@ -60,7 +60,7 @@ const Home = () => {
               </Button>
             </Grid>
           )}
-          {userRole === 'admin' && (
+          {(
             <Grid item xs={12}>
               <Button 
                 fullWidth

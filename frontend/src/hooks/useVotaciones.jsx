@@ -38,7 +38,7 @@ const useVotaciones = () => {
     setLoading(true);
     setView('ver-una');
     try {
-      const data = await getVotacionById(searchId);
+      const data = await getVotacionById(Number(searchId));
       if (data.status === 'Success') {
         setVotacionSeleccionada(data.data);
       } else {

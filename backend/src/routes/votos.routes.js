@@ -10,7 +10,7 @@ import { hasRoles } from '../middlewares/roles.middleware.js';
 
  const router = Router();
 
-router.post('/:votacionId/:opcionId', authenticateJwt, hasCarreras(["Ingeniería Civil Informática "]), hasRoles(["admin","vocalia","estudiante"]) ,postVoto);
+router.post('/:votacionId/:opcionId', authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin","vocalia","estudiante"]) ,postVoto);
 router.get('/:votacionId/votos', authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin","vocalia", "estudiante"]) ,getVotos)
 router.get('/:votacionId/conteo', authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin","vocalia","estudiante"]) ,getConteo);
 export default router;
