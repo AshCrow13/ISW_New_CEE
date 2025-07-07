@@ -60,6 +60,19 @@ const Home = () => {
               </Button>
             </Grid>
           )}
+          {userRole === 'admin' && (
+            <Grid item xs={12}>
+              <Button 
+                fullWidth
+                variant="contained"
+                color="primary"
+                onClick={() => navigate('/votacion')}
+                sx={{ minHeight: 80 }}
+              >
+                Votaciones
+              </Button>
+            </Grid>
+          )}
 
         </Grid>
       </Paper>
