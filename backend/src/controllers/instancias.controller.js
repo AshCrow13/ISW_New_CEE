@@ -29,16 +29,19 @@ export async function createInstancia(req, res) {
 
         const [instancia, err] = await createInstanciaService(req.body);
         if (err) return handleErrorClient(res, 400, err);
-        handleSuccess(res, 201, "Instancia creada correctamente", instancia);
 
+        // Notificar antes de responder al cliente
         const listaEmails = await getEstudiantesService();
-
-        for (const email in listaEmails){
-            NotificarAsamblea(listaEmails[email].email,req.body);
-        }   
+        for (const estudiante of listaEmails) {
+            if (estudiante && estudiante.email) {
+                await NotificarAsamblea(estudiante.email, req.body);
+            }
+        }
+        handleSuccess(res, 201, "Instancia creada correctamente", instancia);
+        return;
 
     } catch (error) {
-        handleErrorServer(res, 500, error.message);
+        return handleErrorServer(res, 500, error.message);
     }
 
 }
