@@ -21,6 +21,8 @@ export const instanciaSchema = Joi.object({
             "string.max": "La Sala debe tener máximo 100 caracteres.",
             "any.required": "La Sala es obligatorio."
         }),
+    AsistenciaAbierta: Joi.boolean().default(false),
+    ClaveAsistencia: Joi.string().length(6).optional(),
 }).unknown(false);
 
 export const instanciaUpdateSchema = Joi.object({
@@ -28,6 +30,7 @@ export const instanciaUpdateSchema = Joi.object({
     Fecha: Joi.date().iso(),
     Sala: Joi.string().min(2).max(100),
     AsistenciaAbierta: Joi.boolean(),
+    ClaveAsistencia: Joi.string().length(6).optional(),
 }).unknown(false);
 
 export const instanciaQuerySchema = Joi.object({

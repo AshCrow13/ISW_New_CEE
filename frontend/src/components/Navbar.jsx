@@ -13,6 +13,7 @@ const Navbar = () => { // Componente de navegación
     const navLinks = [ // Enlaces de navegación
         { to: "/home", label: "Inicio" },
         { to: "/actividades", label: "Actividades" },
+        { to: "/asambleas", label: "Asambleas" },
         { to: "/documentos", label: "Documentos" },
         ...(userRole === 'admin' || userRole === 'vocalia' ? [{ to: "/users", label: "Usuarios" }] : []),
         ...(userRole === 'admin' ? [{ to: "/historial", label: "Historial" }] : [])
