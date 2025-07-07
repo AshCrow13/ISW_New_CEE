@@ -1,8 +1,8 @@
 import axios from "./root.service.js";
 
-export async function getVotaciones() {
+export async function getVotacionConteo(votacionId) {
     try {
-        const response = await axios.get("/votar");
+        const response = await axios.get(`/votar/${votacionId}/conteo`);
         return response.data.data;
     } catch (error) {
         console.error("Error al obtener votaciones:", error);
@@ -10,9 +10,9 @@ export async function getVotaciones() {
     }
 }
 
-export async function getVotacionById(id) {
+export async function getVotacionVotos(votacionId) {
     try {
-        const response = await axios.get(`/votar/${id}`);
+        const response = await axios.get(`/votar/${votacionId}/votos`);
         return response.data;
     } catch (error) {
         console.error(`Error al obtener votación con ID ${id}:`, error);
