@@ -1,9 +1,11 @@
 // Componente para mostrar los detalles de una votación específica
+
 import React from 'react';
 import { useVotacionDetalle } from '@hooks/useVotacionDetalle.jsx';
 
 const DetalleVotacion = (props) => {
     const { votacionSeleccionada, user, handleEliminar } = useVotacionDetalle(props);
+    const { handleVotar } = props; // Recibe la función para votar
     if (props.loading) {
         return <p className="loading-message">🔄 Buscando votación...</p>;
     }
@@ -39,6 +41,16 @@ const DetalleVotacion = (props) => {
                                 <span className="opcion-texto">
                                     {typeof opcion === 'string' ? opcion : opcion.texto}
                                 </span>
+                                {/* Botón para votar, solo si la votación está abierta */}
+                                {votacionSeleccionada.estado && handleVotar && (
+                                    <button
+                                        className="btn-votar"
+                                        style={{ marginLeft: 12 }}
+                                        onClick={() => handleVotar(votacionSeleccionada.id, opcion.id)}
+                                    >
+                                        🗳️ Votar
+                                    </button>
+                                )}
                             </div>
                         ))}
                     </div>

@@ -6,6 +6,7 @@ import {
   updateVotacion,
   deleteVotacion
 } from '@services/votacion.service.js';
+import { postVoto } from '@services/votar.service.js';
 
 const useVotaciones = () => {
   const [view, setView] = useState(null); // null, 'crear', 'ver-todas', 'ver-una', 'actualizar', 'borrar'
@@ -105,6 +106,26 @@ const useVotaciones = () => {
     }
   };
 
+
+  //Votar en una opción de votación
+  const handleVotar = async (votacionId, opcionId) => {
+    console.log('Votando por la opción:', votacionId, opcionId);
+    try {
+      const resultado = await postVoto({ votacionId , opcionId });
+      if (resultado.status === 'Success') {
+        alert('✅ Voto registrado exitosamente');
+        return { success: true };
+      } else {
+        alert('❌ Error al votar: ' + (resultado.message || 'Error desconocido'));
+        return { success: false, error: resultado.message };
+      }
+    } catch (error) {
+      console.error('Error al votar:', error);
+      alert('❌ Error al registrar el voto');
+      return { success: false, error: error.message };
+    }
+  };
+
   // Volver al menú principal
   const volverAlMenu = () => {
     setView(null);
@@ -128,6 +149,7 @@ const useVotaciones = () => {
     handleEliminar,
     handleActualizar,
     handleCrearVotacion,
+    handleVotar,
     volverAlMenu
   };
 };

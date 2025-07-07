@@ -24,6 +24,7 @@ const Votacion = () => {
         handleEliminar,
         handleActualizar,
         handleCrearVotacion,
+        handleVotar,
         volverAlMenu
     } = useVotaciones();
 
@@ -77,6 +78,7 @@ const Votacion = () => {
                         loading={loading}
                         user={user}
                         handleEliminar={handleEliminar}
+                        handleVotar={handleVotar}
                     />
                 </div>
             )}
