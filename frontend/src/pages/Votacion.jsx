@@ -1,3 +1,4 @@
+
 import { useContext } from 'react';
 import { AuthContext } from '@context/AuthContext.jsx';
 import FormularioCrearVotacion from '@components/VotacionFormularioCrear.jsx';
@@ -7,7 +8,8 @@ import DetalleVotacion from '@components/VotacionDetalle.jsx';
 import HeaderVista from '@components/VotacionHeader.jsx';
 import VistaActualizacion from '@components/VotacionVistaActualizacion.jsx';
 import useVotaciones from '@hooks/useVotaciones.jsx';
-import '@styles/votacion.css';
+import { Container, Paper, Typography, Box, Fade } from '@mui/material';
+import HowToVoteIcon from '@mui/icons-material/HowToVote';
 
 const Votacion = () => {
     const { user } = useContext(AuthContext);
@@ -29,82 +31,75 @@ const Votacion = () => {
     } = useVotaciones();
 
     return (
-        <div className="votacion-container">
-            <h1 className="votacion-title">Gestión de Votaciones</h1>
+      <Container maxWidth="md" sx={{ py: 7 }}>
+        <Paper elevation={6} sx={{ p: 5, borderRadius: 4 }}>
+          <Box display="flex" alignItems="center" mb={3}>
+            <HowToVoteIcon color="primary" sx={{ fontSize: 40, mr: 2 }} />
+            <Typography variant="h4" color="primary.main" fontWeight={700}>
+              Gestión de Votaciones
+            </Typography>
+          </Box>
 
-            {/* Menú principal */}
-            {view === null && (
-                <MenuPrincipalVotaciones
-                    user={user}
-                    searchId={searchId}
-                    setSearchId={setSearchId}
-                    setView={setView}
-                    handleVerTodas={handleVerTodas}
-                    handleVerUna={handleVerUna}
-                />
-            )}
+          <Fade in={view === null} unmountOnExit>
+            <Box>
+              <MenuPrincipalVotaciones
+                user={user}
+                searchId={searchId}
+                setSearchId={setSearchId}
+                setView={setView}
+                handleVerTodas={handleVerTodas}
+                handleVerUna={handleVerUna}
+              />
+            </Box>
+          </Fade>
 
-            {/* Vista de crear votación */}
-            {view === 'crear' && (
-                <div className="content-container">
-                    <HeaderVista titulo="Nueva Votación" volverAlMenu={volverAlMenu} />
-                    <FormularioCrearVotacion 
-                        onSubmit={handleCrearVotacion}
-                        onSuccess={volverAlMenu} 
-                        onCancel={volverAlMenu} 
-                    />
-                </div>
-            )}
+          <Fade in={view === 'crear'} unmountOnExit>
+            <Box>
+              <HeaderVista titulo="Nueva Votación" volverAlMenu={volverAlMenu} />
+              <FormularioCrearVotacion
+                onSubmit={handleCrearVotacion}
+                onSuccess={volverAlMenu}
+                onCancel={volverAlMenu}
+              />
+            </Box>
+          </Fade>
 
-            {/* Vista de todas las votaciones */}
-            {view === 'ver-todas' && (
-                <div className="content-container">
-                    <HeaderVista titulo="Todas las Votaciones" volverAlMenu={volverAlMenu} />
-                    <ListaVotaciones
-                        votaciones={votaciones}
-                        loading={loading}
-                        user={user}
-                        handleEliminar={handleEliminar}
-                    />
-                </div>
-            )}
+          <Fade in={view === 'ver-todas'} unmountOnExit>
+            <Box>
+              <HeaderVista titulo="Todas las Votaciones" volverAlMenu={volverAlMenu} />
+              <ListaVotaciones
+                votaciones={votaciones}
+                loading={loading}
+                user={user}
+                handleEliminar={handleEliminar}
+              />
+            </Box>
+          </Fade>
 
-            {/* Vista de detalle de votación */}
-            {view === 'ver-una' && (
-                <div className="content-container">
-                    <HeaderVista titulo="Detalle de Votación" volverAlMenu={volverAlMenu} />
-                    <DetalleVotacion
-                        votacionSeleccionada={votacionSeleccionada}
-                        loading={loading}
-                        user={user}
-                        handleEliminar={handleEliminar}
-                        handleVotar={handleVotar}
-                    />
-                </div>
-            )}
+          <Fade in={view === 'ver-una'} unmountOnExit>
+            <Box>
+              <HeaderVista titulo="Detalle de Votación" volverAlMenu={volverAlMenu} />
+              <DetalleVotacion
+                votacionSeleccionada={votacionSeleccionada}
+                loading={loading}
+                user={user}
+                handleEliminar={handleEliminar}
+                handleVotar={handleVotar}
+              />
+            </Box>
+          </Fade>
 
-            {/* Vista de actualización */}
-            {view === 'actualizar' && (
-                <div className="content-container">
-                    <HeaderVista titulo="Actualizar Votación" volverAlMenu={volverAlMenu} />
-                    <VistaActualizacion 
-                        user={user} 
-                        onActualizar={handleActualizar}
-                    />
-                </div>
-            )}
-
-            {/* Botón flotante para volver al menú */}
-            {view !== null && (
-                <button
-                    onClick={volverAlMenu}
-                    className="btn-floating"
-                    title="Volver al menú principal"
-                >
-                    🏠
-                </button>
-            )}
-        </div>
+          <Fade in={view === 'actualizar'} unmountOnExit>
+            <Box>
+              <HeaderVista titulo="Actualizar Votación" volverAlMenu={volverAlMenu} />
+              <VistaActualizacion
+                user={user}
+                onActualizar={handleActualizar}
+              />
+            </Box>
+          </Fade>
+        </Paper>
+      </Container>
     );
 };
 
