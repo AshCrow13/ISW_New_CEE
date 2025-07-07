@@ -4,9 +4,12 @@ import ArticleIcon from '@mui/icons-material/Article';
 import GroupIcon from '@mui/icons-material/Group';
 import HistoryIcon from '@mui/icons-material/History';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@context/AuthContext'; // 
 
 const Home = () => {
   const navigate = useNavigate();
+  const { user } = useAuth(); // Importa el hook useAuth para acceder al usuario autenticado
+  const userRole = user?.rol; // Obtiene el rol del usuario autenticado
 
   return (
     <Container maxWidth="md" sx={{ py: 7 }}>
@@ -42,41 +45,22 @@ const Home = () => {
               Documentos
             </Button>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              startIcon={<GroupIcon />}
-              onClick={() => navigate('/users')}
-              sx={{ minHeight: 80 }}
-            >
-              Usuarios
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              startIcon={<HistoryIcon />}
-              onClick={() => navigate('/historial')}
-              sx={{ minHeight: 80 }}
-            >
-              Historial
-            </Button>
-          </Grid>
-          <Grid item xs={12}>
-            <Button 
-              fullWidth
-              variant="contained"
-              color="primary"
-              onClick={() => navigate('/feedback')}
-              sx={{ minHeight: 80 }}
-            >
-              Enviar Feedback 
-            </Button>
-          </Grid>
+
+          {/* Solo admin ve feedback */}
+          {userRole === 'admin' && (
+            <Grid item xs={12}>
+              <Button 
+                fullWidth
+                variant="contained"
+                color="primary"
+                onClick={() => navigate('/feedback')}
+                sx={{ minHeight: 80 }}
+              >
+                Enviar Feedback 
+              </Button>
+            </Grid>
+          )}
+
         </Grid>
       </Paper>
     </Container>
@@ -84,3 +68,4 @@ const Home = () => {
 };
 
 export default Home;
+
