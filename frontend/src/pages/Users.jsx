@@ -15,6 +15,8 @@ import { useCallback, useState, useMemo } from 'react';
 import useUsers from '@hooks/users/useGetUsers.jsx';
 import Popup from '../components/Popup';
 import { useAuth } from '@context/AuthContext';
+import { getUsers } from '@services/user.service.js';
+import useEditUser from '@hooks/users/useEditUser.jsx';
 
 const Users = () => {
   const { users, fetchUsers, setUsers } = useUsers();
@@ -24,6 +26,16 @@ const Users = () => {
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+
+  // ✅ USAR: Hook de edición
+  const {
+    handleClickUpdate,
+    handleUpdate,
+    isPopupOpen: isEditPopupOpen,
+    setIsPopupOpen: setIsEditPopupOpen,
+    dataUser,
+    setDataUser
+  } = useEditUser(setUsers);
 
   // Mapea los datos de usuarios a filas
   const rows = useMemo(() => users.map((u, i) => ({
@@ -52,13 +64,17 @@ const Users = () => {
                 variant="outlined"
                 color="primary"
                 onClick={() => {
-                  setSelectedRow(params.row);
-                  setIsPopupOpen(true);
+                  console.log('🔄 Usuario seleccionado para editar:', params.row); // ✅ DEBUG
+                  
+                  // ✅ CORREGIR: Establecer datos del usuario ANTES de abrir el popup
+                  setDataUser([params.row]); // Pasar usuario al hook
+                  setSelectedRow(params.row); // Mantener referencia local
+                  setIsEditPopupOpen(true); // Abrir popup
                 }}
               >
                 Editar
               </Button>
-              {/* Puedes agregar un boton */}
+              {/* Puedes agregar un botón de eliminar aquí */}
             </Stack>
           ),
           flex: 1
@@ -74,6 +90,12 @@ const Users = () => {
         : rows,
     [rows, filterRut]
   );
+
+  // ✅ MANEJAR: Selección de fila para editar
+  const handleRowSelection = (user) => {
+    setDataUser([user]); // Enviar usuario seleccionado al hook
+    setSelectedRow(user);
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -98,10 +120,10 @@ const Users = () => {
       {/* Popup solo para admin */}
       {userRole === 'admin' && (
         <Popup
-          show={isPopupOpen}
-          setShow={setIsPopupOpen}
-          data={selectedRow ? [selectedRow] : []}
-          action={() => {/* Implementar edicion */}}
+          show={isEditPopupOpen}
+          setShow={setIsEditPopupOpen}
+          data={dataUser} // Datos del usuario seleccionado
+          action={handleUpdate} // ✅ FUNCIÓN: Para ejecutar la actualización
         />
       )}
     </Box>

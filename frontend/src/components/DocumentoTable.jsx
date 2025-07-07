@@ -19,23 +19,39 @@ const DocumentoTable = ({
         { field: "titulo", headerName: "Título", flex: 1 },
         { field: "tipo", headerName: "Tipo", flex: 1 },
         {
-        field: "archivo",
+        field: "urlArchivo",
         headerName: "Archivo",
         flex: 1,
-        renderCell: (params) =>
-            params.row.archivo ? (
-            <Button
-                variant="outlined"
-                size="small"
-                onClick={() => onDownload(params.row.id)}
-            >
-                Descargar
-            </Button>
-            ) : (
-            "Sin archivo"
-            ),
+        renderCell: (params) => {
+            const url = params.row.urlArchivo;
+            if (url && url.trim() !== "") {
+                // Extraer el nombre del archivo de la URL
+                const filename = url.split("/").pop();
+                return (
+                <div
+                    style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    }}
+                >
+                    <span>📎 {filename}</span>
+                </div>
+                );
+            }
+            return <span style={{ color: "#666" }}>Sin archivo</span>;
+        },
         sortable: false,
         filterable: false,
+        },
+        {
+        field: "fechaSubida",
+        headerName: "Fecha",
+        flex: 1,
+        renderCell: (params) => {
+            const fecha = new Date(params.row.fechaSubida);
+            return fecha.toLocaleDateString("es-ES");
+        },
         },
         ...(userRole === "admin" || userRole === "vocalia"
         ? [
@@ -44,24 +60,34 @@ const DocumentoTable = ({
                 headerName: "Acciones",
                 flex: 1,
                 renderCell: (params) => (
-                <Stack direction="row" spacing={1}>
+                <div style={{ display: "flex", gap: "8px" }}>
+                    {params.row.urlArchivo && (
                     <Button
-                    variant="outlined"
-                    size="small"
-                    color="primary"
-                    onClick={() => onEdit(params.row)}
+                        size="small"
+                        variant="outlined"
+                        onClick={() => onDownload(params.row.id)}
                     >
-                    Editar
+                        📥 Descargar
                     </Button>
-                    <Button
-                    variant="outlined"
-                    size="small"
-                    color="error"
-                    onClick={() => onDelete(params.row.id)}
-                    >
-                    Eliminar
-                    </Button>
-                </Stack>
+                    )}
+                    {userRole === "admin" && (
+                    <>
+                        <Button
+                        size="small"
+                        onClick={() => onEdit(params.row)}
+                        >
+                        ✏️ Editar
+                        </Button>
+                        <Button
+                        size="small"
+                        color="error"
+                        onClick={() => onDelete(params.row.id)}
+                        >
+                        🗑️ Eliminar
+                        </Button>
+                    </>
+                    )}
+                </div>
                 ),
                 sortable: false,
                 filterable: false,

@@ -46,13 +46,14 @@ export const actividadSchema = Joi.object({
             "any.only": "La categoría debe ser Deportivo, Recreativo u Oficial.",
             "any.required": "La categoría es obligatoria."
         }),
-    responsable: Joi.string()
-        .min(5)
-        .max(100)
-        .optional()
+    responsableId: Joi.number() // ✅ CAMBIO: Usar responsableId como número
+        .integer()
+        .positive()
+        .required()
         .messages({
-            "string.min": "El responsable debe tener al menos 5 caracteres.",
-            "string.max": "El responsable debe tener máximo 100 caracteres.",
+            "number.base": "El responsable debe ser un ID numérico.",
+            "number.positive": "El responsable debe ser un número positivo.",
+            "any.required": "El responsable es obligatorio."
         }),
     recursos: Joi.string()
         .max(500)
@@ -66,7 +67,7 @@ export const actividadSchema = Joi.object({
         .messages({
             "any.only": "El estado debe ser publicada, pendiente o finalizada."
         })
-}).unknown(false);
+}).unknown(true); // ✅ CAMBIO PRINCIPAL: Permitir campos adicionales
 
 export const actividadUpdateSchema = Joi.object({
     titulo: Joi.string()
