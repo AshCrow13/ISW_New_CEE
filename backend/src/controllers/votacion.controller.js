@@ -59,11 +59,6 @@ export async function deleteVotacion(req, res) {
 
 export async function getVotacion(req, res) {
   try {
-    //Utiliza query(URL) para buscar por id o nombre
-    if (req.user.carrera !== "Ingeniería en Computación e Informática") {
-      return handleErrorClient(res, 403, "Solo estudiantes de Ingeniería en Computación e Informática pueden buscar votaciones");
-    }
-
     const id = req.params.id;
     const { error } = votacionQueryValidation.validate({ id }); // <-- validación correcta
 
