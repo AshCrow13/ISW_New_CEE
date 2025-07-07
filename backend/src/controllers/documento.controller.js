@@ -24,23 +24,25 @@ import Documento from "../entity/documento.entity.js";
 // CREATE - Subida de archivo
 export async function createDocumento(req, res) {
     try {
-        // Validar que el cuerpo de la solicitud cumpla con el esquema
+        // ✅ PRIMERA VALIDACIÓN: Verificar que el archivo existe
         if (!req.file) {
             return handleErrorClient(res, 400, "Debe adjuntar un archivo válido.");
         }
 
-        // Validar que el usuario tenga el rol adecuado
-        const documentoData = { // Extraemos los datos del archivo y los campos adicionales
-            ...req.body,
-            urlArchivo: `/api/documentos/download/${req.file.filename}`,
-            subidoPor: req.user.email
+        // ✅ CONSTRUIR los datos del documento con la URL generada
+        const documentoData = {
+            titulo: req.body.titulo,
+            tipo: req.body.tipo,
+            urlArchivo: `/api/documentos/download/${req.file.filename}`, // URL generada
+            subidoPor: req.user.email,
+            id_actividad: req.body.id_actividad || null
         };
 
-        // Validar el esquema del documento
+        // ✅ SEGUNDA VALIDACIÓN: Ahora validar con todos los datos completos
         const { error } = documentoSchema.validate(documentoData);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
         
-        // Crear el documento en la base de datos
+        // ✅ CREAR el documento en la base de datos
         const [documento, err] = await createDocumentoService(documentoData, req.user);
         if (err) return handleErrorClient(res, 400, err);
 
