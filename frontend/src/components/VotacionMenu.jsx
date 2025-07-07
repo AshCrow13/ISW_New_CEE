@@ -11,12 +11,16 @@ const MenuPrincipalVotaciones = ({
 }) => {
     return (
         <div className="menu-grid">
-            <button 
-                onClick={() => setView('crear')}
-                className="menu-button primary"
-            >
-                ➕ Crear Nueva Votación
-            </button>
+            {/* Solo mostrar el botón de crear si el usuario NO es estudiante */}
+            {user && user.rol !== 'estudiante' && (
+                <button 
+                    onClick={() => setView('crear')}
+                    className="menu-button primary"
+                >
+                    ➕ Crear Nueva Votación
+                </button>
+            )
+            }
 
             <button 
                 onClick={handleVerTodas}
@@ -41,7 +45,7 @@ const MenuPrincipalVotaciones = ({
                 </button>
             </div>
 
-            {user && user.rol === 'admin' && (
+            {user && user.rol !== 'estudiante' && (
                 <button 
                     onClick={() => setView('actualizar')}
                     className="menu-button warning"
