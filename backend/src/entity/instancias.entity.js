@@ -16,7 +16,7 @@ const InstanciaSchema = new EntitySchema({
             nullable: false,
         },
         Fecha: {
-            type: "date",
+            type: "timestamp with time zone",
             nullable: false,
         },
         Sala: {
@@ -32,7 +32,7 @@ const InstanciaSchema = new EntitySchema({
         ClaveAsistencia: {
         type: "varchar",
         length: 6,
-        nullable: false,
+        nullable: true,
         },
         createdAt: {
             type: "timestamp with time zone",

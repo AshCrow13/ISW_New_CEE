@@ -15,6 +15,7 @@ import Asambleas from '@pages/Asambleas';
 import Documentos from '@pages/Documentos';
 import Historial from '@pages/Historial';
 import Feedback from './pages/feedback';
+import Votacion from './pages/Votacion';
 
 const router = createBrowserRouter([ // Define las rutas de la aplicación
   {
@@ -37,6 +38,14 @@ const router = createBrowserRouter([ // Define las rutas de la aplicación
       {
         path: '/feedback',
         element: <Feedback/>
+      },
+      {
+        path: '/votacion',
+        element: (
+          <ProtectedRoute allowedRoles={['admin', 'vocalia','estudiante']}>
+            <Votacion/>
+          </ProtectedRoute>
+        )
       },
       {
         path: '/actividades',
