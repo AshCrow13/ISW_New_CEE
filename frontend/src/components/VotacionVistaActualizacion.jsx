@@ -71,7 +71,7 @@ const VistaActualizacion = ({ user, onActualizar }) => {
             )}
 
             {/* Paso 2: Editar votación */}
-            {step === 'editar' && votacionOriginal && (
+            {step === 'editar' && votacionOriginal && votacionOriginal.id && (
                 <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
                     <Box sx={{ mb: 2 }}>
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>

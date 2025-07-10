@@ -82,7 +82,10 @@ const DetalleVotacion = (props) => {
                                 )}
                                 {!votacionSeleccionada.estado && conteo.length > 0 && (
                                     <Typography variant="body2" sx={{ ml: 2, fontWeight: 700 }}>
-                                        Votos: {conteo.find(c => c.opcionId === opcion.id)?.cantidad || 0}
+                                        Votos: {(() => {
+                                            const c = conteo.find(c => Number(c.opcionId) === Number(opcion.id));
+                                            return c ? (c.conteo || c.cantidad || 0) : 0;
+                                        })()}
                                     </Typography>
                                 )}
                             </Box>

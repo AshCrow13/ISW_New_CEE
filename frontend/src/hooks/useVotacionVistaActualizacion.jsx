@@ -27,10 +27,17 @@ export function useVotacionVistaActualizacion({ user, onActualizar }) {
             const response = await getVotacionById(searchId);
             if (response.status === 'Success' && response.data) {
                 setVotacionOriginal(response.data);
+                // Ajuste: convertir fecha UTC/ISO a local para el input datetime-local
+                function toLocalDatetimeString(dateStr) {
+                    if (!dateStr) return '';
+                    const d = new Date(dateStr);
+                    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+                    return d.toISOString().slice(0, 16);
+                }
                 setFormData({
                     titulo: response.data.nombre || '',
-                    fechaInicio: response.data.inicio ? response.data.inicio.slice(0, 16) : '',
-                    fechaFin: response.data.fin ? response.data.fin.slice(0, 16) : '',
+                    fechaInicio: response.data.inicio ? toLocalDatetimeString(response.data.inicio) : '',
+                    fechaFin: response.data.fin ? toLocalDatetimeString(response.data.fin) : '',
                     opciones: response.data.opciones && response.data.opciones.length > 0
                         ? response.data.opciones.map(o => typeof o === 'string' ? o : o.texto)
                         : ['', '']
