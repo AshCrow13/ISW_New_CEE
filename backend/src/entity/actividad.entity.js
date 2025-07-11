@@ -21,7 +21,7 @@ const ActividadSchema = new EntitySchema({
             nullable: false 
         },
         fecha: { 
-            type: "date", 
+            type: "timestamp with time zone", // Cambiar de "date" a "timestamp with time zone"
             nullable: false 
         },
         lugar: { 

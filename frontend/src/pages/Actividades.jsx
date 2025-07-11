@@ -146,7 +146,22 @@ const Actividades = () => {
             field: 'fecha', 
             headerName: 'Fecha', 
             flex: 1,
-            renderCell: (params) => new Date(params.value).toLocaleDateString('es-ES')
+            renderCell: (params) => {
+                const date = new Date(params.value);
+                return date.toLocaleDateString('es-ES');
+            }
+        },
+        { 
+            field: 'hora', 
+            headerName: 'Hora', 
+            flex: 0.7,
+            renderCell: (params) => {
+                const date = new Date(params.row.fecha); // Usamos la misma fecha
+                return date.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
         },
         { field: 'lugar', headerName: 'Lugar', flex: 1 },
         { field: 'categoria', headerName: 'Categoría', flex: 1 },
