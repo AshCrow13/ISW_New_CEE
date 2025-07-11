@@ -1,0 +1,15 @@
+*   [33m4753f4d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mbranch-Krou[m[33m, [m[1;31morigin/branch-Krou[m[33m)[m Merge branch 'branch-Krou' of https://github.com/AshCrow13/ISW_New_CEE into branch-Krou
+[31m|[m[32m\[m  
+[31m|[m * [33m2d24073[m Mejorar la visualización y gestión de actividades, incluyendo una nueva interfaz con tarjetas y filtrado para estudiantes. Se ajusta la lógica de carga y se mejora el manejo de errores en el servicio de actividades.
+* [32m|[m [33mf816272[m Mejorar el servicio y la vista de actividades: agregar paginación y metadata en la respuesta de actividades. Actualizar la lógica en el frontend para manejar la paginación y mostrar información de total de actividades.
+* [32m|[m [33m3821be9[m Mejorar el servicio de actividades: agregar soporte para obtener próximas actividades y optimizar el ordenamiento en la consulta de actividades. Actualizar la vista de actividades para estudiantes y admins, incluyendo nuevas funcionalidades de visualización.
+* [32m|[m [33m9a8b0bc[m Refactor componente Actividades: eliminar lógica de filtrado por tipo de actividad y simplificar la carga de datos. Eliminar estilos CSS no utilizados.
+* [32m|[m [33m486bf1d[m Refactor servicios de actividades: simplificar filtrado y ordenamiento, mejorar paginación y eliminar función de próximas actividades.
+* [32m|[m [33mb19fa18[m Implementar filtrado y ordenamiento de actividades, incluyendo soporte para obtener próximas actividades y mejoras en la visualización en el frontend.
+[32m|[m[32m/[m  
+* [33mfb8f9a8[m Mejorar la validación de inicio de sesión y registro, incluyendo manejo de errores específicos para email, RUT y contraseña. Se implementa soporte para autenticación por RUT y se ajustan mensajes de error en el frontend.
+*   [33m6947acb[m Merge pull request #103 from AshCrow13/main
+[33m|[m[34m\[m  
+[33m|[m *   [33m0b28e9d[m[33m ([m[1;31morigin/segundoProvisional[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Merge pull request #100 from AshCrow13/branch-chito
+[33m|[m [35m|[m[36m\[m  
+[33m|[m [35m|[m * [33mb5b6c91[m Arreglos menores a Actualizacion
