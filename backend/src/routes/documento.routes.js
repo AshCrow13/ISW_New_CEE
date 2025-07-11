@@ -11,7 +11,8 @@ import {
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 import { hasRoles } from "../middlewares/roles.middleware.js";
 import upload from "../middlewares/upload.middleware.js";
-import { uploadErrorHandler } from "../middlewares/uploadError.middleware.js";
+import { uploadErrorHandler, validateMimeType } from "../middlewares/uploadError.middleware.js";
+import { FILE_CONFIG } from "../config/fileConfig.js";
 
 const router = Router();
 
@@ -21,7 +22,13 @@ router
     .get("/download/:id", authenticateJwt, downloadDocumento); // Descargar un documento
 router
     .post(
-      "/", authenticateJwt, hasRoles(["admin", "vocalia"]), upload.single("archivo"), uploadErrorHandler,createDocumento
+      "/", 
+      authenticateJwt, 
+      hasRoles(["admin", "vocalia"]), 
+      upload.single("archivo"), 
+      uploadErrorHandler,
+      validateMimeType(FILE_CONFIG.DOCUMENT.mimeTypes),
+      createDocumento
     ) // Crear un nuevo documento 
     .patch("/detail", authenticateJwt, hasRoles(["admin", "vocalia"]), updateDocumento) // Actualizar un documento
     .delete("/detail", authenticateJwt, hasRoles(["admin", "vocalia"]), deleteDocumento); // Eliminar un documento

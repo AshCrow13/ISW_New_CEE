@@ -20,6 +20,7 @@ import path from "path";
 import fs from "fs";
 import { AppDataSource } from "../config/configDb.js";
 import Documento from "../entity/documento.entity.js";
+import sharp from "sharp"; // Agregar sharp para optimizar imágenes
 
 // CREATE - Subida de archivo
 export async function createDocumento(req, res) {
@@ -29,6 +30,32 @@ export async function createDocumento(req, res) {
             return handleErrorClient(res, 400, "Debe adjuntar un archivo válido.");
         }
 
+        // Optimizar imagen si el archivo es una imagen
+        const fileExt = path.extname(req.file.originalname).toLowerCase();
+        const isImage = ['.jpg', '.jpeg', '.png', '.webp'].includes(fileExt);
+        
+        if (isImage) {
+            try {
+                // Ruta del archivo original
+                const originalPath = req.file.path;
+                // Ruta para la imagen optimizada
+                const optimizedPath = `${originalPath.substring(0, originalPath.lastIndexOf('.'))}_opt${fileExt}`;
+                
+                // Optimizar imagen usando sharp
+                await sharp(originalPath)
+                    .resize(1200) // Redimensionar para que el ancho máximo sea 1200px
+                    .jpeg({ quality: 80 }) // Optimizar calidad
+                    .toFile(optimizedPath);
+                
+                // Eliminar archivo original y reemplazar con la versión optimizada
+                fs.unlinkSync(originalPath);
+                fs.renameSync(optimizedPath, originalPath);
+            } catch (optimizationError) {
+                console.error("Error al optimizar imagen:", optimizationError);
+                // Continuar con el archivo original si falla la optimización
+            }
+        }
+        
         // ✅ CONSTRUIR los datos del documento con la URL generada
         const documentoData = {
             titulo: req.body.titulo,

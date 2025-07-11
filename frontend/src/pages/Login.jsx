@@ -5,6 +5,7 @@ import { Paper, Container, TextField, Button, Typography, Box, Alert, Tabs, Tab,
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import InfoIcon from '@mui/icons-material/Info';
 import { login } from '@services/auth.service.js';
+import { formatRutOnChange } from '@helpers/formatRut.js';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -33,7 +34,14 @@ const Login = () => {
     };
 
     const handleChange = (e) => {
-        setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value } = e.target;
+        
+        // Aplicar formato de RUT automáticamente mientras el usuario escribe
+        if (name === 'rut') {
+            setForm(prev => ({ ...prev, [name]: formatRutOnChange(value) }));
+        } else {
+            setForm(prev => ({ ...prev, [name]: value }));
+        }
         
         // Limpiar error específico cuando el usuario empieza a corregir
         if (errors[e.target.name]) {
