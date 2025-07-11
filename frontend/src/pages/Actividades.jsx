@@ -42,11 +42,11 @@ const Actividades = () => {
         }
     }, [user?.rol, verTodas, paginaActual]);
 
-    // Fetch próximas actividades (solo 5)
+    // Fetch próximas actividades (ahora 7)
     const fetchProximasActividades = async () => {
         setLoading(true);
         try {
-            const res = await getProximasActividades(5);
+            const res = await getProximasActividades(7);
             setProximasActividades(res);
         } catch (e) {
             showErrorAlert('Error', 'No se pudieron cargar las actividades próximas');
@@ -74,8 +74,27 @@ const Actividades = () => {
             const res = await getActividades(params);
             setActividades(res);
             
-            // Calcular total de páginas (aproximado)
-            setTotalPaginas(Math.ceil(res.length > 0 ? res.length / 20 + 2 : 1));
+            // Calcular total de páginas correctamente
+            // Si hay menos de 20 resultados, solo hay una página
+            // Si hay exactamente 20, puede haber más, pero no estamos seguros
+            if (res.length < 20) {
+                setTotalPaginas(1);
+            } else {
+                // Solicitamos el total sin paginación para calcular el total de páginas
+                const countParams = { ...params };
+                delete countParams.limit;
+                delete countParams.offset;
+                countParams.count = true;
+                
+                try {
+                    const totalRes = await getActividades(countParams);
+                    const totalCount = totalRes.length;
+                    setTotalPaginas(Math.ceil(totalCount / 20));
+                } catch (e) {
+                    // En caso de error, mostramos la página actual + 1
+                    setTotalPaginas(paginaActual + 1);
+                }
+            }
         } catch (e) {
             showErrorAlert('Error', 'No se pudieron cargar las actividades');
         }
@@ -486,6 +505,12 @@ const Actividades = () => {
                     rowsPerPageOptions={[20]}
                     loading={loading}
                     disableRowSelectionOnClick
+                    autoHeight
+                    sx={{
+                        '& .MuiDataGrid-virtualScroller': {
+                            maxHeight: '500px'
+                        }
+                    }}
                 />
             </Box>
 
@@ -495,6 +520,10 @@ const Actividades = () => {
                     page={paginaActual}
                     onChange={handlePageChange}
                     color="primary"
+                    siblingCount={1}
+                    boundaryCount={1}
+                    hideNextButton={paginaActual === totalPaginas}
+                    hidePrevButton={paginaActual === 1}
                 />
             </Box>
         </Box>

@@ -10,8 +10,8 @@ export async function getActividades(filtros = {}) {
     }
 }
 
-// Obtener próximas actividades (las 5 más cercanas)
-export async function getProximasActividades(cantidad = 5) {
+// Obtener próximas actividades (las 7 más cercanas)
+export async function getProximasActividades(cantidad = 7) {
     try {
         // Obtener la fecha actual en formato ISO
         const hoy = new Date().toISOString().split('T')[0];
