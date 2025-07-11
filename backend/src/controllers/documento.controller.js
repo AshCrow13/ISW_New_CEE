@@ -118,6 +118,22 @@ export async function updateDocumento(req, res) {
         const { error: bodyError } = documentoUpdateSchema.validate(req.body);
         if (bodyError) return handleErrorClient(res, 400, "Error en los datos", bodyError.message);
 
+        // Si se está intentando cambiar el tipo de documento, verificar permisos adicionales
+        if (req.body.tipo && req.user.rol === 'vocalia') {
+            const repo = AppDataSource.getRepository(Documento);
+            const documento = await repo.findOne({ where: { id: parseInt(req.query.id) } });
+            
+            // Si el documento existe y está intentando cambiar el tipo a uno no permitido
+            if (documento && !(req.body.tipo === 'Actividad' || req.body.tipo === 'Otros')) {
+                return handleErrorClient(
+                    res, 
+                    403, 
+                    "Permisos insuficientes", 
+                    "Vocalia solo puede cambiar el tipo a 'Actividad' u 'Otros'"
+                );
+            }
+        }
+
         // Verificar si se está intentando actualizar el archivo
         const [documento, err] = await updateDocumentoService(req.query, req.body, req.user);
         if (err) return handleErrorClient(res, 400, err);

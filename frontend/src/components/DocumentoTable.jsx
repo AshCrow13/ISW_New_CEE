@@ -86,6 +86,13 @@ const DocumentoTable = ({
     }
   };
 
+  // Función para determinar si un usuario puede editar un documento según su tipo
+  const canEditDocument = (userRole, docType) => {
+    if (userRole === "admin") return true;
+    if (userRole === "vocalia" && (docType === "Actividad" || docType === "Otros")) return true;
+    return false;
+  };
+
   // Renderizar un mensaje si no hay documentos
   if (documentos.length === 0) {
     return (
@@ -174,7 +181,8 @@ const DocumentoTable = ({
                                 Descargar
                               </Button>
                             )}
-                            {(userRole === "admin" || userRole === "vocalia") && (
+                            {/* Solo mostrar botones de edición y eliminación si el usuario tiene permisos */}
+                            {canEditDocument(userRole, doc.tipo) && (
                               <>
                                 <IconButton 
                                   size="small" 

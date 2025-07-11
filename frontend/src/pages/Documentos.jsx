@@ -42,8 +42,23 @@ const Documentos = () => {
         );
     }, [documentos, searchTerm]);
 
+    // Función para verificar si el usuario puede crear ciertos tipos de documentos
+    const canCreateDocumentType = (userRole, docType) => {
+        if (userRole === "admin") return true;
+        if (userRole === "vocalia" && (docType === "Actividad" || docType === "Otros")) return true;
+        return false;
+    };
+
+    // Función para mostrar el modal de creación con el tipo pre-seleccionado si es vocalia
     const handleCrear = () => {
-        setFormData(null); 
+        let initialData = {};
+        
+        // Si es vocalia, preseleccionar el tipo que puede crear
+        if (user?.rol === 'vocalia') {
+            initialData = { tipo: 'Actividad' };
+        }
+        
+        setFormData(initialData); 
         setFormOpen(true);
     };
 
@@ -160,7 +175,7 @@ const Documentos = () => {
                 fullWidth
             >
                 <DialogTitle>
-                    {formData ? "Editar Documento" : "Nuevo Documento"}
+                    {formData?.id ? "Editar Documento" : "Nuevo Documento"}
                 </DialogTitle>
                 <DialogContent>
                     <DocumentoForm
@@ -170,8 +185,9 @@ const Documentos = () => {
                             setFormOpen(false);
                             setFormData(null);
                         }}
-                        isEditing={!!formData}
+                        isEditing={!!formData?.id}
                         loading={loading}
+                        userRole={user?.rol} // Pasar el rol para controlar opciones en el formulario
                     />
                 </DialogContent>
             </Dialog>
