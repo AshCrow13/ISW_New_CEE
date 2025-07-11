@@ -9,7 +9,7 @@ import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers
 // LOGIN
 export async function loginEstudiante(req, res) {
   try {
-    
+    // Validar que tenga al menos email o RUT
     const { error } = estudianteLoginSchema.validate(req.body);
     if (error)
       return handleErrorClient(res, 400, "Error de validación", error.message);
@@ -34,12 +34,41 @@ export async function loginEstudiante(req, res) {
 export async function registerEstudiante(req, res) {
   try {
     const { error } = estudianteSchema.validate(req.body);
-    if (error)
-      return handleErrorClient(res, 400, "Error de validación", error.message);
+    if (error) {
+      // Extraer información de error más específica de Joi
+      const errorDetail = error.details[0];
+      let dataInfo = 'general';
+      
+      // Identificar qué campo causó el error
+      if (errorDetail.path && errorDetail.path.length > 0) {
+        dataInfo = errorDetail.path[0];
+      }
+      
+      return handleErrorClient(
+        res, 
+        400, 
+        "Error de validación", 
+        { 
+          dataInfo, 
+          message: errorDetail.message 
+        }
+      );
+    }
 
     const [newEstudiante, errMsg] = await registerEstudianteService(req.body);
-    if (errMsg)
+    if (errMsg) {
+      // Si el servicio devuelve un objeto con información detallada del error
+      if (typeof errMsg === 'object' && errMsg.dataInfo) {
+        return handleErrorClient(
+          res, 
+          400, 
+          "Error al registrar", 
+          errMsg
+        );
+      }
+      
       return handleErrorClient(res, 400, "Error al registrar", errMsg);
+    }
 
     handleSuccess(res, 201, "Estudiante registrado exitosamente", newEstudiante);
   } catch (error) {
