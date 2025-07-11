@@ -28,7 +28,8 @@ const Actividades = () => {
         titulo: '',
         lugar: '',
         categoria: '',
-        fecha: ''
+        fechaInicio: '',
+        fechaFin: ''
     });
     const { user } = useAuth();
 
@@ -67,7 +68,8 @@ const Actividades = () => {
             if (filtrosAvanzados.titulo) params.q = filtrosAvanzados.titulo;
             if (filtrosAvanzados.lugar) params.lugar = filtrosAvanzados.lugar;
             if (filtrosAvanzados.categoria) params.categoria = filtrosAvanzados.categoria;
-            if (filtrosAvanzados.fecha) params.fechaInicio = filtrosAvanzados.fecha;
+            if (filtrosAvanzados.fechaInicio) params.fechaInicio = filtrosAvanzados.fechaInicio;
+            if (filtrosAvanzados.fechaFin) params.fechaFin = filtrosAvanzados.fechaFin;
 
             const res = await getActividades(params);
             setActividades(res);
@@ -196,66 +198,153 @@ const Actividades = () => {
     };
 
     // Vista para usuarios estudiantes (próximas actividades)
-    const renderProximasActividades = () => (
-        <Box>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h5">Próximas Actividades</Typography>
-                <Button 
-                    variant="contained" 
-                    color="primary"
-                    startIcon={<ListAltIcon />}
-                    onClick={() => setVerTodas(true)}
-                >
-                    Ver todas las actividades
-                </Button>
-            </Stack>
+    const renderProximasActividades = () => {
+        // Función para obtener el color según la categoría
+        const getCategoryColor = (categoria) => {
+            switch (categoria) {
+                case 'Deportivo': return '#2e7d32'; // Verde
+                case 'Recreativo': return '#1565c0'; // Azul
+                case 'Oficial': return '#c62828'; // Rojo
+                default: return '#616161'; // Gris por defecto
+            }
+        };
+        
+        // Función para formatear la fecha con hora
+        const formatDateTime = (dateString) => {
+            const date = new Date(dateString);
+            return {
+                fecha: date.toLocaleDateString('es-ES', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                }),
+                hora: date.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
+        };
 
-            {loading ? (
-                <Typography>Cargando actividades...</Typography>
-            ) : proximasActividades.length === 0 ? (
-                <Typography>No hay actividades próximas programadas.</Typography>
-            ) : (
-                <Grid container spacing={3}>
-                    {proximasActividades.map((actividad) => (
-                        <Grid item xs={12} sm={6} md={4} key={actividad.id}>
-                            <Card elevation={3}>
-                                <CardContent>
-                                    <Typography variant="h6" gutterBottom>{actividad.titulo}</Typography>
-                                    <Typography variant="body2" color="text.secondary" mb={2} 
-                                        sx={{ 
-                                            display: '-webkit-box',
-                                            WebkitLineClamp: 3,
-                                            WebkitBoxOrient: 'vertical',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
+        return (
+            <Box>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+                    <Typography variant="h5">Próximas Actividades</Typography>
+                    <Button 
+                        variant="contained" 
+                        color="primary"
+                        startIcon={<ListAltIcon />}
+                        onClick={() => setVerTodas(true)}
+                    >
+                        Ver todas las actividades
+                    </Button>
+                </Stack>
+
+                {loading ? (
+                    <Box display="flex" justifyContent="center" p={4}>
+                        <Typography>Cargando actividades...</Typography>
+                    </Box>
+                ) : proximasActividades.length === 0 ? (
+                    <Box textAlign="center" p={4} bgcolor="#f5f5f5" borderRadius={2}>
+                        <Typography>No hay actividades próximas programadas.</Typography>
+                    </Box>
+                ) : (
+                    <Grid container spacing={4}>
+                        {proximasActividades.map((actividad) => {
+                            const { fecha, hora } = formatDateTime(actividad.fecha);
+                            const categoryColor = getCategoryColor(actividad.categoria);
+                            
+                            return (
+                                <Grid item xs={12} sm={6} key={actividad.id}>
+                                    <Card 
+                                        elevation={3}
+                                        sx={{
+                                            height: '100%',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            position: 'relative',
+                                            overflow: 'visible',
+                                            '&:hover': {
+                                                transform: 'translateY(-5px)',
+                                                transition: 'transform 0.3s ease'
+                                            }
                                         }}
                                     >
-                                        {actividad.descripcion}
-                                    </Typography>
-                                    <Stack spacing={1}>
-                                        <Box display="flex" alignItems="center" gap={1}>
-                                            <CalendarTodayIcon fontSize="small" color="primary" />
-                                            <Typography variant="body2">
-                                                {new Date(actividad.fecha).toLocaleDateString('es-ES')}
+                                        {/* Banda de color según categoría */}
+                                        <Box 
+                                            sx={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                width: '100%',
+                                                height: '8px',
+                                                backgroundColor: categoryColor
+                                            }}
+                                        />
+                                        
+                                        {/* Chip de categoría */}
+                                        <Box position="absolute" top={15} right={16}>
+                                            <Box
+                                                sx={{
+                                                    backgroundColor: categoryColor,
+                                                    color: 'white',
+                                                    borderRadius: '16px',
+                                                    padding: '4px 12px',
+                                                    fontWeight: 'bold',
+                                                    fontSize: '0.75rem'
+                                                }}
+                                            >
+                                                {actividad.categoria}
+                                            </Box>
+                                        </Box>
+                                        
+                                        <CardContent sx={{ pt: 4, pb: 2, flexGrow: 1 }}>
+                                            <Typography variant="h5" gutterBottom fontWeight="bold" mt={1}>
+                                                {actividad.titulo}
                                             </Typography>
-                                        </Box>
-                                        <Box display="flex" alignItems="center" gap={1}>
-                                            <LocationOnIcon fontSize="small" color="primary" />
-                                            <Typography variant="body2">{actividad.lugar}</Typography>
-                                        </Box>
-                                        <Box display="flex" alignItems="center" gap={1}>
-                                            <CategoryIcon fontSize="small" color="primary" />
-                                            <Typography variant="body2">{actividad.categoria}</Typography>
-                                        </Box>
-                                    </Stack>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-            )}
-        </Box>
-    );
+                                            <Typography 
+                                                variant="body1" 
+                                                color="text.secondary" 
+                                                mb={3} 
+                                                sx={{ 
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 4,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    minHeight: '80px'
+                                                }}
+                                            >
+                                                {actividad.descripcion}
+                                            </Typography>
+                                            <Stack spacing={2}>
+                                                <Box display="flex" alignItems="center" gap={1}>
+                                                    <CalendarTodayIcon fontSize="small" color="primary" />
+                                                    <Box>
+                                                        <Typography variant="body2" fontWeight="bold">
+                                                            {fecha}
+                                                        </Typography>
+                                                        <Typography variant="body2" color="text.secondary">
+                                                            Hora: {hora}
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                                <Box display="flex" alignItems="center" gap={1}>
+                                                    <LocationOnIcon fontSize="small" color="primary" />
+                                                    <Typography variant="body2" fontWeight="medium">
+                                                        {actividad.lugar}
+                                                    </Typography>
+                                                </Box>
+                                            </Stack>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            );
+                        })}
+                    </Grid>
+                )}
+            </Box>
+        );
+    };
 
     // Vista para todas las actividades con filtros y paginación
     const renderTodasActividades = () => (
@@ -340,8 +429,21 @@ const Actividades = () => {
                                 type="date"
                                 variant="outlined"
                                 fullWidth
-                                value={filtrosAvanzados.fecha}
-                                onChange={(e) => handleFiltroAvanzadoChange('fecha', e.target.value)}
+                                value={filtrosAvanzados.fechaInicio}
+                                onChange={(e) => handleFiltroAvanzadoChange('fechaInicio', e.target.value)}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={3}>
+                            <TextField
+                                label="Fecha hasta"
+                                type="date"
+                                variant="outlined"
+                                fullWidth
+                                value={filtrosAvanzados.fechaFin}
+                                onChange={(e) => handleFiltroAvanzadoChange('fechaFin', e.target.value)}
                                 InputLabelProps={{
                                     shrink: true,
                                 }}
@@ -364,7 +466,8 @@ const Actividades = () => {
                                 titulo: '',
                                 lugar: '',
                                 categoria: '',
-                                fecha: ''
+                                fechaInicio: '',
+                                fechaFin: ''
                             });
                             setPaginaActual(1);
                             fetchAllActividades();
@@ -400,7 +503,7 @@ const Actividades = () => {
     return (
         <Box sx={{ p: 3 }}>
             <Typography variant="h4" gutterBottom>
-                Gestión de Actividades
+                Actividades del Centro de Alumnos
             </Typography>
             
             {/* Botón para crear actividades (solo admin y vocalia) */}
