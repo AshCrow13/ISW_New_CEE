@@ -61,6 +61,8 @@ export async function getActividadesService(filtro = {}) {
         
         // ✅ CORREGIR: Usar nombres correctos de columna según la entidad
         if (filtro.categoria) where.categoria = filtro.categoria;
+        if (filtro.lugar) where.lugar = Like(`%${filtro.lugar}%`);
+        
         if (filtro.fechaInicio && filtro.fechaFin) {
             // ✅ CAMBIO: Usar 'fecha' en lugar de 'fechaInicio/fechaFin'
             where.fecha = Between(filtro.fechaInicio, filtro.fechaFin);
@@ -79,8 +81,20 @@ export async function getActividadesService(filtro = {}) {
             );
         }
 
-        // ✅ CORREGIR: Ordenamiento simple
-        queryBuilder = queryBuilder.orderBy("actividad.fecha", "DESC");
+        // ✅ MEJORADO: Ordenamiento configurable
+        let orderField = "actividad.fecha";
+        let orderDirection = "DESC";
+        
+        if (filtro.orderBy) {
+            const parts = filtro.orderBy.split('_');
+            if (parts.length === 2) {
+                const [field, direction] = parts;
+                orderField = `actividad.${field}`;
+                orderDirection = direction.toUpperCase() === "ASC" ? "ASC" : "DESC";
+            }
+        }
+        
+        queryBuilder = queryBuilder.orderBy(orderField, orderDirection);
 
         // Paginación
         const limit = filtro.limit ? parseInt(filtro.limit) : 20;
