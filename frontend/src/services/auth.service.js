@@ -1,6 +1,7 @@
 import axios from './root.service.js';
 import { jwtDecode } from 'jwt-decode';
 import { convertirMinusculas } from '@helpers/formatData.js';
+import { formatRutOnChange } from '@helpers/formatRut.js';
 
 export async function login(dataUser) {
     try {
@@ -15,11 +16,17 @@ export async function login(dataUser) {
         
         const rutRegex = /^(?:(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}|[1-9]\d{6}|[1-2]\d{7}|29\.999\.999|29999999)-[\dkK]$/;
         if (dataUser.rut && !rutRegex.test(dataUser.rut)) {
-            return { 
-                status: 'Error', 
-                dataInfo: 'rut',
-                message: 'El RUT debe tener formato xx.xxx.xxx-x'
-            };
+            // Intentar formatear el RUT si no está en el formato correcto
+            const formattedRut = formatRutOnChange(dataUser.rut);
+            if (!rutRegex.test(formattedRut)) {
+                return { 
+                    status: 'Error', 
+                    dataInfo: 'rut',
+                    message: 'El RUT debe tener formato xx.xxx.xxx-x'
+                };
+            }
+            // Si el formateo tuvo éxito, usar el RUT formateado
+            dataUser.rut = formattedRut;
         }
 
         if (!dataUser.password || dataUser.password.length < 8) {
@@ -115,6 +122,11 @@ export async function register(data) {
                 dataInfo: 'email',
                 message: 'Debe usar un correo institucional'
             };
+        }
+        
+        // Formatear RUT si es necesario
+        if (data.rut) {
+            data.rut = formatRutOnChange(data.rut);
         }
         
         // Validar formato de RUT (solo con puntos)

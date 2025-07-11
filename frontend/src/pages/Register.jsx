@@ -6,8 +6,9 @@ import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import InfoIcon from '@mui/icons-material/Info';
 import { register } from '@services/auth.service.js';
 import { showSuccessAlert } from '@helpers/sweetAlert.js';
+import { formatRutOnChange, validateRut } from '@helpers/formatRut.js';
 
-// Expresión regular para RUT chileno (solo con puntos)
+// Expresión regular para RUT chileno con formato xx.xxx.xxx-x (solo con puntos)
 const rutRegex = /^(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}-[\dkK]$/;
 
 const Register = () => {
@@ -29,7 +30,13 @@ const Register = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
+        
+        // Aplicar formato de RUT automáticamente mientras el usuario escribe
+        if (name === 'rut') {
+            setForm(prev => ({ ...prev, [name]: formatRutOnChange(value) }));
+        } else {
+            setForm(prev => ({ ...prev, [name]: value }));
+        }
         
         // Limpiar error específico cuando el usuario empieza a corregir
         if (errors[name]) {
