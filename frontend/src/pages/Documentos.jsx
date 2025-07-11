@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
     getDocumentos,
     createDocumento,
@@ -10,13 +10,17 @@ import DocumentoTable from '@components/DocumentoTable';
 import DocumentoForm from '@components/DocumentoForm';
 import { showSuccessAlert, showErrorAlert } from '@helpers/sweetAlert';
 import { useAuth } from '@context/AuthContext';
-import { Dialog, DialogTitle, DialogContent, Button, Box, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Button, Box, Typography, Paper, Divider, TextField, InputAdornment } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import SearchIcon from '@mui/icons-material/Search';
 
 const Documentos = () => {
     const [documentos, setDocumentos] = useState([]);
     const [formOpen, setFormOpen] = useState(false);
     const [formData, setFormData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
     const { user } = useAuth();
 
     useEffect(() => {
@@ -27,6 +31,16 @@ const Documentos = () => {
         const res = await getDocumentos();
         setDocumentos(res);
     };
+
+    // Filtrar documentos basados en el término de búsqueda
+    const filteredDocumentos = useMemo(() => {
+        if (!searchTerm.trim()) return documentos;
+        
+        return documentos.filter(doc => 
+            doc.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            doc.tipo?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [documentos, searchTerm]);
 
     const handleCrear = () => {
         setFormData(null); 
@@ -89,21 +103,47 @@ const Documentos = () => {
 
     return (
         <Box sx={{ p: 3 }}>
-            <Typography variant="h4" gutterBottom>
-                Gestión de Documentos
-            </Typography>
-            {(user?.rol === 'admin' || user?.rol === 'vocalia') && (
-                <Button
-                    variant="contained"
-                    sx={{ mb: 2 }}
-                    onClick={handleCrear}
-                >
-                    Nuevo documento
-                </Button>
-            )}
+            <Paper elevation={2} sx={{ p: 3, borderRadius: 3, mb: 3 }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                        Gestión de Documentos
+                    </Typography>
+                    {(user?.rol === 'admin' || user?.rol === 'vocalia') && (
+                        <Button
+                            variant="contained"
+                            startIcon={<NoteAddIcon />}
+                            onClick={handleCrear}
+                            sx={{ borderRadius: 2 }}
+                        >
+                            Nuevo documento
+                        </Button>
+                    )}
+                </Box>
+                <Divider sx={{ my: 2 }} />
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Typography variant="body1" color="text.secondary">
+                        Aquí encontrarás todos los documentos organizados por categorías. Puedes expandir cada sección para ver su contenido.
+                    </Typography>
+                    {/* Campo de búsqueda */}
+                    <TextField
+                        placeholder="Buscar documentos..."
+                        size="small"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        sx={{ width: '300px', maxWidth: '100%' }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon color="action" />
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
+                </Box>
+            </Paper>
 
             <DocumentoTable
-                documentos={documentos}
+                documentos={filteredDocumentos}
                 onEdit={handleEditar}
                 onDelete={handleEliminar}
                 onDownload={handleDownload}

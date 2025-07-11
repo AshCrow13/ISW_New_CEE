@@ -24,9 +24,10 @@ const defaultFields = [
         fieldType: "select",
         required: true,
         options: [
-        { value: "acta", label: "Acta" },
-        { value: "comunicado", label: "Comunicado" },
-        { value: "resultado", label: "Resultado" },
+        { value: "Importantes", label: "Importantes" },
+        { value: "Actividad", label: "Actividad" },
+        { value: "Actas", label: "Actas" },
+        { value: "Otros", label: "Otros" },
         ],
     },
 ];
@@ -115,9 +116,10 @@ const DocumentoForm = ({
             helperText={error.tipo}
             >
             <MenuItem value="">Seleccione...</MenuItem>
-            <MenuItem value="acta">Acta</MenuItem>
-            <MenuItem value="comunicado">Comunicado</MenuItem>
-            <MenuItem value="resultado">Resultado</MenuItem>
+            <MenuItem value="Importantes">Importantes</MenuItem>
+            <MenuItem value="Actividad">Actividad</MenuItem>
+            <MenuItem value="Actas">Actas</MenuItem>
+            <MenuItem value="Otros">Otros</MenuItem>
             </TextField>
             <Button variant="outlined" component="label" color={error.archivo ? "error" : "primary"}>
             {archivo ? archivo.name : "Adjuntar archivo"}
