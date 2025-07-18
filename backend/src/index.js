@@ -12,6 +12,13 @@ import { cookieKey, HOST, PORT } from "./config/configEnv.js";
 import { connectDB } from "./config/configDb.js";
 import { createEstudiantes } from "./config/initialSetup.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
+import fs from "fs";
+import path from "path";
+
+const uploadsPath = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadsPath)) {
+  fs.mkdirSync(uploadsPath);
+}
 
 async function setupServer() {
   try {
@@ -22,7 +29,7 @@ async function setupServer() {
     app.use(
       cors({
         credentials: true,
-        origin: true, //* Cambiar a la URL de tu frontend en producción***
+        origin: "http://localhost:5173", // Cambiar a la URL de tu frontend en producción
       }),
     );
 

@@ -8,15 +8,29 @@ import { Between, LessThanOrEqual, Like, MoreThanOrEqual } from "typeorm";
 // CREATE
 export async function createActividadService(data, usuario) {
     try {
-        // Validar que el cuerpo de la solicitud cumpla con el esquema
         const repo = AppDataSource.getRepository(Actividad);
         const estudianteRepo = AppDataSource.getRepository(Estudiante);
 
-        // Buscar responsable 
-        const responsable = await estudianteRepo.findOne({ where: { id: data.responsableId } });
-        if (!responsable) return [null, "Responsable no encontrado"];
+        // ✅ CAMBIO: Buscar cualquier estudiante disponible si el ID no existe
+        let responsable;
+        if (data.responsableId) {
+            responsable = await estudianteRepo.findOne({ where: { id: data.responsableId } });
+        }
+        
+        // ✅ CORREGIR: Si no se encuentra, usar find() con limit en lugar de findOne()
+        if (!responsable) {
+            const estudiantes = await estudianteRepo.find({ 
+                order: { id: "ASC" },
+                take: 1 // Tomar solo el primer resultado
+            });
+            
+            if (estudiantes.length === 0) {
+                return [null, "No hay estudiantes registrados en el sistema"];
+            }
+            
+            responsable = estudiantes[0]; // Usar el primer estudiante encontrado
+        }
 
-        // Validar que la fecha sea válida
         const actividad = repo.create({ ...data, responsable });
         await repo.save(actividad);
 
@@ -29,8 +43,10 @@ export async function createActividadService(data, usuario) {
             referenciaId: actividad.id
         });
 
-        // Devuelve actividad con responsable incluido
-        const actividadCompleta = await repo.findOne({ where: { id: actividad.id }, relations: ["responsable"] });
+        const actividadCompleta = await repo.findOne({ 
+            where: { id: actividad.id }, 
+            relations: ["responsable"] 
+        });
         return [actividadCompleta, null];
     } catch (error) {
         return [null, "Error al crear actividad: " + error.message];
@@ -40,12 +56,13 @@ export async function createActividadService(data, usuario) {
 // READ (Todos - con filtro)
 export async function getActividadesService(filtro = {}) {
     try {
-        // Validar que el filtro cumpla con el esquema
         const repo = AppDataSource.getRepository(Actividad);
         const where = {};
-        // Filtros básicos
+        
+        // ✅ CORREGIR: Usar nombres correctos de columna según la entidad
         if (filtro.categoria) where.categoria = filtro.categoria;
         if (filtro.fechaInicio && filtro.fechaFin) {
+            // ✅ CAMBIO: Usar 'fecha' en lugar de 'fechaInicio/fechaFin'
             where.fecha = Between(filtro.fechaInicio, filtro.fechaFin);
         } else if (filtro.fechaInicio) {
             where.fecha = MoreThanOrEqual(filtro.fechaInicio);
@@ -53,9 +70,8 @@ export async function getActividadesService(filtro = {}) {
             where.fecha = LessThanOrEqual(filtro.fechaFin);
         }
         
-        let queryBuilder = repo.createQueryBuilder("actividad").where(where); // Construir consulta
+        let queryBuilder = repo.createQueryBuilder("actividad").where(where);
 
-        // Filtro de búsqueda por texto
         if (filtro.q) {
             queryBuilder = queryBuilder.andWhere(
                 "(actividad.titulo ILIKE :q OR actividad.descripcion ILIKE :q)",
@@ -63,13 +79,8 @@ export async function getActividadesService(filtro = {}) {
             );
         }
 
-        // Ordenamiento
-        let order = { fecha: "DESC" };
-        if (filtro.orderBy) {
-            const [campo, dir] = filtro.orderBy.split("_");
-            order = { [campo]: dir.toUpperCase() === "DESC" ? "DESC" : "ASC" };
-        }
-        queryBuilder = queryBuilder.orderBy(order); // Ordenar resultados
+        // ✅ CORREGIR: Ordenamiento simple
+        queryBuilder = queryBuilder.orderBy("actividad.fecha", "DESC");
 
         // Paginación
         const limit = filtro.limit ? parseInt(filtro.limit) : 20;

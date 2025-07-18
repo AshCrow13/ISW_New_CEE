@@ -1,8 +1,8 @@
 "use strict";
+import bcrypt from "bcryptjs";
 import Estudiante from "../entity/estudiante.entity.js";
 import { AppDataSource } from "../config/configDb.js";
-import { comparePassword, encryptPassword } from "../helpers/bcrypt.helper.js";
-import bcrypt from "bcryptjs";
+import Historial from "../entity/historial.entity.js"; // ✅ IMPORTAR: Entidad Historial
 
 // CREATE
 export async function createEstudianteService(data) {
@@ -32,7 +32,7 @@ export async function getEstudiantesService() {
         const repo = AppDataSource.getRepository(Estudiante);
         const estudiantes = await repo.find({ order: { createdAt: "DESC" } });
         const result = estudiantes.map(({ password, ...rest }) => rest);
-        return result;
+        return [result, null]; // ✅ Formato correcto
     } catch (error) {
         return [null, "Error al obtener estudiantes: " + error.message];
     }
@@ -52,19 +52,31 @@ export async function getEstudianteService(query) {
 }
 
 // UPDATE
-export async function updateEstudianteService(query, data) {
+export async function updateEstudianteService(query, data, usuario) { // ✅ AGREGAR: parámetro usuario
     try {
         const repo = AppDataSource.getRepository(Estudiante);
         const estudiante = await repo.findOne({ where: query });
         if (!estudiante) return [null, "Estudiante no encontrado"];
 
         let dataToUpdate = { ...data, updatedAt: new Date() };
-        if (data.password) {
-        dataToUpdate.password = await bcrypt.hash(data.password, 10);
+        
+        if (data.newPassword) {
+            dataToUpdate.password = await bcrypt.hash(data.newPassword, 10);
+            delete dataToUpdate.newPassword;
         }
+        
         Object.assign(estudiante, dataToUpdate);
-
         await repo.save(estudiante);
+
+        // ✅ MEJORAR: Usar el usuario real que hace la acción
+        const historialRepo = AppDataSource.getRepository(Historial);
+        await historialRepo.save({
+            usuario: usuario || { email: "sistema@cee.cl" }, // ✅ Usuario real o sistema
+            accion: "editar",
+            tipo: "estudiante", 
+            referenciaId: estudiante.id,
+            fecha: new Date()
+        });
 
         const { password, ...estudianteSinPassword } = estudiante;
         return [estudianteSinPassword, null];

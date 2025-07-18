@@ -9,13 +9,12 @@ import { Between, LessThanOrEqual, Like, MoreThanOrEqual } from "typeorm";
 // CREATE
 export async function createDocumentoService(data, usuario) {
     try {
-        // Validar que el cuerpo de la solicitud cumpla con el esquema
         const repo = AppDataSource.getRepository(Documento);
         const estudianteRepo = AppDataSource.getRepository(Estudiante);
         const actividadRepo = AppDataSource.getRepository(Actividad);
 
-        // Relacionar subidoPor (obligatorio)
-        const subidoPor = await estudianteRepo.findOne({ where: { id: data.subidoPorId } });
+        // ✅ BUSCAR por email en lugar de por ID
+        const subidoPor = await estudianteRepo.findOne({ where: { email: data.subidoPor } });
         if (!subidoPor) return [null, "Usuario que sube el documento no existe"];
 
         // Relacionar actividad (opcional)
@@ -25,8 +24,14 @@ export async function createDocumentoService(data, usuario) {
             if (!actividad) return [null, "Actividad no existe"];
         }
 
-        // Validar que la fecha sea válida
-        const documento = repo.create({ ...data, subidoPor, actividad });
+        // Crear documento
+        const documento = repo.create({ 
+            titulo: data.titulo,
+            tipo: data.tipo,
+            urlArchivo: data.urlArchivo,
+            subidoPor, 
+            actividad 
+        });
         await repo.save(documento);
 
         // Registrar en historial
@@ -55,6 +60,7 @@ export async function getDocumentosService(filtro = {}) {
         // Filtros básicos
         if (filtro.tipo) where.tipo = filtro.tipo;
         if (filtro.fechaInicio && filtro.fechaFin) {
+            // ✅ USAR EL NOMBRE CORRECTO DE LA COLUMNA
             where.fechaSubida = Between(filtro.fechaInicio, filtro.fechaFin);
         } else if (filtro.fechaInicio) {
             where.fechaSubida = MoreThanOrEqual(filtro.fechaInicio);
@@ -66,18 +72,22 @@ export async function getDocumentosService(filtro = {}) {
         let queryBuilder = repo.createQueryBuilder("documento").where(where);
         if (filtro.q) {
             queryBuilder = queryBuilder.andWhere(
-                "(documento.titulo ILIKE :q OR documento.descripcion ILIKE :q)",
+                "(documento.titulo ILIKE :q)", // ✅ ELIMINAR referencia a descripcion que no existe
                 { q: `%${filtro.q}%` }
             );
         }
 
-        // Ordenamiento
-        let order = { fechaSubida: "DESC" };
+        // Ordenamiento - ✅ USAR EL NOMBRE CORRECTO
+        let order = "documento.fechaSubida";
+        let direction = "DESC";
+        
         if (filtro.orderBy) {
             const [campo, dir] = filtro.orderBy.split("_");
-            order = { [campo]: dir.toUpperCase() === "DESC" ? "DESC" : "ASC" };
+            order = `documento.${campo}`;
+            direction = dir.toUpperCase() === "DESC" ? "DESC" : "ASC";
         }
-        queryBuilder = queryBuilder.orderBy(order); // Ordenar resultados
+        
+        queryBuilder = queryBuilder.orderBy(order, direction);
 
         // Paginación
         const limit = filtro.limit ? parseInt(filtro.limit) : 20;
@@ -118,7 +128,7 @@ export async function updateDocumentoService(query, data, usuario) {
         const repo = AppDataSource.getRepository(Documento);
         const estudianteRepo = AppDataSource.getRepository(Estudiante);
         const actividadRepo = AppDataSource.getRepository(Actividad);
-        // Buscar documento con relaciones
+        // Buscar documento with relaciones
         const documento = await repo.findOne({ where: query, relations: ["subidoPor", "actividad"] });
         if (!documento) return [null, "Documento no encontrado"];
 

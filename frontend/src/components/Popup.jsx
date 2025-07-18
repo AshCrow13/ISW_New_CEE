@@ -4,13 +4,20 @@ import CloseIcon from '@assets/XIcon.svg';
 import QuestionIcon from '@assets/QuestionCircleIcon.svg';
 
 export default function Popup({ show, setShow, data, action }) {
+    
+    console.log('🎯 Popup recibió data:', data);
+    
     const userData = data && data.length > 0 ? data[0] : {};
+    
+    console.log('👤 userData extraído:', userData);
 
-    const handleSubmit = (formData) => {
-        action(formData);
+    const handleSubmit = (data) => {
+        console.log('📤 Popup enviando datos:', data);
+        action(data);
     };
 
     const patternRut = new RegExp(/^(?:(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}|[1-9]\d{6}|[1-2]\d{7}|29\.999\.999|29999999)-[\dkK]$/);
+    
     return (
         <div>
             { show && (
@@ -60,15 +67,29 @@ export default function Popup({ show, setShow, data, action }) {
                                 required: true,
                             },
                             {
+                                label: "Carrera",
+                                name: "carrera",
+                                fieldType: 'select',
+                                options: [
+                                    { value: "Ingeniería Civil Informática", label: "Ingeniería Civil Informática" },
+                                    { value: "Ingeniería Civil Eléctrica", label: "Ingeniería Civil Eléctrica" },
+                                    { value: "Ingeniería Civil Industrial", label: "Ingeniería Civil Industrial" },
+                                    { value: "Ingeniería en Computación e Informática", label: "Ingeniería en Computación e Informática" }
+                                ],
+                                required: true,
+                                defaultValue: userData.carrera || "Ingeniería Civil Informática",
+                            },
+                            {
                                 label: "Rol",
                                 name: "rol",
                                 fieldType: 'select',
                                 options: [
-                                    { value: 'administrador', label: 'Administrador' },
-                                    { value: 'usuario', label: 'Usuario' },
+                                    { value: "admin", label: "Administrador" },
+                                    { value: "vocalia", label: "Vocalía" },
+                                    { value: "estudiante", label: "Estudiante" }
                                 ],
                                 required: true,
-                                defaultValue: userData.rol || "",
+                                defaultValue: userData.rol || "estudiante",
                             },
                             {
                                 label: (
