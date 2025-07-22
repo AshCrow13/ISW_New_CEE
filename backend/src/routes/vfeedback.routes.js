@@ -11,9 +11,9 @@ import { hasCarreras } from "../middlewares/carrera.middleware.js";
 import { hasRoles } from "../middlewares/roles.middleware.js";
 
 const router = Router();
-router.post("/", authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin", "estudiante"]), postFeedback);
-router.get("/", authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin"]), getFeedbacks);
-router.get("/:id", authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin"]), getFeedback);
-router.delete("/:id", authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin"]), deleteFeedback)
+router.post("/", authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin","vocalia", "estudiante"]), postFeedback);
+router.get("/", authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin","vocalia"]), getFeedbacks);
+router.get("/:id", authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin", "vocalia"]), getFeedback);
+router.delete("/:id", authenticateJwt, hasCarreras(["Ingeniería Civil Informática"]), hasRoles(["admin","vocalia"]), deleteFeedback)
 
 export default router
