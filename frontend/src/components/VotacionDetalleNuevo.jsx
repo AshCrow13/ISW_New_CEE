@@ -376,7 +376,7 @@ const VotacionDetalleNuevo = ({ votacionSeleccionada, loading, user, onVolver, h
                 </Alert>
               ) : (
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12}>
                     <Typography variant="body1" sx={{ mb: 2, fontWeight: 600 }}>
                       📊 Resumen de Votación
                     </Typography>
@@ -389,42 +389,6 @@ const VotacionDetalleNuevo = ({ votacionSeleccionada, loading, user, onVolver, h
                     <Typography variant="body2" sx={{ mb: 1 }}>
                       <strong>Participación:</strong> {votos && Array.isArray(votos) ? votos.length : 0} usuarios votaron
                     </Typography>
-                  </Grid>
-                  
-                  {/* Mostrar opción ganadora */}
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="body1" sx={{ mb: 2, fontWeight: 600 }}>
-                      🏆 Opción Ganadora
-                    </Typography>
-                    {(() => {
-                      const opcionGanadora = votacionSeleccionada.opciones?.find(opcion => {
-                        const votosOpcion = conteo[opcion.id] || 0;
-                        return votosOpcion === Math.max(...Object.values(conteo));
-                      });
-                      
-                      const maxVotos = Math.max(...Object.values(conteo));
-                      
-                      return opcionGanadora ? (
-                        <Box sx={{ 
-                          p: 2, 
-                          bgcolor: 'success.light', 
-                          borderRadius: 2, 
-                          border: '2px solid',
-                          borderColor: 'success.main'
-                        }}>
-                          <Typography variant="h6" sx={{ fontWeight: 700, color: 'success.contrastText' }}>
-                            {opcionGanadora.texto}
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: 'success.contrastText' }}>
-                            {maxVotos} votos ({calcularPorcentaje(maxVotos, totalVotos)}%)
-                          </Typography>
-                        </Box>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          No hay votos registrados
-                        </Typography>
-                      );
-                    })()}
                   </Grid>
                 </Grid>
               )}
