@@ -3,7 +3,14 @@ import axios from "./root.service.js";
 export async function getVotaciones() {
     try {
         const response = await axios.get("/votacion/Todas");
-        return response.data.data;
+        
+        // Verificar que tengamos los datos esperados
+        if (response.data && response.data.data) {
+            return response.data.data;
+        } else {
+            console.warn('Estructura de datos inesperada:', response.data);
+            return [];
+        }
     } catch (error) {
         console.error("Error al obtener votaciones:", error);
         return [];
