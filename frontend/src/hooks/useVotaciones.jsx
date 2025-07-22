@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   getVotaciones,
   getVotacionById,
@@ -9,16 +9,15 @@ import {
 import { postVoto } from '@services/votar.service.js';
 
 const useVotaciones = () => {
-  const [view, setView] = useState(null); // null, 'crear', 'ver-todas', 'ver-una', 'actualizar', 'borrar'
+  const [view, setView] = useState('tabla'); // 'tabla', 'crear', 'detalle', 'editar'
   const [votaciones, setVotaciones] = useState([]);
   const [votacionSeleccionada, setVotacionSeleccionada] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchId, setSearchId] = useState('');
 
-  // Obtener todas las votaciones
-  const handleVerTodas = async () => {
+  // Cargar todas las votaciones al inicializar
+  const cargarVotaciones = useCallback(async () => {
     setLoading(true);
-    setView('ver-todas');
     try {
       const data = await getVotaciones();
       setVotaciones(data || []);
@@ -27,23 +26,42 @@ const useVotaciones = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  // Buscar una votación específica
-  const handleVerUna = async () => {
-    if (!searchId) {
-      alert('Por favor ingresa un ID válido');
-      return;
-    }
+  // Cargar votaciones automáticamente al montar el hook
+  useEffect(() => {
+    cargarVotaciones();
+  }, [cargarVotaciones]); // Ahora cargarVotaciones es estable gracias a useCallback
+
+  // Ver detalle de una votación
+  const verDetalle = async (id) => {
     setLoading(true);
-    setView('ver-una');
     try {
-      const data = await getVotacionById(Number(searchId));
+      const data = await getVotacionById(id);
       if (data.status === 'Success') {
         setVotacionSeleccionada(data.data);
+        setView('detalle');
       } else {
         alert('Votación no encontrada');
-        setVotacionSeleccionada(null);
+      }
+    } catch (error) {
+      console.error('Error al buscar votación:', error);
+      alert('Error al buscar la votación');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Ir a la vista de edición
+  const irAEditar = async (id) => {
+    setLoading(true);
+    try {
+      const data = await getVotacionById(id);
+      if (data.status === 'Success') {
+        setVotacionSeleccionada(data.data);
+        setView('editar');
+      } else {
+        alert('Votación no encontrada');
       }
     } catch (error) {
       console.error('Error al buscar votación:', error);
@@ -62,7 +80,7 @@ const useVotaciones = () => {
       const resultado = await deleteVotacion(id);
       if (resultado.status === 'Success') {
         alert('✅ Votación eliminada exitosamente');
-        handleVerTodas();
+        cargarVotaciones(); // Recargar la tabla
       } else {
         alert('❌ Error al eliminar: ' + (resultado.message || 'Error desconocido'));
       }
@@ -78,7 +96,8 @@ const useVotaciones = () => {
       const resultado = await updateVotacion(id, datosActualizados);
       if (resultado.status === 'Success') {
         alert('✅ Votación actualizada exitosamente');
-        setView(null);
+        setView('tabla');
+        cargarVotaciones(); // Recargar la tabla
       } else {
         alert('❌ Error al actualizar: ' + (resultado.message || 'Error desconocido'));
       }
@@ -94,7 +113,8 @@ const useVotaciones = () => {
       const resultado = await postVotacion(datosVotacion);
       if (resultado.status === 'Success') {
         alert('✅ Votación creada exitosamente');
-        setView(null);
+        setView('tabla');
+        cargarVotaciones(); // Recargar la tabla
         return { success: true };
       } else {
         alert('❌ Error al crear la votación: ' + (resultado.message || 'Error desconocido'));
@@ -126,10 +146,9 @@ const useVotaciones = () => {
     }
   };
 
-  // Volver al menú principal
+  // Volver al menú principal (tabla)
   const volverAlMenu = () => {
-    setView(null);
-    setVotaciones([]);
+    setView('tabla');
     setVotacionSeleccionada(null);
     setSearchId('');
   };
@@ -144,8 +163,8 @@ const useVotaciones = () => {
     loading,
     searchId,
     setSearchId,
-    handleVerTodas,
-    handleVerUna,
+    verDetalle,
+    irAEditar,
     handleEliminar,
     handleActualizar,
     handleCrearVotacion,
