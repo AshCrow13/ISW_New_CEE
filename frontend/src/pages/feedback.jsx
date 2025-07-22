@@ -3,12 +3,14 @@ import { useState, useContext } from 'react';
 import useFeedback from '@hooks/feedback/useFeedback.jsx';
 import FeedbackForm from "@components/FeedbackForm.jsx";
 import { AuthContext } from '@context/AuthContext.jsx';
+import { deleteFeedback } from '@services/feedback.service.js';
 import { Container, Paper, Typography, Box, Button, Grid, CircularProgress, IconButton, Fade, Alert, TextField } from '@mui/material';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import AddCommentIcon from '@mui/icons-material/AddComment';
 import CloseIcon from '@mui/icons-material/Close';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import deleteIcon from '@assets/deleteIcon.svg';
 
 const Feedback = () => {
   const [view, setView] = useState(null);
@@ -31,6 +33,26 @@ const Feedback = () => {
         return fechaFeedbackString === fechaFiltro;
       })
     : feedbacks;
+
+  // Función para eliminar feedback
+  const handleEliminarFeedback = async (id) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar este feedback?')) {
+      return;
+    }
+    
+    try {
+      const resultado = await deleteFeedback(id);
+      if (resultado.status === 'Success') {
+        alert('✅ Feedback eliminado exitosamente');
+        fetchFeedbacks(); // Recargar la lista
+      } else {
+        alert('❌ Error al eliminar: ' + (resultado.message || 'Error desconocido'));
+      }
+    } catch (error) {
+      console.error('Error al eliminar feedback:', error);
+      alert('❌ Error al eliminar el feedback');
+    }
+  };
 
   return (
     <Container maxWidth="md" sx={{ py: 7 }}>
@@ -140,15 +162,37 @@ const Feedback = () => {
                   )}
                   <Box display="flex" flexDirection="column" gap={2}>
                     {feedbacksFiltrados.map((fb, index) => (
-                    <Paper key={fb.id || index} elevation={1} sx={{ p: 2, borderRadius: 2, mb: 1 }}>
-                      <Box display="flex" alignItems="center" gap={1} mb={1}>
-                        <Typography fontWeight={600} color="primary.main">
-                          {fb.usuarioName || 'Anónimo'}
-                        </Typography>
-                        {fb.anonimo && (
-                          <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                            (Anónimo)
+                    <Paper key={fb.id || index} elevation={1} sx={{ p: 2, borderRadius: 2, mb: 1, position: 'relative' }}>
+                      <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
+                        <Box display="flex" alignItems="center" gap={1} flex={1}>
+                          <Typography fontWeight={600} color="primary.main">
+                            {fb.usuarioName || 'Anónimo'}
                           </Typography>
+                          {fb.anonimo && (
+                            <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+                              (Anónimo)
+                            </Typography>
+                          )}
+                        </Box>
+                        {user?.rol !== 'estudiante' && (
+                          <Box 
+                            component="img"
+                            src={deleteIcon}
+                            alt="Eliminar feedback"
+                            onClick={() => handleEliminarFeedback(fb.id)}
+                            sx={{ 
+                              width: 20,
+                              height: 20,
+                              cursor: 'pointer',
+                              opacity: 0.7,
+                              transition: 'opacity 0.2s',
+                              '&:hover': { 
+                                opacity: 1,
+                                transform: 'scale(1.1)'
+                              },
+                              ml: 1
+                            }}
+                          />
                         )}
                       </Box>
                       <Typography color="text.secondary" sx={{ mb: 1 }}>
