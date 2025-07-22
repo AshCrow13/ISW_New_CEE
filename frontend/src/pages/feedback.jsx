@@ -95,9 +95,9 @@ const Feedback = () => {
                       <Typography color="text.secondary" sx={{ mb: 1 }}>
                         {fb.comentario}
                       </Typography>
-                      {fb.createdAt && (
+                      {fb.fechaCreacion && (
                         <Typography variant="caption" color="text.disabled">
-                          {new Date(fb.createdAt).toLocaleDateString('es-ES', {
+                          Fecha: {new Date(fb.fechaCreacion).toLocaleDateString('es-ES', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
