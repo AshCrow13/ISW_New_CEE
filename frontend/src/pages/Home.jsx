@@ -46,7 +46,7 @@ const Home = () => {
             </Button>
           </Grid>
 
-          {/* Solo admin ve feedback */}
+          
           {(
             <Grid item xs={12}>
               <Button 
