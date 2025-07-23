@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -21,6 +21,8 @@ import {
   Delete as DeleteIcon,
   Add as AddIcon
 } from '@mui/icons-material';
+import FiltroFecha from '@components/FiltroFecha.jsx';
+import { filterVotacionesByDate } from '@helpers/votacionHelpers.js';
 
 const VotacionTabla = ({ 
   votaciones, 
@@ -31,6 +33,23 @@ const VotacionTabla = ({
   onEliminar, 
   onCrearNueva
 }) => {
+  // Estado para el filtro de fecha
+  const [fechaFiltro, setFechaFiltro] = useState('');
+
+  // Filtrar votaciones por fecha
+  const votacionesFiltradas = useMemo(() => 
+    filterVotacionesByDate(votaciones, fechaFiltro), 
+    [votaciones, fechaFiltro]
+  );
+
+  // Handlers para el filtro
+  const handleFechaChange = (nuevaFecha) => {
+    setFechaFiltro(nuevaFecha);
+  };
+
+  const handleClearFilter = () => {
+    setFechaFiltro('');
+  };
 
   const formatearFecha = (fecha) => {
     if (!fecha) return 'No definida';
@@ -115,6 +134,21 @@ const VotacionTabla = ({
         </Box>
       )}
 
+      {/* Filtro por fecha */}
+      <FiltroFecha 
+        fechaFiltro={fechaFiltro}
+        onFechaChange={handleFechaChange}
+        onClearFilter={handleClearFilter}
+      />
+
+      {/* Contador de votaciones */}
+      {fechaFiltro && (
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Mostrando {votacionesFiltradas.length} votación{votacionesFiltradas.length !== 1 ? 'es' : ''} 
+          para la fecha seleccionada
+        </Typography>
+      )}
+
       {/* Tabla */}
       <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 3 }}>
         <Table>
@@ -128,16 +162,17 @@ const VotacionTabla = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {!Array.isArray(votaciones) || votaciones.length === 0 ? (
+            {!Array.isArray(votacionesFiltradas) || votacionesFiltradas.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} sx={{ textAlign: 'center', py: 4 }}>
                   <Typography variant="body1" color="text.secondary">
-                    {!Array.isArray(votaciones) ? 'Error en los datos de votaciones' : 'No hay votaciones disponibles'}
+                    {fechaFiltro ? 'No hay votaciones para la fecha seleccionada' : 
+                     (!Array.isArray(votacionesFiltradas) ? 'Error en los datos de votaciones' : 'No hay votaciones disponibles')}
                   </Typography>
                 </TableCell>
               </TableRow>
             ) : (
-              votaciones.map((votacion, index) => {
+              votacionesFiltradas.map((votacion, index) => {
                 const { estado, color } = obtenerEstadoVotacion(votacion);
                 return (
                   <TableRow 

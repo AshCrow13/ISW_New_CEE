@@ -62,3 +62,30 @@ export const formatearFechaSafe = (fecha, formato = 'completo') => {
     return 'Error en fecha';
   }
 };
+
+// Helper para extraer fecha de votación para filtrado
+export const extractDateFromVotacion = (fechaCreacion) => {
+  if (!fechaCreacion) return null;
+  
+  const fecha = new Date(fechaCreacion);
+  return fecha.getFullYear() + '-' + 
+    String(fecha.getMonth() + 1).padStart(2, '0') + '-' + 
+    String(fecha.getDate()).padStart(2, '0');
+};
+
+// Helper para filtrar votaciones por fecha
+export const filterVotacionesByDate = (votaciones, fechaFiltro) => {
+  if (!fechaFiltro) return votaciones;
+  
+  return votaciones.filter(votacion => {
+    const fechaVotacion = extractDateFromVotacion(votacion.inicio);
+    return fechaVotacion === fechaFiltro;
+  });
+};
+
+// Helper para ordenar votaciones por fecha (más reciente primero)
+export const sortVotacionesByDate = (votaciones) => {
+  return (votaciones || []).sort((a, b) => 
+    new Date(b.inicio) - new Date(a.inicio)
+  );
+};

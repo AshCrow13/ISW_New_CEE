@@ -7,6 +7,7 @@ import {
   deleteVotacion
 } from '@services/votacion.service.js';
 import { postVoto } from '@services/votar.service.js';
+import { sortVotacionesByDate } from '@helpers/votacionHelpers.js';
 
 const useVotaciones = () => {
   const [view, setView] = useState('tabla'); // 'tabla', 'crear', 'detalle', 'editar'
@@ -20,7 +21,9 @@ const useVotaciones = () => {
     setLoading(true);
     try {
       const data = await getVotaciones();
-      setVotaciones(data || []);
+      // Ordenar por fecha (más reciente primero)
+      const votacionesOrdenadas = sortVotacionesByDate(data || []);
+      setVotaciones(votacionesOrdenadas);
     } catch (error) {
       console.error('Error al cargar votaciones:', error);
     } finally {

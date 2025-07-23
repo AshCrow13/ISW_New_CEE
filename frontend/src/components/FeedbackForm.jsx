@@ -36,7 +36,7 @@ const FeedbackForm = ({ onSuccess }) => {
           </Typography>
         </Box>
         <Typography sx={{ mb: 3, color: 'text.secondary' }}>
-          Tu opinión es importante para mejorar el centro de estudiantes. ¡Gracias por tu aporte!
+          Toda opinión es importante para mejorar el centro de estudiantes. ¡Gracias por tu aporte!
         </Typography>
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
