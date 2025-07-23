@@ -15,6 +15,8 @@ const Navbar = () => { // Componente de navegación
         { to: "/actividades", label: "Actividades" },
         { to: "/asambleas", label: "Asambleas" },
         { to: "/documentos", label: "Documentos" },
+        { to: "/votacion", label: "Votaciones" },
+        { to: "/feedback", label: "Feedback" },
         ...(userRole === 'admin' || userRole === 'vocalia' ? [{ to: "/users", label: "Usuarios" }] : []),
         ...(userRole === 'admin' ? [{ to: "/historial", label: "Historial" }] : [])
     ];

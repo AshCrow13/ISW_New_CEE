@@ -34,7 +34,7 @@ const Votacion = () => {
             <Box display="flex" alignItems="center" mb={4}>
               <HowToVoteIcon color="primary" sx={{ fontSize: 48, mr: 2 }} />
               <Typography variant="h3" color="primary.main" fontWeight={700}>
-                Sistema de Votaciones
+                Centro de Votaciones
               </Typography>
             </Box>
           )}
