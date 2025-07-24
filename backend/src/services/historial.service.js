@@ -66,10 +66,9 @@ export async function getHistorialService(filtro = {}) {
             };
         });
 
-        console.log('📊 Historial formateado:', historial.slice(0, 2)); // ✅ DEBUG
         return [historial, null];
     } catch (error) {
-        console.error('❌ Error en getHistorialService:', error); // ✅ DEBUG
+        console.error('❌ Error en getHistorialService:', error); // 
         return [null, "Error al obtener historial: " + error.message];
     }
 }

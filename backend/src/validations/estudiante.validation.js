@@ -1,8 +1,8 @@
 "use strict";
 import Joi from "joi";
 
-// Validación para rut chileno*
-const rutRegex = /^(?:(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}|[1-9]\d{6}|[1-2]\d{7}|29\.999\.999|29999999)-[\dkK]$/;
+// Validación para rut chileno con formato xx.xxx.xxx-x (solo con puntos)
+const rutRegex = /^(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}-[\dkK]$/;
 
 export const estudianteSchema = Joi.object({
     nombreCompleto: Joi.string()
@@ -22,7 +22,7 @@ export const estudianteSchema = Joi.object({
         .pattern(rutRegex)
         .messages({
             "string.empty": "El RUT no puede estar vacío.",
-            "string.pattern.base": "Formato de RUT no válido.",
+            "string.pattern.base": "Formato de RUT inválido. Debe tener formato xx.xxx.xxx-x.",
             "any.required": "El RUT es obligatorio."
         }),
     email: Joi.string()
@@ -37,11 +37,13 @@ export const estudianteSchema = Joi.object({
             "string.empty": "El email no puede estar vacío.",
             "any.required": "El email es obligatorio."
         }),
-    carrera: Joi.string().min(3).max(100).required()
+    carrera: Joi.string()
+        .min(3)
+        .max(100)
+        .optional() // Ahora es opcional
         .messages({
-            "string.empty": "La carrera no puede estar vacía.",
-            "string.min": "La carrera debe tener al menos 3 caracteres.",
-            "any.required": "La carrera es obligatoria."
+            "string.empty": "Si proporciona una carrera, no puede estar vacía.",
+            "string.min": "La carrera debe tener al menos 3 caracteres."
         }),
     password: Joi.string()
         .min(8)

@@ -8,19 +8,29 @@ import { ACCESS_TOKEN_SECRET } from "../config/configEnv.js";
 export async function loginService(estudiante) {
   try {
     const estudianteRepository = AppDataSource.getRepository(Estudiante);
-    const { email, password } = estudiante;
+    const { email, rut, password } = estudiante;
 
     const createErrorMessage = (dataInfo, message) => ({
       dataInfo,
       message
     });
 
+    // Determinar el campo de búsqueda (email o rut)
+    let whereCondition = {};
+    if (email) {
+      whereCondition = { email };
+    } else if (rut) {
+      whereCondition = { rut };
+    } else {
+      return [null, createErrorMessage("auth", "Se requiere correo o RUT para iniciar sesión")];
+    }
+
     const estudianteFound = await estudianteRepository.findOne({
-      where: { email }
+      where: whereCondition
     });
 
     if (!estudianteFound) {
-      return [null, createErrorMessage("email", "El correo electrónico es incorrecto")];
+      return [null, createErrorMessage(email ? "email" : "rut", `El ${email ? 'correo electrónico' : 'RUT'} no está registrado`)];
     }
 
     const isMatch = await comparePassword(password, estudianteFound.password);
@@ -53,45 +63,71 @@ export async function registerService(estudiante) {
   try {
     const estudianteRepository = AppDataSource.getRepository(Estudiante);
 
-    const { nombreCompleto, rut, email } = estudiante;
+    const { nombreCompleto, rut, email, password } = estudiante;
 
     const createErrorMessage = (dataInfo, message) => ({
       dataInfo,
       message
     });
 
+    // Validar formato de RUT (solo con puntos)
+    const rutRegexConPuntos = /^(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}-[\dkK]$/;
+    if (!rutRegexConPuntos.test(rut)) {
+      return [null, createErrorMessage("rut", "El RUT debe tener formato xx.xxx.xxx-x")];
+    }
+
+    // Validación de formato de correo institucional
+    if (!email.match(/@(alumnos\.)?ubiobio\.cl$/)) {
+      return [null, createErrorMessage("email", "Solo se aceptan correos institucionales")];
+    }
+
+    // Validación de longitud de contraseña
+    if (password.length < 8) {
+      return [null, createErrorMessage("password", "La contraseña debe tener al menos 8 caracteres")];
+    }
+
+    // Verificar si ya existe un usuario con el mismo correo
     const existingEmailEstudiante = await estudianteRepository.findOne({
-      where: {
-        email,
-      },
+      where: { email }
     });
     
-    if (existingEmailEstudiante) return [null, createErrorMessage("email", "Correo electrónico en uso")];
+    if (existingEmailEstudiante) {
+      return [null, createErrorMessage("email", "Este correo electrónico ya está registrado")];
+    }
 
+    // Verificar si ya existe un usuario con el mismo RUT
     const existingRutEstudiante = await estudianteRepository.findOne({
-      where: {
-        rut,
-      },
+      where: { rut }
     });
 
-    if (existingRutEstudiante) return [null, createErrorMessage("rut", "Rut ya asociado a una cuenta")];
+    if (existingRutEstudiante) {
+      return [null, createErrorMessage("rut", "Este RUT ya está registrado")];
+    }
+
+    // Determinar la carrera según el dominio del correo o usar valor por defecto
+    let carrera = estudiante.carrera;
+    if (!carrera) {
+      // Si el email es @alumnos.ubiobio.cl, asumimos que es "Ingeniería Civil Informática"
+      // Si el email es @ubiobio.cl, asumimos que es "Personal UBB"
+      carrera = email.includes('@alumnos.') ? "Ingeniería Civil Informática" : "Personal UBB";
+    }
 
     const newEstudiante = estudianteRepository.create({
       nombreCompleto,
       email,
       rut,
       rol: estudiante.rol || "estudiante",
-      carrera: estudiante.carrera,
-      password: await encryptPassword(estudiante.password),
+      carrera, // Usamos la carrera determinada o proporcionada
+      password: await encryptPassword(password),
     });
 
     await estudianteRepository.save(newEstudiante);
 
-    const { password, ...dataEstudiante } = newEstudiante;
+    const { password: _, ...dataEstudiante } = newEstudiante;
 
     return [dataEstudiante, null];
   } catch (error) {
     console.error("Error al registrar un estudiante", error);
-    return [null, "Error interno del servidor"];
+    return [null, { dataInfo: "general", message: "Error interno del servidor" }];
   }
 }

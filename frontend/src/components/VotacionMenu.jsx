@@ -13,11 +13,15 @@ const MenuPrincipalVotaciones = ({
     handleVerTodas, 
     handleVerUna 
 }) => {
+    // Determinar permisos basados en el rol
+    const canCreate = user && (user.rol === 'admin'); // Solo admin puede crear
+    const canUpdate = user && (user.rol === 'admin'); // Solo admin puede actualizar
+
     return (
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, mt: 2 }}>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ width: '100%', justifyContent: 'center' }}>
-                {/* Solo mostrar el botón de crear si el usuario NO es estudiante */}
-                {user && user.rol !== 'estudiante' && (
+                {/* Solo mostrar botones según permisos */}
+                {canCreate && (
                     <Button
                         variant="contained"
                         color="primary"
@@ -57,7 +61,7 @@ const MenuPrincipalVotaciones = ({
                     </Button>
                 </Box>
 
-                {user && user.rol !== 'estudiante' && (
+                {canUpdate && (
                     <Button
                         variant="contained"
                         color="warning"

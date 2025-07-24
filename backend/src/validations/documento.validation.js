@@ -13,10 +13,10 @@ export const documentoSchema = Joi.object({
             "any.required": "El título es obligatorio."
         }),
     tipo: Joi.string()
-        .valid("comunicado", "acta", "resultado")
+        .valid("Importantes", "Actividad", "Actas", "Otros")
         .required()
         .messages({
-            "any.only": "El tipo debe ser comunicado, acta o resultado.",
+            "any.only": "El tipo debe ser Importantes, Actividad, Actas u Otros.",
             "any.required": "El tipo es obligatorio."
         }),
     urlArchivo: Joi.string() // ✅ RELAJAR la validación de URL
@@ -51,7 +51,7 @@ export const documentoUpdateSchema = Joi.object({
         .min(5)
         .max(100),
     tipo: Joi.string()
-        .valid("comunicado", "acta", "resultado"),
+        .valid("Importantes", "Actividad", "Actas", "Otros"),
     urlArchivo: Joi.string()
         .uri(),
     subidoPor: Joi.string()
@@ -68,7 +68,7 @@ export const documentoQuerySchema = Joi.object({
         .integer()
         .positive(),
     tipo: Joi.string()
-        .valid("comunicado", "acta", "resultado"),
+        .valid("Importantes", "Actividad", "Actas", "Otros"),
     id_actividad: Joi.number()
         .integer()
         .positive(),
