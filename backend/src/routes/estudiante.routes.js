@@ -11,9 +11,9 @@ import { hasRoles } from "../middlewares/roles.middleware.js";
 
 const router = Router();
 
-// Modificar los permisos para que vocalia pueda ver la lista de estudiantes
+// Modificar los permisos para que estudiante pueda ver la lista de estudiantes
 router
-    .get("/", authenticateJwt, hasRoles(["admin", "vocalia"]), getEstudiantes) // Lista todos los estudiantes
+    .get("/", authenticateJwt, hasRoles(["admin", "vocalia", "estudiante"]), getEstudiantes) // Lista todos los estudiantes
     .get("/detail", authenticateJwt, hasRoles(["admin"]), getEstudiante) // Buscar estudiante
     .post("/", authenticateJwt, hasRoles(["admin"]), createEstudiante) // Crea un nuevo estudiante
     .patch("/detail", authenticateJwt, hasRoles(["admin"]), updateEstudiante) // Actualiza un estudiante

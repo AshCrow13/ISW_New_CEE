@@ -24,6 +24,7 @@ const DocumentoForm = ({
     const [error, setError] = useState({});
 
     useEffect(() => {
+        // Ignorar id en initialData si es null o undefined para evitar confusión
         setForm({
             titulo: initialData.titulo || "",
             tipo: initialData.tipo || "",
@@ -87,13 +88,23 @@ const DocumentoForm = ({
         e.preventDefault();
         const err = validate();
         if (Object.keys(err).length > 0) {
-        setError(err);
-        return;
+            setError(err);
+            return;
         }
+        
+        // Crear FormData para enviar al servidor
         const data = new FormData();
         data.append("titulo", form.titulo);
         data.append("tipo", form.tipo);
         if (archivo) data.append("archivo", archivo);
+        
+        // Si estamos editando y hay un ID válido, incluirlo en los logs
+        if (isEditing && initialData?.id) {
+            console.log(`Editando documento con ID: ${initialData.id}`);
+        } else {
+            console.log('Creando nuevo documento');
+        }
+        
         onSubmit(data);
     };
 
