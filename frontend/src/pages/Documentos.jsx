@@ -51,11 +51,12 @@ const Documentos = () => {
 
     // Función para mostrar el modal de creación con el tipo pre-seleccionado si es vocalia
     const handleCrear = () => {
-        let initialData = {};
+        // Asegurarse de que initialData no tenga un ID
+        let initialData = { id: null };
         
         // Si es vocalia, preseleccionar el tipo que puede crear
         if (user?.rol === 'vocalia') {
-            initialData = { tipo: 'Actividad' };
+            initialData = { id: null, tipo: 'Actividad' };
         }
         
         setFormData(initialData); 
@@ -99,10 +100,12 @@ const Documentos = () => {
     const onSubmit = async (formDataObj) => {
         try {
             setLoading(true);
-            if (formData) {
+            if (formData && formData.id) {
+                // Solo llamar a updateDocumento si formData tiene un id válido
                 await updateDocumento(formData.id, formDataObj);
                 showSuccessAlert('Editado', 'Documento editado con éxito');
             } else {
+                // Si no hay id o formData es null, crear nuevo documento
                 await createDocumento(formDataObj);
                 showSuccessAlert('Creado', 'Documento creado con éxito');
             }
@@ -110,6 +113,7 @@ const Documentos = () => {
             setFormData(null);
             fetchDocumentos();
         } catch (e) {
+            console.error("Error en documento submit:", e);
             showErrorAlert('Error', e.message || 'Ocurrió un error');
         } finally {
             setLoading(false);

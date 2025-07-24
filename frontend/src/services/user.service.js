@@ -25,6 +25,33 @@ export const getUsers = async () => {
     }
 };
 
+// ✅ NUEVO: Obtener solo usuarios admin y vocalia (para estudiantes)
+export const getStaffUsers = async () => {
+    try {
+        const response = await api.get('/estudiantes');
+        
+        if (response.data && response.data.data && Array.isArray(response.data.data)) {
+            // Filtrar solo usuarios con rol admin o vocalia
+            const staffUsers = response.data.data.filter(
+                user => user.rol === 'admin' || user.rol === 'vocalia'
+            );
+            return staffUsers;
+        } else {
+            throw new Error('Estructura de respuesta inválida');
+        }
+    } catch (error) {
+        console.error('Error en el servicio getStaffUsers:', error);
+        
+        if (error.response) {
+            throw new Error(`Error del servidor: ${error.response.status}`);
+        } else if (error.request) {
+            throw new Error('Error de conexión con el servidor');
+        } else {
+            throw new Error(error.message || 'Error desconocido');
+        }
+    }
+};
+
 // ✅ CORREGIR: Actualizar usuario - Cambiar PUT por PATCH y ruta correcta
 export const updateUser = async (userData, rut) => {
     try {
