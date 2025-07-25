@@ -13,11 +13,14 @@ export async function deleteDataAlert() {
 }
 
 export const showSuccessAlert = (titleMessage, message) => {
-  Swal.fire(
-    titleMessage,
-    message,
-    'success'
-  );
+  Swal.fire({
+    title: titleMessage,
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'Aceptar',
+    timer: 3000, // Auto cierre después de 3 segundos
+    timerProgressBar: true
+  });
 };
 
 export const showErrorAlert = (titleMessage, message) => {

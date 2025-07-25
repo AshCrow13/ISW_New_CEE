@@ -1,36 +1,73 @@
 import { useState, useEffect } from 'react';
+import { 
+  Box, 
+  TextField, 
+  Button, 
+  Typography, 
+  Select, 
+  MenuItem, 
+  FormControl, 
+  InputLabel, 
+  FormHelperText,
+  Paper, 
+  Grid, 
+  Divider, 
+  InputAdornment,
+  Card,
+  CardContent
+} from '@mui/material';
+import EventIcon from '@mui/icons-material/Event';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import CategoryIcon from '@mui/icons-material/Category';
+import TitleIcon from '@mui/icons-material/Title';
+import DescriptionIcon from '@mui/icons-material/Description';
 
-const ActividadForm = ({ // Props del componente
+const ActividadForm = ({
   initialData = {},
   onSubmit,
   onCancel,
   isEditing = false,
   loading = false,
-}) => { // Estado del formulario
+}) => {
   const [form, setForm] = useState({
     titulo: "",
     descripcion: "",
     fecha: "",
+    hora: "",
     lugar: "",
     categoria: "",
-    responsableId: 1, // ✅ AGREGAR: Campo obligatorio con valor por defecto
+    responsableId: 1, 
     recursos: "",
     estado: "publicada",
     error: {},
   });
   
-  // Contador de caracteres para la descripción
   const [charCount, setCharCount] = useState(form.descripcion.length);
 
-  // Resetea el formulario cuando cambian los datos iniciales
   useEffect(() => {
+    // Si hay fecha en los datos iniciales, separarla en fecha y hora
+    let fechaValue = "";
+    let horaValue = "";
+    
+    if (initialData.fecha) {
+      const fechaObj = new Date(initialData.fecha);
+      if (!isNaN(fechaObj.getTime())) {
+        // Formato YYYY-MM-DD para el input date
+        fechaValue = fechaObj.toISOString().slice(0, 10);
+        // Formato HH:MM para el input time
+        horaValue = fechaObj.toTimeString().slice(0, 5);
+      }
+    }
+    
     setForm({
         titulo: initialData.titulo || "",
         descripcion: initialData.descripcion || "",
-        fecha: initialData.fecha || "",
+        fecha: fechaValue,
+        hora: horaValue,
         lugar: initialData.lugar || "",
         categoria: initialData.categoria || "",
-        responsableId: initialData.responsableId || 1, // ✅ AGREGAR
+        responsableId: initialData.responsableId || 1,
         recursos: initialData.recursos || "",
         estado: initialData.estado || "publicada",
         error: {},
@@ -38,19 +75,18 @@ const ActividadForm = ({ // Props del componente
     setCharCount(initialData.descripcion?.length || 0);
   }, [initialData]);
 
-  // Validación sencilla
   const validate = () => {
     let error = {};
     if (!form.titulo || form.titulo.length < 5) error.titulo = "Debe tener al menos 5 caracteres.";
     if (!form.descripcion || form.descripcion.length < 10) error.descripcion = "Debe tener al menos 10 caracteres.";
     if (!form.fecha) error.fecha = "Debe ingresar una fecha.";
+    if (!form.hora) error.hora = "Debe ingresar una hora.";
     if (!form.lugar) error.lugar = "Campo obligatorio.";
     if (!form.categoria) error.categoria = "Seleccione una categoría.";
-    if (!form.responsableId) error.responsableId = "Debe seleccionar un responsable."; // ✅ AGREGAR
+    if (!form.responsableId) error.responsableId = "Debe seleccionar un responsable.";
     return error;
   };
 
-  // Maneja los cambios en los campos del formulario
   const handleChange = e => {
     const { name, value } = e.target;
     setForm(prev => ({
@@ -61,7 +97,6 @@ const ActividadForm = ({ // Props del componente
     if (name === "descripcion") setCharCount(value.length);
   };
 
-  // Maneja el envío del formulario
   const handleSubmit = e => {
     e.preventDefault();
     const errors = validate();
@@ -70,102 +105,214 @@ const ActividadForm = ({ // Props del componente
       return;
     }
     
+    // Combinar fecha y hora en un solo campo ISO
+    const fechaHora = `${form.fecha}T${form.hora}:00`;
+    
     const cleanData = {
         titulo: form.titulo.trim(),
         descripcion: form.descripcion.trim(),
-        fecha: form.fecha,
+        fecha: fechaHora,
         lugar: form.lugar.trim(),
         categoria: form.categoria,
-        responsableId: parseInt(form.responsableId) || 1, // ✅ ASEGURAR que sea número
+        responsableId: parseInt(form.responsableId) || 1,
         recursos: form.recursos || "",
         estado: form.estado || "publicada"
     };
     
-    console.log('📊 Datos limpios a enviar:', cleanData); // ✅ DEBUG
     onSubmit(cleanData);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>{isEditing ? "Editar Actividad" : "Nueva Actividad"}</h2>
+    <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+      <Card elevation={0} sx={{ mb: 4 }}>
+        <CardContent>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+            <EventIcon sx={{ color: 'primary.main', mr: 1, fontSize: 28 }} />
+            <Typography variant="h5" component="h2">
+              {isEditing ? "Editar Actividad" : "Nueva Actividad"}
+            </Typography>
+          </Box>
+          
+          <Divider sx={{ mb: 4 }} />
+          
+          {/* Sección de información básica */}
+          <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2, color: 'text.secondary' }}>
+            Información Básica
+          </Typography>
+          
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Título *"
+                name="titulo"
+                value={form.titulo}
+                onChange={handleChange}
+                placeholder="Ej: Jornada Deportiva 2024"
+                variant="outlined"
+                error={!!form.error.titulo}
+                helperText={form.error.titulo || "Ingresa un título descriptivo de al menos 5 caracteres"}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <TitleIcon color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                label="Descripción *"
+                name="descripcion"
+                value={form.descripcion}
+                onChange={handleChange}
+                placeholder="Describe la actividad. Ej: Partido amistoso entre carreras."
+                variant="outlined"
+                error={!!form.error.descripcion}
+                helperText={form.error.descripcion || `${charCount}/300 caracteres`}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1 }}>
+                      <DescriptionIcon color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+          </Grid>
+          
+          {/* Sección de fecha y lugar */}
+          <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2, color: 'text.secondary' }}>
+            Fecha y Ubicación
+          </Typography>
+          
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Fecha *"
+                name="fecha"
+                type="date"
+                value={form.fecha}
+                onChange={handleChange}
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+                error={!!form.error.fecha}
+                helperText={form.error.fecha}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EventIcon color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Hora *"
+                name="hora"
+                type="time"
+                value={form.hora}
+                onChange={handleChange}
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+                error={!!form.error.hora}
+                helperText={form.error.hora}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <AccessTimeIcon color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Lugar *"
+                name="lugar"
+                value={form.lugar}
+                onChange={handleChange}
+                placeholder="Ej: Gimnasio UBB"
+                variant="outlined"
+                error={!!form.error.lugar}
+                helperText={form.error.lugar}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LocationOnIcon color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth error={!!form.error.categoria} variant="outlined">
+                <InputLabel id="categoria-label">Categoría *</InputLabel>
+                <Select
+                  labelId="categoria-label"
+                  name="categoria"
+                  value={form.categoria}
+                  onChange={handleChange}
+                  label="Categoría *"
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <CategoryIcon color="primary" />
+                    </InputAdornment>
+                  }
+                >
+                  <MenuItem value="">Seleccione...</MenuItem>
+                  <MenuItem value="Deportivo">Deportivo</MenuItem>
+                  <MenuItem value="Recreativo">Recreativo</MenuItem>
+                  <MenuItem value="Oficial">Oficial</MenuItem>
+                </Select>
+                {form.error.categoria && <FormHelperText>{form.error.categoria}</FormHelperText>}
+              </FormControl>
+            </Grid>
+          </Grid>
 
-      <label>
-        Título *
-        <input
-          name="titulo"
-          type="text"
-          value={form.titulo}
-          onChange={handleChange}
-          placeholder="Ej: Jornada Deportiva 2024"
-          minLength={5}
-          maxLength={100}
-          required
-        />
-        <small>Ejemplo: Jornada Deportiva 2024 (mínimo 5 caracteres)</small>
-        {form.error.titulo && <span className="form-error">{form.error.titulo}</span>}
-      </label>
-
-      <label>
-        Descripción *
-        <textarea
-          name="descripcion"
-          value={form.descripcion}
-          onChange={handleChange}
-          placeholder="Describe la actividad. Ej: Partido amistoso entre carreras."
-          minLength={10}
-          maxLength={300}
-          required
-        />
-        <small>{charCount}/300 caracteres</small>
-        {form.error.descripcion && <span className="form-error">{form.error.descripcion}</span>}
-      </label>
-
-      <label>
-        Fecha *
-        <input
-          name="fecha"
-          type="date"
-          value={form.fecha}
-          onChange={handleChange}
-          required
-        />
-        <small>Ejemplo: 2025-08-20</small>
-        {form.error.fecha && <span className="form-error">{form.error.fecha}</span>}
-      </label>
-
-      <label>
-        Lugar *
-        <input
-          name="lugar"
-          type="text"
-          value={form.lugar}
-          onChange={handleChange}
-          placeholder="Ej: Gimnasio UBB"
-          required
-        />
-        {form.error.lugar && <span className="form-error">{form.error.lugar}</span>}
-      </label>
-
-      <label>
-        Categoría *
-        <select name="categoria" value={form.categoria} onChange={handleChange} required>
-          <option value="">Seleccione...</option>
-          <option value="Deportivo">Deportivo</option>
-          <option value="Recreativo">Recreativo</option>
-          <option value="Oficial">Oficial</option>
-        </select>
-        {form.error.categoria && <span className="form-error">{form.error.categoria}</span>}
-      </label>
-
-      <div style={{ marginTop: 16 }}>
-        <button type="submit" disabled={loading}>
-          {loading ? "Guardando..." : isEditing ? "Guardar Cambios" : "Crear"}
-        </button>
-        <button type="button" onClick={onCancel} style={{ marginLeft: 10 }}>
-          Cancelar
-        </button>
-      </div>
-    </form>
+          <Divider sx={{ my: 4 }} />
+          
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+            <Button
+              variant="outlined"
+              color="inherit"
+              onClick={onCancel}
+              disabled={loading}
+              sx={{ borderRadius: 2 }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              sx={{ 
+                borderRadius: 2,
+                px: 4,
+                '&:hover': {
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.15)'
+                }
+              }}
+            >
+              {loading ? "Guardando..." : isEditing ? "Guardar Cambios" : "Crear Actividad"}
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

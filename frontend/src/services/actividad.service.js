@@ -10,6 +10,27 @@ export async function getActividades(filtros = {}) {
     }
 }
 
+// Obtener próximas actividades (las 7 más cercanas)
+export async function getProximasActividades(cantidad = 7) {
+    try {
+        // Obtener la fecha actual en formato ISO
+        const hoy = new Date().toISOString().split('T')[0];
+        
+        // Parámetros para filtrar por fecha posterior a hoy y limitar cantidad
+        const params = {
+            fechaInicio: hoy,
+            limit: cantidad,
+            orderBy: 'fecha_asc' // Ordenadas por fecha ascendente (las más próximas primero)
+        };
+        
+        const { data } = await axios.get('/actividades', { params });
+        return data.data;
+    } catch (error) {
+        console.error('Error al obtener próximas actividades:', error);
+        return [];
+    }
+}
+
 // Crear actividad
 export async function createActividad(actividad) {
     try {

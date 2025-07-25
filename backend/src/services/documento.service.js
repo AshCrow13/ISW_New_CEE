@@ -68,6 +68,19 @@ export async function getDocumentosService(filtro = {}) {
             where.fechaSubida = LessThanOrEqual(filtro.fechaFin);
         }
 
+        // Mapeo de tipos antiguos a nuevos (para compatibilidad)
+        if (filtro.tipo) {
+            // Mapeo para compatibilidad con tipos antiguos
+            const tipoMappings = {
+                "comunicado": "Importantes",
+                "acta": "Actas",
+                "resultado": "Actividad"
+            };
+            
+            // Si viene un tipo antiguo, convertirlo al nuevo formato
+            where.tipo = tipoMappings[filtro.tipo] || filtro.tipo;
+        }
+        
         // Construir consulta
         let queryBuilder = repo.createQueryBuilder("documento").where(where);
         if (filtro.q) {
