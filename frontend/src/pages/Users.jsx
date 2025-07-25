@@ -24,6 +24,7 @@ import SearchIcon from '@mui/icons-material/Search';
 const Users = () => {
   const { users, fetchUsers, setUsers } = useUsers();
   const [staffUsers, setStaffUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [filterTerm, setFilterTerm] = useState('');
   const { user } = useAuth();
   const userRole = user?.rol;
@@ -46,6 +47,11 @@ const Users = () => {
     loadStaffUsers();
   }, []);
 
+  // Cargar todos los usuarios
+  useEffect(() => {
+    loadAllUsers();
+  }, []);
+
   // Función para cargar solo usuarios admin y vocalia
   const loadStaffUsers = async () => {
     try {
@@ -53,6 +59,16 @@ const Users = () => {
       setStaffUsers(staffData);
     } catch (error) {
       console.error('Error al cargar usuarios staff:', error);
+    }
+  };
+
+  // Función para cargar todos los usuarios
+  const loadAllUsers = async () => {
+    try {
+      const usersData = await getUsers();
+      setAllUsers(usersData);
+    } catch (error) {
+      console.error('Error al cargar usuarios:', error);
     }
   };
 
@@ -67,6 +83,21 @@ const Users = () => {
       user.rol?.toLowerCase().includes(filterTerm.toLowerCase())
     );
   }, [staffUsers, filterTerm]);
+
+  // Filtrar todos los usuarios por el término de búsqueda
+  const filteredUsers = useMemo(() => {
+    if (!filterTerm.trim()) {
+      // Solo staff por defecto
+      return allUsers.filter(user => user.rol === 'admin' || user.rol === 'vocalia');
+    }
+    // Todos los usuarios al buscar
+    return allUsers.filter(user =>
+      user.nombreCompleto?.toLowerCase().includes(filterTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(filterTerm.toLowerCase()) ||
+      user.rut?.toLowerCase().includes(filterTerm.toLowerCase()) ||
+      user.rol?.toLowerCase().includes(filterTerm.toLowerCase())
+    );
+  }, [allUsers, filterTerm]);
 
   // Abrir el modal de edición para admin
   const handleEditUser = (userData) => {
@@ -101,8 +132,8 @@ const Users = () => {
       )}
       
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 3 }}>
-        {filteredStaffUsers.map((staff) => (
-          <Card key={staff.id} sx={{ 
+        {filteredUsers.map((user) => (
+          <Card key={user.id} sx={{ 
             boxShadow: 2, 
             transition: 'transform 0.2s', 
             '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 } 
@@ -113,23 +144,23 @@ const Users = () => {
                   width: 80, 
                   height: 80, 
                   mb: 2,
-                  bgcolor: staff.rol === 'admin' ? 'primary.main' : 'secondary.main',
+                  bgcolor: user.rol === 'admin' ? 'primary.main' : 'secondary.main',
                   fontSize: '2rem'
                 }}
               >
-                {staff.nombreCompleto.charAt(0)}
+                {user.nombreCompleto.charAt(0)}
               </Avatar>
               
               <Typography variant="h6" align="center" gutterBottom>
-                {staff.nombreCompleto}
+                {user.nombreCompleto}
               </Typography>
               
               <Typography 
                 variant="caption" 
                 align="center" 
                 sx={{ 
-                  bgcolor: staff.rol === 'admin' ? 'primary.light' : 'secondary.light',
-                  color: staff.rol === 'admin' ? 'primary.contrastText' : 'secondary.contrastText',
+                  bgcolor: user.rol === 'admin' ? 'primary.light' : 'secondary.light',
+                  color: user.rol === 'admin' ? 'primary.contrastText' : 'secondary.contrastText',
                   px: 1.5,
                   py: 0.5,
                   borderRadius: 1,
@@ -137,14 +168,14 @@ const Users = () => {
                   fontWeight: 'bold'
                 }}
               >
-                {staff.rol === 'admin' ? 'Administrador' : 'Vocalía'}
+                {user.rol === 'admin' ? 'Administrador' : 'Vocalía'}
               </Typography>
               
               <Divider sx={{ width: '100%', my: 1.5 }} />
               
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%', mb: 1 }}>
                 <EmailIcon color="action" fontSize="small" />
-                <Typography variant="body2">{staff.email}</Typography>
+                <Typography variant="body2">{user.email}</Typography>
               </Box>
               
               {/* Botón de editar solo para administradores */}
@@ -154,7 +185,7 @@ const Users = () => {
                   size="small"
                   color="primary"
                   sx={{ mt: 2 }}
-                  onClick={() => handleEditUser(staff)}
+                  onClick={() => handleEditUser(user)}
                 >
                   Editar usuario
                 </Button>
@@ -165,7 +196,7 @@ const Users = () => {
       </Box>
       
       {/* Mensaje si no hay resultados */}
-      {filteredStaffUsers.length === 0 && (
+      {filteredUsers.length === 0 && (
         <Box sx={{ 
           p: 4, 
           textAlign: 'center', 
