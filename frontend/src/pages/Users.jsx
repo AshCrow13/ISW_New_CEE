@@ -168,7 +168,11 @@ const Users = () => {
                   fontWeight: 'bold'
                 }}
               >
-                {user.rol === 'admin' ? 'Administrador' : 'Vocalía'}
+                {user.rol === 'admin'
+                  ? 'Administrador'
+                  : user.rol === 'vocalia'
+                    ? 'Vocalía'
+                    : 'Estudiante'}
               </Typography>
               
               <Divider sx={{ width: '100%', my: 1.5 }} />

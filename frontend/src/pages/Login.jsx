@@ -135,10 +135,9 @@ const Login = () => {
                                 inputProps={{ maxLength: 100 }}
                                 autoFocus
                             />
-                            <FormHelperText sx={{ mt: -1, mb: 1, ml: 2 }}>
+                            <FormHelperText component="span">
                                 <Box display="flex" alignItems="center">
-                                    <InfoIcon fontSize="small" sx={{ mr: 0.5, fontSize: '0.8rem', color: 'text.secondary' }} />
-                                    <span>Debe ser un correo institucional</span>
+                                    <div>Contenido</div>
                                 </Box>
                             </FormHelperText>
                         </>
@@ -158,10 +157,9 @@ const Login = () => {
                                 inputProps={{ maxLength: 12 }}
                                 autoFocus
                             />
-                            <FormHelperText sx={{ mt: -1, mb: 1, ml: 2 }}>
+                            <FormHelperText component="span">
                                 <Box display="flex" alignItems="center">
-                                    <InfoIcon fontSize="small" sx={{ mr: 0.5, fontSize: '0.8rem', color: 'text.secondary' }} />
-                                    <span>Formato: 12.345.678-9</span>
+                                    <div>Contenido</div>
                                 </Box>
                             </FormHelperText>
                         </>
