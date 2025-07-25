@@ -30,7 +30,7 @@ const router = createBrowserRouter([ // Define las rutas de la aplicación
       {
         path: '/users',
         element: (
-          <ProtectedRoute allowedRoles={['admin', 'vocalia']}>
+          <ProtectedRoute allowedRoles={['admin', 'vocalia', 'estudiante']}>
             <Users />
           </ProtectedRoute>
         ),
