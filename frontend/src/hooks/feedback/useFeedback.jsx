@@ -8,7 +8,11 @@ const useFeedbacks = () => {
     const fetchFeedbacks = async () => {
         setLoading(true);
         const data = await getFeedbacks();
-        setFeedbacks(data || []);
+        // Ordenar por fecha de creación (más reciente primero)
+        const sortedData = (data || []).sort((a, b) => 
+            new Date(b.fechaCreacion) - new Date(a.fechaCreacion)
+        );
+        setFeedbacks(sortedData);
         setLoading(false);
     };
 

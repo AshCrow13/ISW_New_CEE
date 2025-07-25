@@ -8,6 +8,7 @@ const FeedbackForm = ({ onSuccess }) => {
   const [comentario, setComentario] = useState("");
   const [anonimo, setAnonimo] = useState(false);
   const [mensaje, setMensaje] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("info");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,11 +16,13 @@ const FeedbackForm = ({ onSuccess }) => {
     const res = await postFeedback({ comentario, anonimo });
     if (res.status === "Success") {
       setMensaje("¡Feedback enviado!");
+      setAlertSeverity("success");
       setComentario("");
       setAnonimo(false);
       if (onSuccess) onSuccess();
     } else {
       setMensaje(res.message || "Error al enviar feedback");
+      setAlertSeverity("error");
     }
   };
 
@@ -33,7 +36,7 @@ const FeedbackForm = ({ onSuccess }) => {
           </Typography>
         </Box>
         <Typography sx={{ mb: 3, color: 'text.secondary' }}>
-          Tu opinión es importante para mejorar el centro de estudiantes. ¡Gracias por tu aporte!
+          Toda opinión es importante para mejorar el centro de estudiantes. ¡Gracias por tu aporte!
         </Typography>
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
@@ -70,7 +73,7 @@ const FeedbackForm = ({ onSuccess }) => {
             Enviar
           </Button>
           {mensaje && (
-            <Alert severity={res.status === 'Success' ? 'success' : 'info'} sx={{ mt: 2 }}>
+            <Alert severity={alertSeverity} sx={{ mt: 2 }}>
               {mensaje}
             </Alert>
           )}
