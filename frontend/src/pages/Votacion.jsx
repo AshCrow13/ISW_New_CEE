@@ -1,12 +1,10 @@
-
 import { useContext } from 'react';
 import { AuthContext } from '@context/AuthContext.jsx';
 import FormularioCrearVotacion from '@components/VotacionFormularioCrear.jsx';
-import MenuPrincipalVotaciones from '@components/VotacionMenu.jsx';
-import ListaVotaciones from '@components/VotacionLista.jsx';
-import DetalleVotacion from '@components/VotacionDetalle.jsx';
+import VotacionTabla from '@components/VotacionTabla.jsx';
+import VotacionDetalleNuevo from '@components/VotacionDetalleNuevo.jsx';
+import VotacionEditar from '@components/VotacionEditar.jsx';
 import HeaderVista from '@components/VotacionHeader.jsx';
-import VistaActualizacion from '@components/VotacionVistaActualizacion.jsx';
 import useVotaciones from '@hooks/useVotaciones.jsx';
 import { Container, Paper, Typography, Box, Fade } from '@mui/material';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
@@ -19,10 +17,8 @@ const Votacion = () => {
         votaciones,
         votacionSeleccionada,
         loading,
-        searchId,
-        setSearchId,
-        handleVerTodas,
-        handleVerUna,
+        verDetalle,
+        irAEditar,
         handleEliminar,
         handleActualizar,
         handleCrearVotacion,
@@ -31,28 +27,34 @@ const Votacion = () => {
     } = useVotaciones();
 
     return (
-      <Container maxWidth="md" sx={{ py: 7 }}>
-        <Paper elevation={6} sx={{ p: 5, borderRadius: 4 }}>
-          <Box display="flex" alignItems="center" mb={3}>
-            <HowToVoteIcon color="primary" sx={{ fontSize: 40, mr: 2 }} />
-            <Typography variant="h4" color="primary.main" fontWeight={700}>
-              Gestión de Votaciones
-            </Typography>
-          </Box>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Paper elevation={6} sx={{ p: 4, borderRadius: 4, minHeight: '80vh' }}>
+          {/* Header principal - solo se muestra en vista tabla */}
+          {view === 'tabla' && (
+            <Box display="flex" alignItems="center" mb={4}>
+              <HowToVoteIcon color="primary" sx={{ fontSize: 48, mr: 2 }} />
+              <Typography variant="h3" color="primary.main" fontWeight={700}>
+                Centro de Votaciones
+              </Typography>
+            </Box>
+          )}
 
-          <Fade in={view === null} unmountOnExit>
+          {/* Vista de tabla principal */}
+          <Fade in={view === 'tabla'} unmountOnExit>
             <Box>
-              <MenuPrincipalVotaciones
+              <VotacionTabla
+                votaciones={votaciones}
+                loading={loading}
                 user={user}
-                searchId={searchId}
-                setSearchId={setSearchId}
-                setView={setView}
-                handleVerTodas={handleVerTodas}
-                handleVerUna={handleVerUna}
+                onVerDetalle={verDetalle}
+                onEditar={irAEditar}
+                onEliminar={handleEliminar}
+                onCrearNueva={() => setView('crear')}
               />
             </Box>
           </Fade>
 
+          {/* Vista de crear nueva votación */}
           <Fade in={view === 'crear'} unmountOnExit>
             <Box>
               <HeaderVista titulo="Nueva Votación" volverAlMenu={volverAlMenu} />
@@ -64,37 +66,27 @@ const Votacion = () => {
             </Box>
           </Fade>
 
-          <Fade in={view === 'ver-todas'} unmountOnExit>
+          {/* Vista de detalle de votación */}
+          <Fade in={view === 'detalle'} unmountOnExit>
             <Box>
-              <HeaderVista titulo="Todas las Votaciones" volverAlMenu={volverAlMenu} />
-              <ListaVotaciones
-                votaciones={votaciones}
-                loading={loading}
-                user={user}
-                handleEliminar={handleEliminar}
-              />
-            </Box>
-          </Fade>
-
-          <Fade in={view === 'ver-una'} unmountOnExit>
-            <Box>
-              <HeaderVista titulo="Detalle de Votación" volverAlMenu={volverAlMenu} />
-              <DetalleVotacion
+              <VotacionDetalleNuevo
                 votacionSeleccionada={votacionSeleccionada}
                 loading={loading}
                 user={user}
-                handleEliminar={handleEliminar}
+                onVolver={volverAlMenu}
                 handleVotar={handleVotar}
               />
             </Box>
           </Fade>
 
-          <Fade in={view === 'actualizar'} unmountOnExit>
+          {/* Vista de edición */}
+          <Fade in={view === 'editar'} unmountOnExit>
             <Box>
-              <HeaderVista titulo="Actualizar Votación" volverAlMenu={volverAlMenu} />
-              <VistaActualizacion
-                user={user}
-                onActualizar={handleActualizar}
+              <VotacionEditar
+                votacion={votacionSeleccionada}
+                onVolver={volverAlMenu}
+                onGuardar={handleActualizar}
+                loading={loading}
               />
             </Box>
           </Fade>
