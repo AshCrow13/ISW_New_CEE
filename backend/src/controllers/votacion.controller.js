@@ -17,7 +17,7 @@ export async function postVotacion(req, res) {
     try {
         const { nombre, duracion, opciones, estado} = req.body;
         const { errorb } = votacionBodyValidation.validate({ nombre, duracion, opciones, estado });
-        if (errorb) return handleErrorClient(res, 400, error.message);
+        if (errorb) return handleErrorClient(res, 400, errorb.message);
         const inicio = new Date();
         const fin = new Date(inicio.getTime() + duracion * 60000); // 24 horas después
          

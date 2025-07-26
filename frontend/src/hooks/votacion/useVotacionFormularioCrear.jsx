@@ -81,8 +81,8 @@ export function useVotacionFormularioCrear({ onSubmit, onSuccess }) {
                 if (fechaInicio >= fechaFin) {
                     newErrors.fechaFin = 'La fecha de fin debe ser posterior a la fecha de inicio';
                 }
-                const duracionHoras = (fechaFin - fechaInicio) / (1000 * 60 * 60);
-                if (duracionHoras < 1) {
+                const duracionHoras = (fechaFin - fechaInicio) / (1000 * 60);
+                if (duracionHoras < 10) {
                     newErrors.fechaFin = 'La votación debe durar al menos 1 hora';
                 }
             }
