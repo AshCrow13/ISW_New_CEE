@@ -57,7 +57,7 @@ const Votacion = () => {
           {/* Vista de crear nueva votación */}
           <Fade in={view === 'crear'} unmountOnExit>
             <Box>
-              <VotacionHeader titulo="Nueva Votación" volverAlMenu={volverAlMenu} />
+              <VotacionHeader titulo="Vamos a Crear una Nueva Votación" volverAlMenu={volverAlMenu} />
               <FormularioCrearVotacion
                 onSubmit={handleCrearVotacion}
                 onSuccess={volverAlMenu}

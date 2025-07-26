@@ -150,7 +150,7 @@ const VotacionTabla = ({
       )}
 
       {/* Tabla */}
-      <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 3 }}>
+      <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 2 }}>
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: 'primary.main' }}>
