@@ -190,7 +190,17 @@ export async function downloadDocumento(req, res) {
         if (!fs.existsSync(filePath)) {
             return handleErrorClient(res, 404, "Archivo no encontrado en el servidor");
         }
-        res.download(filePath, documento.titulo + path.extname(filename));
+
+        // Sanitizar el título para usarlo como nombre de archivo
+        let safeTitle = documento.titulo
+            .toString()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-zA-Z0-9_\-]/g, "_")
+            .replace(/_+/g, "_")
+            .replace(/^_+|_+$/g, "")
+            .substring(0, 40);
+        if (!safeTitle) safeTitle = "documento";
+        res.download(filePath, safeTitle + path.extname(filename));
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }

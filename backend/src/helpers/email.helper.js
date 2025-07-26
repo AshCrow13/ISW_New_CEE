@@ -1,4 +1,3 @@
-
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({ // Configuración del transporte SMTP
@@ -11,13 +10,16 @@ const transporter = nodemailer.createTransport({ // Configuración del transport
     }
 });
 
-export async function enviarCorreoEstudiantes(asunto, mensajeHtml, destinatarios) {
+export async function enviarCorreoEstudiantes(asunto, mensajeHtml, destinatarios, attachments) {
     const mailOptions = { // Opciones del correo
         from: `"Centro de Estudiantes" <${process.env.EMAIL_USER}>`,
         to: destinatarios, // puede ser un solo email o un array
         subject: asunto,
         html: mensajeHtml,
     };
+    if (attachments) {
+        mailOptions.attachments = attachments;
+    }
 
     try {
         const info = await transporter.sendMail(mailOptions); // Enviar el correo

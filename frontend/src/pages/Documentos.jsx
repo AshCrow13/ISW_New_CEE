@@ -97,12 +97,29 @@ const Documentos = () => { // Componente principal para la gestión de documento
     const handleDownload = async (id) => {
         try {
             const blob = await downloadDocumento(id); // Llamar al servicio para descargar el documento
+            // Buscar el documento por id para obtener el título
+            const doc = documentos.find(d => d.id === id);
+            let nombre = doc?.titulo || `documento_${id}`;
+            // Sanitizar el nombre para evitar caracteres inválidos
+            nombre = nombre
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-zA-Z0-9_\-]/g, "_")
+                .replace(/_+/g, "_")
+                .replace(/^_+|_+$/g, "")
+                .substring(0, 40);
+            if (!nombre) nombre = `documento_${id}`;
+            // Obtener extensión del archivo original si está disponible
+            let ext = "";
+            if (doc?.urlArchivo) {
+                const parts = doc.urlArchivo.split(".");
+                if (parts.length > 1) ext = "." + parts.pop();
+            }
             const url = window.URL.createObjectURL(blob); // Crear un objeto URL para el blob
-            const link = document.createElement('a'); //    Crear un enlace temporal
-            link.href = url; // Asignar la URL al enlace
-            link.download = `documento_${id}`; // Nombre del archivo a descargar
-            link.click(); // Simular un clic para descargar el archivo
-            window.URL.revokeObjectURL(url); // Liberar el objeto URL
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = nombre + ext;
+            link.click();
+            window.URL.revokeObjectURL(url);
         } catch (e) {
             showErrorAlert('Error', e.message || 'No se pudo descargar el archivo');
         }

@@ -22,6 +22,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CategoryIcon from '@mui/icons-material/Category';
 import TitleIcon from '@mui/icons-material/Title';
 import DescriptionIcon from '@mui/icons-material/Description';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 
 const ActividadForm = ({
   initialData = {},
@@ -44,6 +45,7 @@ const ActividadForm = ({
   });
   
   const [charCount, setCharCount] = useState(form.descripcion.length);
+  const [archivo, setArchivo] = useState(null);
 
   useEffect(() => {
     // Si hay fecha en los datos iniciales, separarla en fecha y hora
@@ -97,6 +99,11 @@ const ActividadForm = ({
     if (name === "descripcion") setCharCount(value.length);
   };
 
+  const handleFileChange = (e) => {
+    setArchivo(e.target.files[0]);
+    // tipo/tamaño
+  };
+
   const handleSubmit = e => { // Manejar el envío del formulario
     e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
     const errors = validate();
@@ -104,22 +111,37 @@ const ActividadForm = ({
       setForm(prev => ({ ...prev, error: errors })); // Actualizar el estado con los errores
       return;
     }
-    
+
     // Combinar fecha y hora en un solo campo ISO
     const fechaHora = `${form.fecha}T${form.hora}:00`;
-    
-    const cleanData = { // Preparar los datos para enviar
+
+    // Usar FormData si hay archivo
+    let dataToSend;
+    if (archivo) {
+      dataToSend = new FormData();
+      dataToSend.append('titulo', form.titulo.trim());
+      dataToSend.append('descripcion', form.descripcion.trim());
+      dataToSend.append('fecha', fechaHora);
+      dataToSend.append('lugar', form.lugar.trim());
+      dataToSend.append('categoria', form.categoria);
+      dataToSend.append('responsableId', String(form.responsableId)); // Asegurarse de enviar como string
+      dataToSend.append('recursos', form.recursos || "");
+      dataToSend.append('estado', form.estado || "publicada");
+      dataToSend.append('archivo', archivo);
+    } else {
+      dataToSend = {
         titulo: form.titulo.trim(),
         descripcion: form.descripcion.trim(),
         fecha: fechaHora,
         lugar: form.lugar.trim(),
         categoria: form.categoria,
-        responsableId: parseInt(form.responsableId) || 1,
+        responsableId: form.responsableId,
         recursos: form.recursos || "",
         estado: form.estado || "publicada"
-    };
-    
-    onSubmit(cleanData);
+      };
+    }
+
+    onSubmit(dataToSend);
   };
 
   return (
@@ -280,6 +302,19 @@ const ActividadForm = ({
                 {form.error.categoria && <FormHelperText>{form.error.categoria}</FormHelperText>}
               </FormControl>
             </Grid>
+          </Grid>
+
+          {/* Campo para subir archivo */}
+          <Grid item xs={12}>
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={<AttachFileIcon />}
+              color={archivo ? "success" : "primary"}
+            >
+              {archivo ? archivo.name : "Adjuntar documento (opcional)"}
+              <input type="file" hidden name="archivo" onChange={handleFileChange} />
+            </Button>
           </Grid>
 
           <Divider sx={{ my: 4 }} />

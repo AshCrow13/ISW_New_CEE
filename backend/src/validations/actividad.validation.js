@@ -46,7 +46,7 @@ export const actividadSchema = Joi.object({
             "any.only": "La categoría debe ser Deportivo, Recreativo u Oficial.",
             "any.required": "La categoría es obligatoria."
         }),
-    responsableId: Joi.number() // ID del responsable de la actividad
+    responsableId: Joi.number()
         .integer()
         .positive()
         .required()
@@ -54,6 +54,13 @@ export const actividadSchema = Joi.object({
             "number.base": "El responsable debe ser un ID numérico.",
             "number.positive": "El responsable debe ser un número positivo.",
             "any.required": "El responsable es obligatorio."
+        })
+        .custom((value, helpers) => {
+            // Permitir strings numéricos (por FormData)
+            if (typeof value === "string" && /^\d+$/.test(value)) {
+                return parseInt(value, 10);
+            }
+            return value;
         }),
     recursos: Joi.string() // Recursos de la actividad
         .max(500)
