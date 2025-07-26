@@ -1,8 +1,3 @@
-/**
- * Formatea un RUT chileno agregando puntos y guión mientras el usuario escribe
- * @param {string} value - El valor del RUT ingresado por el usuario
- * @return {string} - RUT formateado con puntos y guión
- */
 export const formatRutOnChange = (value) => {
   // Eliminar todos los caracteres que no sean números o k/K
   let rutClean = value.replace(/[^0-9kK]/g, '');
@@ -25,11 +20,11 @@ export const formatRutOnChange = (value) => {
   // Formatear con puntos según la longitud
   let formattedRut = '';
   
-  if (rutDigits.length <= 3) {
+  if (rutDigits.length <= 3) { // Si tiene 3 o menos dígitos, no se agregan puntos
     formattedRut = rutDigits;
-  } else if (rutDigits.length <= 6) {
+  } else if (rutDigits.length <= 6) { // Si tiene entre 4 y 6 dígitos, se agrega un punto
     formattedRut = `${rutDigits.slice(0, rutDigits.length - 3)}.${rutDigits.slice(-3)}`;
-  } else {
+  } else { // Si tiene más de 6 dígitos, se agregan dos puntos
     formattedRut = `${rutDigits.slice(0, rutDigits.length - 6)}.${rutDigits.slice(-6, -3)}.${rutDigits.slice(-3)}`;
   }
   
@@ -37,11 +32,6 @@ export const formatRutOnChange = (value) => {
   return `${formattedRut}-${dv}`;
 };
 
-/**
- * Verifica si un RUT es válido según el algoritmo de verificación
- * @param {string} rut - El RUT formateado (con o sin puntos y guión)
- * @return {boolean} - true si el RUT es válido
- */
 export const validateRut = (rut) => {
     // Implementación básica de validación - solo verifica formato
     const rutRegex = /^(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}-[\dkK]$/;

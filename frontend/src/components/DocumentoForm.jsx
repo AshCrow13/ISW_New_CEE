@@ -29,13 +29,13 @@ const DocumentoForm = ({
             titulo: initialData.titulo || "",
             tipo: initialData.tipo || "",
         });
-        setArchivo(null);
-        setError({});
+        setArchivo(null); // Reiniciar archivo al editar
+        setError({}); // Reiniciar errores al editar
     }, [initialData, isEditing]);
 
     // Determinar qué tipos de documentos puede crear/editar el usuario según su rol
     const getTiposPermitidos = () => {
-        if (userRole === 'admin') {
+        if (userRole === 'admin') { // Administrador puede ver todos los tipos
             return [
                 { value: "Importantes", label: "Importantes" },
                 { value: "Actividad", label: "Actividad" },
@@ -43,7 +43,7 @@ const DocumentoForm = ({
                 { value: "Otros", label: "Otros" }
             ];
         } else if (userRole === 'vocalia') {
-            return [
+            return [ // Vocalía puede ver solo ciertos tipos
                 { value: "Actividad", label: "Actividad" },
                 { value: "Otros", label: "Otros" }
             ];
@@ -51,7 +51,7 @@ const DocumentoForm = ({
         return [];
     };
 
-    const tiposPermitidos = getTiposPermitidos();
+    const tiposPermitidos = getTiposPermitidos(); // Obtener los tipos permitidos según el rol del usuario
 
     // Si es edición, verificar que el usuario tiene permiso para editar este documento
     useEffect(() => {
@@ -64,7 +64,7 @@ const DocumentoForm = ({
         }
     }, [isEditing, initialData.tipo, userRole]);
 
-    const validate = () => {
+    const validate = () => { // Validación de los campos del formulario
         const err = {};
         if (!form.titulo || form.titulo.length < 5)
         err.titulo = "Debe tener al menos 5 caracteres.";
@@ -73,18 +73,18 @@ const DocumentoForm = ({
         return err;
     };
 
-    const handleChange = (e) => {
+    const handleChange = (e) => { // Manejar cambios en los campos del formulario
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
         setError((prev) => ({ ...prev, [name]: undefined }));
     };
 
-    const handleFileChange = (e) => {
+    const handleFileChange = (e) => { // Manejar el cambio de archivo
         setArchivo(e.target.files[0]);
         setError((prev) => ({ ...prev, archivo: undefined }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e) => { // Manejar el envío del formulario
         e.preventDefault();
         const err = validate();
         if (Object.keys(err).length > 0) {

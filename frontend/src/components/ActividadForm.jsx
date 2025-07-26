@@ -50,7 +50,7 @@ const ActividadForm = ({
     let fechaValue = "";
     let horaValue = "";
     
-    if (initialData.fecha) {
+    if (initialData.fecha) { // Asegurarse de que initialData.fecha no sea undefined
       const fechaObj = new Date(initialData.fecha);
       if (!isNaN(fechaObj.getTime())) {
         // Formato YYYY-MM-DD para el input date
@@ -60,7 +60,7 @@ const ActividadForm = ({
       }
     }
     
-    setForm({
+    setForm({ // Inicializar el formulario con los datos
         titulo: initialData.titulo || "",
         descripcion: initialData.descripcion || "",
         fecha: fechaValue,
@@ -75,7 +75,7 @@ const ActividadForm = ({
     setCharCount(initialData.descripcion?.length || 0);
   }, [initialData]);
 
-  const validate = () => {
+  const validate = () => { // Validación de los campos del formulario
     let error = {};
     if (!form.titulo || form.titulo.length < 5) error.titulo = "Debe tener al menos 5 caracteres.";
     if (!form.descripcion || form.descripcion.length < 10) error.descripcion = "Debe tener al menos 10 caracteres.";
@@ -87,28 +87,28 @@ const ActividadForm = ({
     return error;
   };
 
-  const handleChange = e => {
+  const handleChange = e => { // Manejar cambios en los campos del formulario
     const { name, value } = e.target;
     setForm(prev => ({
-      ...prev,
-      [name]: value,
+      ...prev, // Actualizar el estado del formulario
+      [name]: value, // Actualizar el campo correspondiente
       error: { ...prev.error, [name]: undefined }
     }));
     if (name === "descripcion") setCharCount(value.length);
   };
 
-  const handleSubmit = e => {
-    e.preventDefault();
+  const handleSubmit = e => { // Manejar el envío del formulario
+    e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
     const errors = validate();
     if (Object.keys(errors).length > 0) {
-      setForm(prev => ({ ...prev, error: errors }));
+      setForm(prev => ({ ...prev, error: errors })); // Actualizar el estado con los errores
       return;
     }
     
     // Combinar fecha y hora en un solo campo ISO
     const fechaHora = `${form.fecha}T${form.hora}:00`;
     
-    const cleanData = {
+    const cleanData = { // Preparar los datos para enviar
         titulo: form.titulo.trim(),
         descripcion: form.descripcion.trim(),
         fecha: fechaHora,

@@ -11,7 +11,7 @@ export default function Popup({ show, setShow, data, action }) {
     
     console.log(' userData extraído:', userData);
 
-    const handleSubmit = (data) => {
+    const handleSubmit = (data) => { // Manejo del envío del formulario
         console.log(' Popup enviando datos:', data);
         action(data);
     };
@@ -36,12 +36,12 @@ export default function Popup({ show, setShow, data, action }) {
                                 placeholder: 'Diego Alexis Salazar Jara',
                                 fieldType: 'input',
                                 type: "text",
-                                required: true,
+                                required: true, // Validación de nombre completo
                                 minLength: 15,
                                 maxLength: 50,
-                                pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+                                pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, // Solo letras y espacios
                                 patternMessage: "Debe contener solo letras y espacios",
-                                disabled: true, // <--- Solo lectura
+                                disabled: true, // Solo lectura
                             },
                             {
                                 label: "Correo electrónico",
@@ -50,10 +50,10 @@ export default function Popup({ show, setShow, data, action }) {
                                 placeholder: 'example@gmail.cl',
                                 fieldType: 'input',
                                 type: "email",
-                                required: true,
+                                required: true, // Validación de correo electrónico
                                 minLength: 15,
                                 maxLength: 100,
-                                disabled: true, // <--- Solo lectura
+                                disabled: true, // Solo lectura
                             },
                             {
                                 label: "Rut",
@@ -66,8 +66,8 @@ export default function Popup({ show, setShow, data, action }) {
                                 maxLength: 12,
                                 pattern: patternRut,
                                 patternMessage: "Debe ser xx.xxx.xxx-x o xxxxxxxx-x",
-                                required: true,
-                                disabled: true, // <--- Solo lectura
+                                required: true, // Validación de RUT
+                                disabled: true, // Solo lectura
                             },
                             {
                                 label: "Carrera",
@@ -79,20 +79,20 @@ export default function Popup({ show, setShow, data, action }) {
                                     { value: "Ingeniería Civil Industrial", label: "Ingeniería Civil Industrial" },
                                     { value: "Ingeniería en Computación e Informática", label: "Ingeniería en Computación e Informática" }
                                 ],
-                                required: true,
+                                required: true, // Validación de carrera
                                 defaultValue: userData.carrera || "Ingeniería Civil Informática",
-                                disabled: true, // <--- Solo lectura
+                                disabled: true, // Solo lectura
                             },
                             {
                                 label: "Rol",
                                 name: "rol",
                                 fieldType: 'select',
-                                options: [
+                                options: [ // Opciones de rol
                                     { value: "admin", label: "Administrador" },
                                     { value: "vocalia", label: "Vocalía" },
                                     { value: "estudiante", label: "Estudiante" }
                                 ],
-                                required: true,
+                                required: true, // Validación de rol
                                 defaultValue: userData.rol || "estudiante",
                             },
                             // Campo de nueva contraseña eliminado para edición por admin
