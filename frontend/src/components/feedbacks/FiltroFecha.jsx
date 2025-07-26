@@ -1,7 +1,7 @@
 import { Box, TextField, Button } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
-const DateFilter = ({ fechaFiltro, onFechaChange, onClearFilter }) => {
+const FiltroFecha = ({ fechaFiltro, onFechaChange, onClearFilter }) => {
   return (
     <Box display="flex" alignItems="center" gap={2} mb={3}>
       <FilterListIcon color="primary" />
@@ -29,4 +29,4 @@ const DateFilter = ({ fechaFiltro, onFechaChange, onClearFilter }) => {
   );
 };
 
-export default DateFilter;
+export default FiltroFecha;

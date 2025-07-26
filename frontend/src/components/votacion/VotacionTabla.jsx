@@ -21,7 +21,7 @@ import {
   Delete as DeleteIcon,
   Add as AddIcon
 } from '@mui/icons-material';
-import FiltroFecha from '@components/FiltroFecha.jsx';
+import FiltroFecha from '@components/feedbacks/FiltroFecha.jsx';
 import { filterVotacionesByDate } from '@helpers/votacionHelpers.js';
 
 const VotacionTabla = ({ 
@@ -150,7 +150,7 @@ const VotacionTabla = ({
       )}
 
       {/* Tabla */}
-      <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 3 }}>
+      <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 2 }}>
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: 'primary.main' }}>

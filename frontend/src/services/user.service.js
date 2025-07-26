@@ -55,7 +55,7 @@ export const getStaffUsers = async () => {
 // ✅ CORREGIR: Actualizar usuario - Cambiar PUT por PATCH y ruta correcta
 export const updateUser = async (userData, rut) => {
     try {
-        console.log('🔄 Enviando actualización:', userData, 'para RUT:', rut); // ✅ DEBUG
+        console.log(' Enviando actualización:', userData, 'para RUT:', rut); // ✅ DEBUG
         
         // ✅ LIMPIAR: Remover campos no permitidos en actualización
         const { email, id, createdAt, updatedAt, rut: userRut, ...cleanUserData } = userData;
@@ -66,15 +66,15 @@ export const updateUser = async (userData, rut) => {
             delete cleanUserData.newPassword;
         }
         
-        console.log('📤 Datos limpios a enviar:', cleanUserData); // ✅ DEBUG
+        console.log(' Datos limpios a enviar:', cleanUserData); // ✅ DEBUG
         
         // ✅ USAR: PATCH en lugar de PUT y ruta /detail
         const response = await api.patch(`/estudiantes/detail?rut=${rut}`, cleanUserData);
         
-        console.log('✅ Respuesta del backend:', response.data); // ✅ DEBUG
+        console.log(' Respuesta del backend:', response.data); // ✅ DEBUG
         return response.data;
     } catch (error) {
-        console.error('❌ Error en updateUser:', error); // ✅ DEBUG
+        console.error(' Error en updateUser:', error); // ✅ DEBUG
         throw error;
     }
 };
