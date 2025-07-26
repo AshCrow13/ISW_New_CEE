@@ -1,7 +1,7 @@
 // Componente reutilizable para el header de las vistas
 import React from 'react';
 
-const HeaderVista = ({ titulo, volverAlMenu }) => {
+const VotacionHeader = ({ titulo, volverAlMenu }) => {
     return (
         <div className="content-header">
             <h2 className="content-title">{titulo}</h2>
@@ -15,4 +15,4 @@ const HeaderVista = ({ titulo, volverAlMenu }) => {
     );
 };
 
-export default HeaderVista;
+export default VotacionHeader;
