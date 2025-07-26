@@ -28,6 +28,16 @@ export async function createActividad(req, res) {
         // Validar que el cuerpo de la solicitud cumpla con el esquema
         const { error } = actividadSchema.validate(req.body);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
+
+        // Validar que la fecha sea posterior a la fecha actual
+        const fechaActividad = new Date(req.body.fecha);
+        const ahora = new Date();
+        if (isNaN(fechaActividad.getTime())) {
+            return handleErrorClient(res, 400, "La fecha de la actividad no es válida.");
+        }
+        if (fechaActividad < ahora) {
+            return handleErrorClient(res, 400, "La fecha de la actividad debe ser posterior a la fecha actual.");
+        }
         
         // Validar que el usuario tenga el rol adecuado        
         // 1. Crear la actividad
