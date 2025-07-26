@@ -83,7 +83,7 @@ export function useVotacionFormularioCrear({ onSubmit, onSuccess }) {
                 }
                 const duracionHoras = (fechaFin - fechaInicio) / (1000 * 60);
                 if (duracionHoras < 10) {
-                    newErrors.fechaFin = 'La votación debe durar al menos 1 hora';
+                    newErrors.fechaFin = 'La votación debe durar al menos 10';
                 }
             }
         }
@@ -102,6 +102,7 @@ export function useVotacionFormularioCrear({ onSubmit, onSuccess }) {
         try {
             const inicioDate = new Date(formData.fechaInicio);
             const finDate = new Date(formData.fechaFin);
+            console.log("Inicio:", inicioDate, "Fin:", finDate);
             const duracionMinutos = Math.floor((finDate - inicioDate) / (1000 * 60));
             const datosVotacion = {
                 nombre: formData.titulo.trim(),
