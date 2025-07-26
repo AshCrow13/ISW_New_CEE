@@ -1,16 +1,3 @@
-// Helper para debug temporal - remover después de verificar funcionamiento
-export const debugVotaciones = (enabled = true) => {
-  if (!enabled) return;
-  
-  // Esta función nos ayudará a debuggear los datos sin llenar el código de console.log
-  return {
-    logVotaciones: (votaciones) => console.log('🗳️ Votaciones:', votaciones),
-    logVotacion: (votacion, index) => console.log(`📊 Votación ${index}:`, votacion),
-    logRespuesta: (response) => console.log('📡 Respuesta backend:', response),
-    logError: (error, context) => console.error(`❌ Error en ${context}:`, error)
-  };
-};
-
 // Helper para extraer texto de opciones de forma segura
 export const extraerTextoOpcion = (opcion, index) => {
   if (typeof opcion === 'string') return opcion;

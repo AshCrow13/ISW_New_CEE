@@ -15,7 +15,7 @@ instance.interceptors.request.use(
     // ✅ USAR SOLO LOCALSTORAGE (las cookies no funcionan en tu entorno)
     const token = localStorage.getItem('jwt-auth');
     
-    console.log('🔍 REQUEST DEBUG:');
+    console.log(' REQUEST DEBUG:');
     console.log('URL:', config.url);
     console.log('Token encontrado:', token ? 'SÍ' : 'NO');
     console.log('Token source: localStorage');
@@ -23,9 +23,9 @@ instance.interceptors.request.use(
     
     if(token && token !== 'undefined') {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('✅ Authorization header configurado');
+      console.log(' Authorization header configurado');
     } else {
-      console.log('❌ NO se configuró Authorization header');
+      console.log(' NO se configuró Authorization header');
       delete config.headers.Authorization;
     }
     
@@ -37,11 +37,11 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => {
-    console.log('✅ Response exitosa:', response.config.url);
+    console.log(' Response exitosa:', response.config.url);
     return response;
   },
   (error) => {
-    console.log('❌ ERROR en response:');
+    console.log(' ERROR en response:');
     console.log('URL:', error.config?.url);
     console.log('Status:', error.response?.status);
     console.log('Headers enviados:', error.config?.headers);

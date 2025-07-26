@@ -36,14 +36,14 @@ const Feedback = () => {
     try {
       const resultado = await deleteFeedback(id);
       if (resultado.status === 'Success') {
-        alert('✅ Feedback eliminado exitosamente');
+        alert('Feedback eliminado exitosamente');
         fetchFeedbacks();
       } else {
-        alert('❌ Error al eliminar: ' + (resultado.message || 'Error desconocido'));
+        alert('Error al eliminar: ' + (resultado.message || 'Error desconocido'));
       }
     } catch (error) {
       console.error('Error al eliminar feedback:', error);
-      alert('❌ Error al eliminar el feedback');
+      alert(' Error al eliminar el feedback');
     }
   }, [fetchFeedbacks]);
 
