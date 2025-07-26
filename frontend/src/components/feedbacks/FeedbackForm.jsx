@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Container, Paper, Typography, Box, Button, Checkbox, FormControlLabel, Alert, TextField } from '@mui/material';
 import FeedbackIcon from '@mui/icons-material/Feedback';
-import { postFeedback } from '../services/feedback.service';
+import { postFeedback } from '../../services/feedback.service';
 
 const FeedbackForm = ({ onSuccess }) => {
   const [comentario, setComentario] = useState("");

@@ -21,7 +21,7 @@ import {
   Delete as DeleteIcon,
   Add as AddIcon
 } from '@mui/icons-material';
-import FiltroFecha from '@components/FiltroFecha.jsx';
+import FiltroFecha from '@components/feedbacks/FiltroFecha.jsx';
 import { filterVotacionesByDate } from '@helpers/votacionHelpers.js';
 
 const VotacionTabla = ({ 

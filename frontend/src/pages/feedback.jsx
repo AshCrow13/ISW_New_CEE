@@ -1,8 +1,8 @@
 import { useState, useContext, useMemo, useCallback } from 'react';
 import useFeedback from '@hooks/feedback/useFeedback.jsx';
-import FeedbackForm from "@components/FeedbackForm.jsx";
-import FeedbackList from "@components/FeedbackList.jsx";
-import FiltroFecha from "@components/FiltroFecha.jsx";
+import FeedbackForm from "@components/feedbacks/FeedbackForm.jsx";
+import FeedbackList from "@components/feedbacks/FeedbackList.jsx";
+import FiltroFecha from "@components/feedbacks/FiltroFecha.jsx";
 import { AuthContext } from '@context/AuthContext.jsx';
 import { deleteFeedback } from '@services/feedback.service.js';
 import { filterFeedbacksByDate, isAdmin } from '@helpers/feedbackHelpers.js';
