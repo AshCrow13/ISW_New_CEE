@@ -5,7 +5,7 @@ import Joi from "joi";
 const rutRegex = /^(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}-[\dkK]$/;
 
 export const estudianteSchema = Joi.object({
-    nombreCompleto: Joi.string()
+    nombreCompleto: Joi.string()    // Nombre completo del estudiante
         .min(8)
         .max(100)
         .required()
@@ -15,7 +15,7 @@ export const estudianteSchema = Joi.object({
             "string.max": "El nombre debe tener máximo 100 caracteres.",
             "any.required": "El nombre es obligatorio."
         }),
-    rut: Joi.string()
+    rut: Joi.string()       // RUT del estudiante
         .min(9)
         .max(12)
         .required()
@@ -25,7 +25,7 @@ export const estudianteSchema = Joi.object({
             "string.pattern.base": "Formato de RUT inválido. Debe tener formato xx.xxx.xxx-x.",
             "any.required": "El RUT es obligatorio."
         }),
-    email: Joi.string()
+    email: Joi.string() // Email del estudiante
         .min(10)
         .max(255)
         .email({ tlds: { allow: false } })
@@ -37,7 +37,7 @@ export const estudianteSchema = Joi.object({
             "string.empty": "El email no puede estar vacío.",
             "any.required": "El email es obligatorio."
         }),
-    carrera: Joi.string()
+    carrera: Joi.string() // Carrera del estudiante
         .min(3)
         .max(100)
         .optional() // Ahora es opcional
@@ -45,7 +45,7 @@ export const estudianteSchema = Joi.object({
             "string.empty": "Si proporciona una carrera, no puede estar vacía.",
             "string.min": "La carrera debe tener al menos 3 caracteres."
         }),
-    password: Joi.string()
+    password: Joi.string() // Contraseña del estudiante
         .min(8)
         .max(26)
         .pattern(/^[a-zA-Z0-9]+$/)
@@ -58,7 +58,7 @@ export const estudianteSchema = Joi.object({
             "string.max": "La contraseña debe tener como máximo 26 caracteres.",
             "string.pattern.base": "La contraseña solo puede contener letras y números.",
         }),
-    rol: Joi.string()
+    rol: Joi.string() // Rol del estudiante
     .valid("admin", "vocalia", "estudiante")
     .default("estudiante")
     .messages({
@@ -68,19 +68,19 @@ export const estudianteSchema = Joi.object({
 
 // Validación para actualizar estudiante
 export const estudianteUpdateSchema = Joi.object({
-    nombreCompleto: Joi.string()
+    nombreCompleto: Joi.string()    // Nombre completo del estudiante
         .min(8)
         .max(100)
         .pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
         .optional(),
-    carrera: Joi.string()
+    carrera: Joi.string() // Carrera del estudiante
         .min(3)
         .max(100)
         .optional(),
     rol: Joi.string()
         .valid("admin", "vocalia", "estudiante")
-        .optional(), // ✅ AGREGAR: Permitir actualización de rol
-    newPassword: Joi.string()
+        .optional(), // Permitir actualización de rol
+    newPassword: Joi.string() // Nueva contraseña del estudiante
         .min(8)
         .max(26)
         .pattern(/^[a-zA-Z0-9]+$/)
@@ -94,25 +94,25 @@ export const estudianteUpdateSchema = Joi.object({
 
 // Validación para eliminar estudiante
 export const estudianteQuerySchema = Joi.object({
-    id: Joi.number()
+    id: Joi.number() // ID del estudiante
         .integer()
         .positive(),
-    rut: Joi.string()
+    rut: Joi.string() // RUT del estudiante
         .pattern(rutRegex),
-    email: Joi.string()
+    email: Joi.string() // Email del estudiante
         .email(),
 }).or("id", "rut", "email").unknown(false);
 
 // Validación para login de estudiante
 // Se permite el login por email o rut, pero no ambos
 export const estudianteLoginSchema = Joi.object({
-    email: Joi.string()
+    email: Joi.string() // Email del estudiante
         .email()
         .min(10)
         .max(255),
-    rut: Joi.string()
+    rut: Joi.string() // RUT del estudiante
         .pattern(rutRegex),
-    password: Joi.string()
+    password: Joi.string() // Contraseña del estudiante
         .min(4)
         .max(50)
         .required(),

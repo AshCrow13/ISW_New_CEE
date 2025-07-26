@@ -2,7 +2,7 @@
 import Joi from "joi";
 
 export const actividadSchema = Joi.object({
-    titulo: Joi.string()
+    titulo: Joi.string() // Título de la actividad
         .min(5)
         .max(100)
         .required()
@@ -12,7 +12,7 @@ export const actividadSchema = Joi.object({
             "string.max": "El título debe tener máximo 100 caracteres.",
             "any.required": "El título es obligatorio."
         }),
-    descripcion: Joi.string()
+    descripcion: Joi.string() // Descripción de la actividad
         .min(10)
         .max(2000)
         .required()
@@ -22,14 +22,14 @@ export const actividadSchema = Joi.object({
             "string.max": "La descripción debe tener máximo 2000 caracteres.",
             "any.required": "La descripción es obligatoria."
         }),
-    fecha: Joi.date()
+    fecha: Joi.date() // Fecha de la actividad
         .iso()
         .required()
         .messages({
             "date.base": "La fecha debe ser válida.",
             "any.required": "La fecha es obligatoria."
         }),
-    lugar: Joi.string()
+    lugar: Joi.string() // Lugar de la actividad
         .min(5)
         .max(100)
         .required()
@@ -39,14 +39,14 @@ export const actividadSchema = Joi.object({
             "string.max": "El lugar debe tener máximo 100 caracteres.",
             "any.required": "El lugar es obligatorio."
         }),
-    categoria: Joi.string()
+    categoria: Joi.string() // Categoría de la actividad
         .valid("Deportivo", "Recreativo", "Oficial")
         .required()
         .messages({
             "any.only": "La categoría debe ser Deportivo, Recreativo u Oficial.",
             "any.required": "La categoría es obligatoria."
         }),
-    responsableId: Joi.number() // ✅ CAMBIO: Usar responsableId como número
+    responsableId: Joi.number() // ID del responsable de la actividad
         .integer()
         .positive()
         .required()
@@ -55,50 +55,50 @@ export const actividadSchema = Joi.object({
             "number.positive": "El responsable debe ser un número positivo.",
             "any.required": "El responsable es obligatorio."
         }),
-    recursos: Joi.string()
+    recursos: Joi.string() // Recursos de la actividad
         .max(500)
         .allow(null, "")
         .messages({
             "string.max": "Los recursos deben tener máximo 500 caracteres.",
         }),
-    estado: Joi.string()
+    estado: Joi.string() // Estado de la actividad
         .valid("publicada", "pendiente", "finalizada")
         .optional()
         .messages({
             "any.only": "El estado debe ser publicada, pendiente o finalizada."
         })
-}).unknown(true); //
+}).unknown(true);
 
 export const actividadUpdateSchema = Joi.object({
-    titulo: Joi.string()
+    titulo: Joi.string() // Título de la actividad
         .min(5)
         .max(100),
-    descripcion: Joi.string()
+    descripcion: Joi.string() // Descripción de la actividad
         .min(10)
         .max(2000),
-    fecha: Joi.date()
+    fecha: Joi.date() // Fecha de la actividad
         .iso(),
-    lugar: Joi.string()
+    lugar: Joi.string() // Lugar de la actividad
         .min(5)
         .max(100),
-    categoria: Joi.string()
+    categoria: Joi.string() // Categoría de la actividad
         .valid("Deportivo", "Recreativo", "Oficial"),
     responsableId: Joi.number()  // Este campo es el que está causando el problema
         .integer()
         .positive(),
-    recursos: Joi.string()
+    recursos: Joi.string() // Recursos de la actividad
         .max(500)
         .allow(null, ""),
-    estado: Joi.string()
+    estado: Joi.string() // Estado de la actividad
         .valid("publicada", "pendiente", "finalizada"),
 }).unknown(false);
 
 export const actividadQuerySchema = Joi.object({
-    id: Joi.number()
+    id: Joi.number() // ID de la actividad
         .integer()
         .positive(),
-    categoria: Joi.string()
+    categoria: Joi.string() // Categoría de la actividad
         .valid("Deportivo", "Recreativo", "Oficial"),
-    fecha: Joi.date()
+    fecha: Joi.date() // Fecha de la actividad
         .iso(),
 }).or("id", "categoria", "fecha").unknown(false);
