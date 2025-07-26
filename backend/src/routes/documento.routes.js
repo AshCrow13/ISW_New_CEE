@@ -24,30 +24,13 @@ router
     .get("/download/:id", authenticateJwt, downloadDocumento); // Cualquier usuario autenticado puede descargar
 
 // Rutas protegidas (requieren autenticación y permisos)
-router
-    .post(
-      "/", 
-      authenticateJwt, 
-      hasRoles(["admin", "vocalia"]),
-      canCreateDocumentType, // Verificar si puede crear este tipo de documento
-      upload.single("archivo"), 
-      uploadErrorHandler,
-      validateMimeType(FILE_CONFIG.DOCUMENT.mimeTypes),
-      createDocumento
-    )
-    .patch(
-      "/detail", 
-      authenticateJwt, 
-      hasRoles(["admin", "vocalia"]),
-      canModifyDocument, // Verificar si puede modificar este documento
-      updateDocumento
-    )
-    .delete(
-      "/detail", 
-      authenticateJwt, 
-      hasRoles(["admin", "vocalia"]),
-      canModifyDocument, // Verificar si puede eliminar este documento
-      deleteDocumento
-    );
+router    
+    .post("/", authenticateJwt, hasRoles(["admin", "vocalia"]), canCreateDocumentType, 
+      upload.single("archivo"), uploadErrorHandler, validateMimeType(FILE_CONFIG.DOCUMENT.mimeTypes),
+      createDocumento)// Verificar si puede crear este tipo de documento    
+    .patch("/detail", authenticateJwt, hasRoles(["admin", "vocalia"]), canModifyDocument,
+      updateDocumento)// Verificar si puede modificar este documento    
+    .delete("/detail", authenticateJwt, hasRoles(["admin", "vocalia"]), canModifyDocument,
+      deleteDocumento );// Verificar si puede eliminar este documento
 
 export default router;

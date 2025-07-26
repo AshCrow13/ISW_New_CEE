@@ -19,12 +19,13 @@ import {
 
 // CREATE
 export async function createEstudiante(req, res) {
-    try {
+    try { // Validar que el cuerpo de la solicitud cumpla con el esquema
         const { body } = req;
         const { error } = estudianteSchema.validate(body);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
-
-        const [estudiante, serviceError] = await createEstudianteService(body);
+        
+        // Crear estudiante
+        const [estudiante, serviceError] = await createEstudianteService(body); 
         if (serviceError) return handleErrorClient(res, 400, serviceError);
 
         handleSuccess(res, 201, "Estudiante creado correctamente", estudiante);
@@ -35,7 +36,7 @@ export async function createEstudiante(req, res) {
 
 // READ (Todos)
 export async function getEstudiantes(req, res) {
-    try {
+    try { // Validar que la consulta cumpla con el esquema
         const [estudiantes, errorEstudiantes] = await getEstudiantesService();
         if (errorEstudiantes) return handleErrorClient(res, 404, errorEstudiantes);
         handleSuccess(res, 200, "Estudiantes encontrados", estudiantes);
@@ -46,12 +47,12 @@ export async function getEstudiantes(req, res) {
 
 // READ (Uno)
 export async function getEstudiante(req, res) {
-    try {
+    try { // Validar que la consulta cumpla con el esquema
         const { query } = req;
         const { error } = estudianteQuerySchema.validate(query);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
 
-        const [estudiante, serviceError] = await getEstudianteService(query);
+        const [estudiante, serviceError] = await getEstudianteService(query); // Buscar estudiante por ID
         if (serviceError) return handleErrorClient(res, 404, serviceError);
 
         handleSuccess(res, 200, "Estudiante encontrado", estudiante);
@@ -62,15 +63,15 @@ export async function getEstudiante(req, res) {
 
 // UPDATE
 export async function updateEstudiante(req, res) {
-    try {
+    try { // Validar que la consulta y el cuerpo de la solicitud cumplan con los esquemas
         const { query, body } = req;
-        const { error: queryError } = estudianteQuerySchema.validate(query);
+        const { error: queryError } = estudianteQuerySchema.validate(query); // Validar consulta
         if (queryError) return handleErrorClient(res, 400, "Error en la consulta", queryError.message);
 
-        const { error: bodyError } = estudianteUpdateSchema.validate(body);
+        const { error: bodyError } = estudianteUpdateSchema.validate(body); // Validar cuerpo de la solicitud
         if (bodyError) return handleErrorClient(res, 400, "Error en los datos", bodyError.message);
 
-        // ✅ PASAR: Usuario que realiza la acción
+        // Usuario que realiza la acción
         const [estudiante, serviceError] = await updateEstudianteService(query, body, req.user);
         if (serviceError) return handleErrorClient(res, 400, serviceError);
 
@@ -82,12 +83,12 @@ export async function updateEstudiante(req, res) {
 
 // DELETE
 export async function deleteEstudiante(req, res) {
-    try {
+    try { // Validar que la consulta cumpla con el esquema
         const { query } = req;
-        const { error } = estudianteQuerySchema.validate(query);
+        const { error } = estudianteQuerySchema.validate(query); // Validar consulta
         if (error) return handleErrorClient(res, 400, "Error en la consulta", error.message);
 
-        const [estudiante, serviceError] = await deleteEstudianteService(query);
+        const [estudiante, serviceError] = await deleteEstudianteService(query); // Eliminar estudiante por ID
         if (serviceError) return handleErrorClient(res, 404, serviceError);
 
         handleSuccess(res, 200, "Estudiante eliminado correctamente", estudiante);

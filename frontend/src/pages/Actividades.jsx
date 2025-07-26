@@ -2,8 +2,25 @@ import ActividadForm from '@components/ActividadForm';
 import { showSuccessAlert, showErrorAlert } from '@helpers/sweetAlert';
 import { useState, useEffect, useMemo } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { Box, Typography, Button, Stack, TextField, Card, CardContent, CardActions, Grid, Pagination, IconButton, InputAdornment } from '@mui/material';
-import { getActividades, createActividad, updateActividad, deleteActividad, getProximasActividades } from '@services/actividad.service.js';
+import { 
+    Box, 
+    Typography, 
+    Button, Stack, 
+    TextField, 
+    Card, 
+    CardContent, 
+    CardActions, 
+    Grid, 
+    Pagination, 
+    InputAdornment 
+} from '@mui/material';
+import { 
+    getActividades, 
+    createActividad, 
+    updateActividad, 
+    deleteActividad, 
+    getProximasActividades 
+} from '@services/actividad.service.js';
 import { useAuth } from '@context/AuthContext';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -17,21 +34,21 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 const Actividades = () => {
     const [actividades, setActividades] = useState([]);
     const [proximasActividades, setProximasActividades] = useState([]);
-    const [filtro, setFiltro] = useState('');
-    const [formOpen, setFormOpen] = useState(false);
+    const [filtro, setFiltro] = useState(''); // Estado para el filtro de búsqueda
+    const [formOpen, setFormOpen] = useState(false); // Para mostrar el formulario
     const [formData, setFormData] = useState(null); // Para edición
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false); // Estado de carga
     const [verTodas, setVerTodas] = useState(false);
     const [paginaActual, setPaginaActual] = useState(1);
     const [totalPaginas, setTotalPaginas] = useState(1);
-    const [filtrosAvanzados, setFiltrosAvanzados] = useState({
+    const [filtrosAvanzados, setFiltrosAvanzados] = useState({ // Filtros avanzados
         titulo: '',
         lugar: '',
         categoria: '',
         fechaInicio: '',
         fechaFin: ''
     });
-    const { user } = useAuth();
+    const { user } = useAuth(); // Obtener información del usuario autenticado
 
     // Cargar actividades según la vista
     useEffect(() => {

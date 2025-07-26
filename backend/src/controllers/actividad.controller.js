@@ -35,13 +35,22 @@ export async function createActividad(req, res) {
         const estudiantes = await AppDataSource.getRepository(Estudiante).find();
         const emails = estudiantes.map(e => e.email);
 
-        // Enviar el correo
+
+        // Enviar el correo mejorado
         await enviarCorreoEstudiantes(
             `Nueva actividad publicada: ${actividad.titulo}`,
-            `<p>Se ha publicado una nueva actividad: <b>${actividad.titulo}</b><br>
-            Fecha: ${actividad.fecha}<br>
-            Lugar: ${actividad.lugar}<br>
-            ¡No te la pierdas!</p>`,
+            `
+            <p>¡Hola estudiante!</p>
+            <p>Te informamos que se ha publicado una nueva actividad organizada por el Centro de Estudiantes:</p>
+            <ul>
+                <li><b>${actividad.titulo}</b></li>
+                <li><b>Fecha:</b> ${actividad.fecha}</li>
+                <li><b>Lugar:</b> ${actividad.lugar}</li>
+                <li><b>Descripción:</b> ${actividad.descripcion}</li>
+                <li><b>Recursos:</b> ${actividad.recursos || "No especificados"}</li>
+            </ul>
+            <p>¡No te la pierdas!</p>
+            `,
             emails
         );
 
@@ -99,7 +108,8 @@ export async function updateActividad(req, res) {
         if (req.body.responsableId) {
             const responsableId = parseInt(req.body.responsableId);
             if (isNaN(responsableId) || responsableId <= 0) {
-                return handleErrorClient(res, 400, "ID de responsable inválido", "El ID del responsable debe ser un número positivo");
+                return handleErrorClient(res, 400, 
+                    "ID de responsable inválido", "El ID del responsable debe ser un número positivo");
             }
         }
 

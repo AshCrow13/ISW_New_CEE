@@ -15,6 +15,7 @@ import { passportJwtSetup } from "./auth/passport.auth.js";
 import fs from "fs";
 import path from "path";
 
+// Crear carpeta de uploads si no existe
 const uploadsPath = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadsPath)) {
   fs.mkdirSync(uploadsPath);
@@ -68,7 +69,7 @@ async function setupServer() {
 
     passportJwtSetup();
 
-    app.use("/api", indexRoutes);
+    app.use("/api", indexRoutes); 
 
     app.listen(PORT, () => {
       console.log(`=> Servidor corriendo en ${HOST}:${PORT}/api`);

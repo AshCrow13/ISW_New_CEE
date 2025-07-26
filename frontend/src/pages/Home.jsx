@@ -18,35 +18,9 @@ const Home = () => {
           ¡Bienvenido al Portal del Centro de Estudiantes!
         </Typography>
         <Typography sx={{ mb: 4 }}>
-          texto wena wena
-        </Typography>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              startIcon={<EventIcon />}
-              onClick={() => navigate('/actividades')}
-              sx={{ minHeight: 80 }}
-            >
-              Actividades
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              startIcon={<ArticleIcon />}
-              onClick={() => navigate('/documentos')}
-              sx={{ minHeight: 80 }}
-            >
-              Documentos
-            </Button>
-          </Grid>
-
           
+        </Typography>
+        <Grid container spacing={3}> 
           {(
             <Grid item xs={12}>
               <Button 

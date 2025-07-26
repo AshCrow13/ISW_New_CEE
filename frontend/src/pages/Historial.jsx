@@ -4,38 +4,36 @@ import { useAuth } from '@context/AuthContext';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography, Paper, Stack, TextField } from '@mui/material';
 
-const Historial = () => {
+const Historial = () => { // Componente para mostrar el historial de acciones
     const [historial, setHistorial] = useState([]);
     const [loading, setLoading] = useState(false);
     const [filter, setFilter] = useState('');
-    const { user } = useAuth();
+    const { user } = useAuth(); // Obtener información del usuario autenticado**
 
-    useEffect(() => {
+    useEffect(() => { // Cargar historial al montar el componente
         fetchHistorial();
-        // eslint-disable-next-line
     }, []);
 
     const fetchHistorial = async () => {
         setLoading(true);
         try {
-            const data = await getHistorial();
-            // ✅ VALIDAR que data sea un array
+            const data = await getHistorial(); // Llamada al servicio para obtener el historial
             setHistorial(Array.isArray(data) ? data : []);
-        } catch (error) {
+        } catch (error) { // Manejo de errores al cargar el historial
             console.error('Error al cargar historial:', error);
             setHistorial([]);
         }
         setLoading(false);
     };
 
-    // ✅ SIMPLIFICAR: Columnas más directas
-    const columns = [
+    // Columnas más directas
+    const columns = [ // directamente los campos del backend
         { field: 'id', headerName: 'ID', width: 80 },
         { 
             field: 'fecha', 
             headerName: 'Fecha', 
             flex: 1,
-            renderCell: (params) => {
+            renderCell: (params) => { // Formatear la fecha
                 if (!params.row.fecha) return '-';
                 return new Date(params.row.fecha).toLocaleString('es-ES', {
                     year: 'numeric',
@@ -50,7 +48,7 @@ const Historial = () => {
             field: 'usuario', 
             headerName: 'Usuario', 
             flex: 1
-            // ✅ USAR directamente el campo, sin valueGetter
+            // directamente el campo, sin valueGetter
         },
         { field: 'accion', headerName: 'Acción', flex: 0.8 },
         { field: 'tipo', headerName: 'Tipo', flex: 0.8 },
@@ -58,33 +56,33 @@ const Historial = () => {
             field: 'detalle', 
             headerName: 'Detalle', 
             flex: 2
-            // ✅ USAR directamente el campo, sin valueGetter
+            // directamente el campo, sin valueGetter
         }
     ];
 
-    // ✅ MEJORAR: Filtrado más seguro
-    const filteredRows = useMemo(() => {
+    // Filtrado más seguro
+    const filteredRows = useMemo(() => { // Filtrar historial según el texto de búsqueda
         if (!filter) return historial;
-        return historial.filter(row => {
+        return historial.filter(row => { // Verificar que row sea un objeto y tenga los campos necesarios
             if (!row || typeof row !== 'object') return false;
             
             const usuario = typeof row.usuario === 'string' ? row.usuario : row.usuario?.nombreCompleto || '';
-            const accion = row.accion || '';
-            const detalle = row.detalle || '';
-            
-            return usuario.toLowerCase().includes(filter.toLowerCase()) ||
-                   accion.toLowerCase().includes(filter.toLowerCase()) ||
-                   detalle.toLowerCase().includes(filter.toLowerCase());
-        });
-    }, [historial, filter]);
+            const accion = row.accion || ''; // Acción realizada
+            const detalle = row.detalle || ''; // Detalle de la acción
 
-    // ✅ SIMPLIFICAR: Usar directamente los datos del backend
-    const rows = useMemo(
+            return usuario.toLowerCase().includes(filter.toLowerCase()) || 
+                    accion.toLowerCase().includes(filter.toLowerCase()) ||
+                    detalle.toLowerCase().includes(filter.toLowerCase());
+        });
+    }, [historial, filter]); // Filtrar historial según el texto de búsqueda
+
+    // Usar directamente los datos del backend
+    const rows = useMemo( // Transformar los datos filtrados en un formato adecuado para DataGrid
         () => filteredRows
             .filter(row => row && typeof row === 'object')
             .map((row, idx) => ({ 
-                ...row, // ✅ Usar todos los campos del backend
-                id: row.id ?? idx
+                ...row, // Usar todos los campos del backend
+                id: row.id ?? idx // Asegurar que cada fila tenga un ID único
             })),
         [filteredRows]
     );

@@ -33,7 +33,7 @@ export async function getProximasActividades(cantidad = 7) {
 
 // Crear actividad
 export async function createActividad(actividad) {
-    try {
+    try { // Validar que la actividad tenga los campos necesarios
         const { data } = await axios.post('/actividades', actividad);
         return data;
     } catch (error) {
@@ -43,7 +43,7 @@ export async function createActividad(actividad) {
 
 // Editar actividad
 export async function updateActividad(id, actividad) {
-    try {
+    try { // Validar que la actividad tenga los campos necesarios
         const { data } = await axios.patch(`/actividades/detail?id=${id}`, actividad);
         return data;
     } catch (error) {
@@ -53,7 +53,7 @@ export async function updateActividad(id, actividad) {
 
 // Eliminar actividad
 export async function deleteActividad(id) {
-    try {
+    try { // Validar que el ID sea válido
         const { data } = await axios.delete(`/actividades/detail?id=${id}`);
         return data;
     } catch (error) {

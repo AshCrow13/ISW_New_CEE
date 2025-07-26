@@ -22,15 +22,15 @@ export function uploadErrorHandler(req, res, next) {
   let maxSize = FILE_CONFIG.MAX_SIZE;
   let fileType;
   
-  if (req.path.includes('/documentos')) {
-    fileType = 'DOCUMENT';
+  if (req.path.includes("/documentos")) { // Verificar si es una ruta de documentos
+    fileType = "DOCUMENT";
     maxSize = FILE_CONFIG.DOCUMENT.maxSize;
-  } else if (req.path.includes('/imagenes')) {
-    fileType = 'IMAGE';
+  } else if (req.path.includes("/imagenes")) { // Verificar si es una ruta de imágenes
+    fileType = "IMAGE";
     maxSize = FILE_CONFIG.IMAGE.maxSize;
   }
   
-  if (fileSize > maxSize) {
+  if (fileSize > maxSize) { // Si el archivo excede el tamaño máximo permitido
     return handleErrorClient(
       res, 
       400, 
@@ -56,7 +56,7 @@ export function validateMimeType(allowedTypes) {
       return handleErrorClient(
         res, 
         400, 
-        `Tipo de archivo no permitido. Solo se aceptan: ${allowedTypes.join(', ')}`
+        "Tipo de archivo no permitido. Solo se aceptan: " + allowedTypes.join(", ")
       );
     }
     
