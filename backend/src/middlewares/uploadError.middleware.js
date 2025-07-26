@@ -11,9 +11,14 @@ export function uploadErrorHandler(req, res, next) {
     return handleErrorClient(res, 400, req.fileValidationError);
   }
 
-  // Si no se proporcionó ningún archivo
+  // Permitir que el archivo sea opcional en rutas de actividades
   if (!req.file) {
-    return handleErrorClient(res, 400, "No se ha subido ningún archivo o el archivo no es válido");
+    // Si la ruta es /documentos, el archivo es obligatorio
+    if (req.path.includes("/documentos")) {
+      return handleErrorClient(res, 400, "No se ha subido ningún archivo o el archivo no es válido");
+    }
+    // En otras rutas (como /actividades), permitir continuar sin archivo
+    return next();
   }
 
   // Si el archivo excede el tamaño máximo (este error lo maneja multer directamente)

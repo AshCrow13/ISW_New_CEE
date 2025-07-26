@@ -19,6 +19,7 @@ import {
 import { AppDataSource } from "../config/configDb.js";
 import Estudiante from "../entity/estudiante.entity.js";
 import { enviarCorreoEstudiantes } from "../helpers/email.helper.js";
+import { createDocumentoService } from "../services/documento.service.js";
 
 // CREATE
 export async function createActividad(req, res) {
@@ -28,9 +29,22 @@ export async function createActividad(req, res) {
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
         
         // Validar que el usuario tenga el rol adecuado        
+        // 1. Crear la actividad
         const [actividad, err] = await createActividadService(req.body, req.user); 
         if (err) return handleErrorClient(res, 400, err);
-        
+
+        // 2. Si hay archivo, crear el documento y asociarlo a la actividad
+        if (req.file) {
+            const docData = {
+                titulo: req.body.titulo || "Documento de actividad",
+                tipo: "Actividad",
+                urlArchivo: `/api/documentos/download/${req.file.filename}`,
+                subidoPor: req.user.email,
+                id_actividad: actividad.id,
+            };
+            await createDocumentoService(docData, req.user);
+        }
+
         // Buscar los emails de todos los estudiantes
         const estudiantes = await AppDataSource.getRepository(Estudiante).find();
         const emails = estudiantes.map(e => e.email);

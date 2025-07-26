@@ -33,8 +33,13 @@ export async function getProximasActividades(cantidad = 7) {
 
 // Crear actividad
 export async function createActividad(actividad) {
-    try { // Validar que la actividad tenga los campos necesarios
-        const { data } = await axios.post('/actividades', actividad);
+    try {
+        // Si es FormData (tiene archivo), enviar como multipart
+        let config = {};
+        if (actividad instanceof FormData) {
+            config.headers = { 'Content-Type': 'multipart/form-data' };
+        }
+        const { data } = await axios.post('/actividades', actividad, config);
         return data;
     } catch (error) {
         throw error.response?.data || { message: 'Error desconocido' };
