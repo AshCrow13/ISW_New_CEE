@@ -373,23 +373,6 @@
     margin: 0;
 }
 
-.btn-back {
-    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-back:hover {
-    background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
-    transform: translateY(-2px);
-}
-
 .loading-message {
     text-align: center;
     font-size: 18px;
@@ -705,21 +688,6 @@
 
 .info-card strong {
     color: #003366;
-}
-
-.btn-back {
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 16px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-}
-
-.btn-back:hover {
-    background-color: #545b62;
 }
 
 .editar-votacion .votacion-form {

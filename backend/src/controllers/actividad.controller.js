@@ -82,13 +82,26 @@ export async function getActividad(req, res) {
 // UPDATE
 export async function updateActividad(req, res) {
     try {
-        // Validar que la consulta y el cuerpo de la solicitud cumplan con los esquemas
+        console.log("Body recibido para actualización:", req.body);
+        
+        // Validar que la consulta cumpla con el esquema
         const { error: queryError } = actividadQuerySchema.validate(req.query);
         if (queryError) return handleErrorClient(res, 400, "Error en la consulta", queryError.message);
 
         // Validar que el cuerpo de la solicitud cumpla con el esquema de actualización
         const { error: bodyError } = actividadUpdateSchema.validate(req.body);
-        if (bodyError) return handleErrorClient(res, 400, "Error en los datos", bodyError.message);
+        if (bodyError) {
+            console.error("Error de validación:", bodyError.details[0].message);
+            return handleErrorClient(res, 400, "Error en los datos", bodyError.details[0].message);
+        }
+
+        // Verificar que el responsableId sea válido si se proporciona
+        if (req.body.responsableId) {
+            const responsableId = parseInt(req.body.responsableId);
+            if (isNaN(responsableId) || responsableId <= 0) {
+                return handleErrorClient(res, 400, "ID de responsable inválido", "El ID del responsable debe ser un número positivo");
+            }
+        }
 
         // Llamar al servicio para actualizar la actividad
         const [actividad, err] = await updateActividadService(req.query, req.body, req.user);
@@ -107,7 +120,7 @@ export async function updateActividad(req, res) {
             emails
         );
 
-        handleSuccess(res, 201, "Actividad creada correctamente y notificación enviada", actividad);
+        handleSuccess(res, 200, "Actividad actualizada correctamente", actividad);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }

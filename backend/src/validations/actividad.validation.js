@@ -67,7 +67,7 @@ export const actividadSchema = Joi.object({
         .messages({
             "any.only": "El estado debe ser publicada, pendiente o finalizada."
         })
-}).unknown(true); // ✅ CAMBIO PRINCIPAL: Permitir campos adicionales
+}).unknown(true); //
 
 export const actividadUpdateSchema = Joi.object({
     titulo: Joi.string()
@@ -83,9 +83,9 @@ export const actividadUpdateSchema = Joi.object({
         .max(100),
     categoria: Joi.string()
         .valid("Deportivo", "Recreativo", "Oficial"),
-    responsable: Joi.string()
-        .min(5)
-        .max(100),
+    responsableId: Joi.number()  // Este campo es el que está causando el problema
+        .integer()
+        .positive(),
     recursos: Joi.string()
         .max(500)
         .allow(null, ""),

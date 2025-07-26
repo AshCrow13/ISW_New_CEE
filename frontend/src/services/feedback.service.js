@@ -17,4 +17,14 @@ export async function postFeedback(data) {
     } catch (error) {
         return error.response.data;
     }
+}
+
+export async function deleteFeedback(id) {
+    try {
+        const response = await axios.delete(`/feedback/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error al eliminar feedback:', error);
+        return error.response?.data || { status: 'Error', message: 'Error al eliminar el feedback' };
+    }
 } 

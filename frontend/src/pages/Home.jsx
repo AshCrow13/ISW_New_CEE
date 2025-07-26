@@ -18,7 +18,7 @@ const Home = () => {
           ¡Bienvenido al Portal del Centro de Estudiantes!
         </Typography>
         <Typography sx={{ mb: 4 }}>
-          Aquí puedes gestionar actividades, consultar documentos, y revisar el historial de acciones del centro. Utiliza el menú superior para navegar.
+          texto wena wena
         </Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
@@ -46,7 +46,7 @@ const Home = () => {
             </Button>
           </Grid>
 
-          {/* Solo admin ve feedback */}
+          
           {(
             <Grid item xs={12}>
               <Button 
