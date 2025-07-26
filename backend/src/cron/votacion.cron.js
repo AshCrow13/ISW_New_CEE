@@ -6,7 +6,7 @@ import votacionSchema from "../entity/votacion.entity.js";
 let isRunning = false; // Flag para evitar ejecuciones simultáneas
 
 // Tarea programada para gestionar estados de votaciones automáticamente - Cada 5 minutos
-cron.schedule("*/5 * * * *", async () => {
+cron.schedule("*/1 * * * *", async () => {
     if (isRunning) {
         console.log("Cron job ya ejecutándose, omitiendo...");
         return;

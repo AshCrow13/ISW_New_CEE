@@ -19,7 +19,7 @@ export async function postVotacion(req, res) {
         const { errorb } = votacionBodyValidation.validate({ nombre, duracion, opciones, estado });
         if (errorb) return handleErrorClient(res, 400, errorb.message);
         const inicio = new Date();
-        const fin = new Date(inicio.getTime() + duracion * 60000); // 24 horas después
+        const fin = new Date(inicio.getTime() + duracion * 60000); 
          
         const body = {
             nombre,
@@ -27,7 +27,7 @@ export async function postVotacion(req, res) {
             duracion,
             fin,
             estado: true || req.body.estado, // Por defecto, la votación está abierta
-            opciones // Incluimos cualquier otro campo adicional que pueda venir en el body
+            opciones 
         };
 
         const [votacion, errorVotacion] = await postVotacionService(body);
