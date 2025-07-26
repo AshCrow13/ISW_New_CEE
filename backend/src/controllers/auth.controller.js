@@ -70,6 +70,20 @@ export async function registerEstudiante(req, res) {
       return handleErrorClient(res, 400, "Error al registrar", errMsg);
     }
 
+    // Enviar correo de bienvenida
+    try {
+      const { enviarCorreoEstudiantes } = await import("../helpers/email.helper.js");
+      await enviarCorreoEstudiantes(
+        "¡Bienvenido/a al Centro de Estudiantes!",
+        `<p>Hola <b>${newEstudiante.nombreCompleto}</b>,<br>
+        Tu registro ha sido exitoso.<br>
+        Ahora puedes acceder a toda la información y actividades del Centro de Estudiantes.<br>
+        ¡Bienvenido/a!</p>`,
+        newEstudiante.email
+      );
+    } catch (err) {
+      console.error("Error al enviar correo de bienvenida:", err.message);
+    }
     handleSuccess(res, 201, "Estudiante registrado exitosamente", newEstudiante);
   } catch (error) {
     handleErrorServer(res, 500, error.message);
