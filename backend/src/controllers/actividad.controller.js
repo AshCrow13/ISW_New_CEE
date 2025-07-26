@@ -20,6 +20,7 @@ import { AppDataSource } from "../config/configDb.js";
 import Estudiante from "../entity/estudiante.entity.js";
 import { enviarCorreoEstudiantes } from "../helpers/email.helper.js";
 import { createDocumentoService } from "../services/documento.service.js";
+import path from "path";
 
 // CREATE
 export async function createActividad(req, res) {
@@ -34,6 +35,7 @@ export async function createActividad(req, res) {
         if (err) return handleErrorClient(res, 400, err);
 
         // 2. Si hay archivo, crear el documento y asociarlo a la actividad
+        let archivoAdjunto = null;
         if (req.file) {
             const docData = {
                 titulo: req.body.titulo || "Documento de actividad",
@@ -43,6 +45,12 @@ export async function createActividad(req, res) {
                 id_actividad: actividad.id,
             };
             await createDocumentoService(docData, req.user);
+
+            // Preparar adjunto para el correo
+            archivoAdjunto = {
+                filename: req.file.originalname,
+                path: path.join(process.cwd(), "uploads", req.file.filename)
+            };
         }
 
         // Buscar los emails de todos los estudiantes
@@ -50,7 +58,7 @@ export async function createActividad(req, res) {
         const emails = estudiantes.map(e => e.email);
 
 
-        // Enviar el correo mejorado
+        // Enviar el correo mejorado con adjunto si existe
         await enviarCorreoEstudiantes(
             `Nueva actividad publicada: ${actividad.titulo}`,
             `
@@ -65,7 +73,8 @@ export async function createActividad(req, res) {
             </ul>
             <p>¡No te la pierdas!</p>
             `,
-            emails
+            emails,
+            archivoAdjunto ? [archivoAdjunto] : undefined
         );
 
         handleSuccess(res, 201, "Actividad creada correctamente y notificación enviada", actividad);
