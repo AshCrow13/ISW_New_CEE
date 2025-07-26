@@ -25,7 +25,7 @@ import {
   Cancel as CancelIcon,
   BarChart as BarChartIcon
 } from '@mui/icons-material';
-import { useVotacionDetalle } from '@hooks/useVotacionDetalle.jsx';
+import { useVotacionDetalle } from '@hooks/votacion/useVotacionDetalle.jsx';
 
 const VotacionDetalleNuevo = ({ votacionSeleccionada, loading, user, onVolver, handleVotar }) => {
   const { conteo, votos, loadingResultados, errorResultados } = useVotacionDetalle({

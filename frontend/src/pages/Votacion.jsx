@@ -5,7 +5,7 @@ import VotacionTabla from '@components/VotacionTabla.jsx';
 import VotacionDetalleNuevo from '@components/VotacionDetalleNuevo.jsx';
 import VotacionEditar from '@components/VotacionEditar.jsx';
 import HeaderVista from '@components/VotacionHeader.jsx';
-import useVotaciones from '@hooks/useVotaciones.jsx';
+import useVotaciones from '@hooks/votacion/useVotaciones.jsx';
 import { Container, Paper, Typography, Box, Fade } from '@mui/material';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 
