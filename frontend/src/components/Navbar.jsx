@@ -1,4 +1,6 @@
 import { AppBar, Toolbar, Typography, IconButton, Button, Box, Drawer, List, ListItem, ListItemText } from "@mui/material";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import PerfilDialog from './PerfilDialog';
 import MenuIcon from "@mui/icons-material/Menu";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -9,6 +11,7 @@ const Navbar = () => { // Componente de navegación
     const user = JSON.parse(sessionStorage.getItem('usuario')) || '';
     const userRole = user?.rol;
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [perfilOpen, setPerfilOpen] = useState(false);
 
     const navLinks = [ // Enlaces de navegación
         { to: "/home", label: "Inicio" },
@@ -35,8 +38,11 @@ const Navbar = () => { // Componente de navegación
                 <ListItemText primary={link.label} />
             </ListItem>
             ))}
+            <ListItem button onClick={() => setPerfilOpen(true)}>
+                <ListItemText primary="Perfil" />
+            </ListItem>
             <ListItem button onClick={handleLogout}>
-            <ListItemText primary="Cerrar sesión" />
+                <ListItemText primary="Cerrar sesión" />
             </ListItem>
         </List>
         </Box>
@@ -59,19 +65,23 @@ const Navbar = () => { // Componente de navegación
             </Typography>
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
                 {navLinks.map((link) => (
-                <Button
-                    key={link.to}
-                    color="inherit"
-                    component={NavLink}
-                    to={link.to}
-                    sx={{ mx: 1 }}
-                    style={({ isActive }) => ({ textDecoration: isActive ? 'underline' : 'none' })}
-                >
-                    {link.label}
-                </Button>
+                    <Button
+                        key={link.to}
+                        color="inherit"
+                        component={NavLink}
+                        to={link.to}
+                        sx={{ mx: 1 }}
+                        style={({ isActive }) => ({ textDecoration: isActive ? 'underline' : 'none' })}
+                    >
+                        {link.label}
+                    </Button>
                 ))}
-                <Button color="inherit" onClick={handleLogout} sx={{ mx: 1 }}>
-                Cerrar sesión
+                <Button color="inherit" onClick={() => setPerfilOpen(true)} sx={{ mx: 1, display: 'inline-flex', alignItems: 'center' }}>
+                    <AccountCircleIcon sx={{ mr: 0.5 }} />
+                    Perfil
+                    </Button>
+                    <Button color="inherit" onClick={handleLogout} sx={{ mx: 1 }}>
+                    Cerrar sesión
                 </Button>
             </Box>
             </Toolbar>
@@ -85,6 +95,7 @@ const Navbar = () => { // Componente de navegación
         >
             {drawerList}
         </Drawer>
+        <PerfilDialog open={perfilOpen} onClose={() => setPerfilOpen(false)} />
         </>
     );
 };
