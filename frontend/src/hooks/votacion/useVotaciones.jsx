@@ -82,14 +82,14 @@ const useVotaciones = () => {
     try {
       const resultado = await deleteVotacion(id);
       if (resultado.status === 'Success') {
-        alert('✅ Votación eliminada exitosamente');
+        alert('Votación eliminada exitosamente');
         cargarVotaciones(); // Recargar la tabla
       } else {
-        alert('❌ Error al eliminar: ' + (resultado.message || 'Error desconocido'));
+        alert('Error al eliminar: ' + (resultado.message || 'Error desconocido'));
       }
     } catch (error) {
       console.error('Error al eliminar votación:', error);
-      alert('❌ Error al eliminar la votación');
+      alert('Error al eliminar la votación');
     }
   };
 
@@ -98,15 +98,15 @@ const useVotaciones = () => {
     try {
       const resultado = await updateVotacion(id, datosActualizados);
       if (resultado.status === 'Success') {
-        alert('✅ Votación actualizada exitosamente');
+        alert('Votación actualizada exitosamente');
         setView('tabla');
         cargarVotaciones(); // Recargar la tabla
       } else {
-        alert('❌ Error al actualizar: ' + (resultado.message || 'Error desconocido'));
+        alert('Error al actualizar: ' + (resultado.message || 'Error desconocido'));
       }
     } catch (error) {
       console.error('Error al actualizar votación:', error);
-      alert('❌ Error al actualizar la votación');
+      alert('Error al actualizar la votación');
     }
   };
 
@@ -115,16 +115,16 @@ const useVotaciones = () => {
     try {
       const resultado = await postVotacion(datosVotacion);
       if (resultado.status === 'Success') {
-        alert('✅ Votación creada exitosamente');
+        alert('Votación creada exitosamente');
         setView('tabla');
         cargarVotaciones(); // Recargar la tabla
         return { success: true };
       } else {
-        alert('❌ Error al crear la votación: ' + (resultado.message || 'Error desconocido'));
+        alert('Error al crear la votación: ' + (resultado.message || 'Error desconocido'));
         return { success: false, error: resultado.message };
       }
     } catch (error) {
-      alert('❌ Error al crear la votación');
+      alert('Error al crear la votación');
       return { success: false, error: error.message };
     }
   };
@@ -132,19 +132,18 @@ const useVotaciones = () => {
 
   //Votar en una opción de votación
   const handleVotar = async (votacionId, opcionId) => {
-    console.log('Votando por la opción:', votacionId, opcionId);
     try {
       const resultado = await postVoto({ votacionId , opcionId });
       if (resultado.status === 'Success') {
-        alert('✅ Voto registrado exitosamente');
+        alert('Voto registrado exitosamente');
         return { success: true };
       } else {
-        alert('❌ Error al votar: ' + (resultado.message || 'Error desconocido'));
+        alert('Error al votar: ' + (resultado.message || 'Error desconocido'));
         return { success: false, error: resultado.message };
       }
     } catch (error) {
       console.error('Error al votar:', error);
-      alert('❌ Error al registrar el voto');
+      alert('Error al registrar el voto');
       return { success: false, error: error.message };
     }
   };

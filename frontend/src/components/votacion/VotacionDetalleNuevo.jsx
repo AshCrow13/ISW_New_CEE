@@ -25,7 +25,7 @@ import {
   Cancel as CancelIcon,
   BarChart as BarChartIcon
 } from '@mui/icons-material';
-import { useVotacionDetalle } from '@hooks/useVotacionDetalle.jsx';
+import { useVotacionDetalle } from '@hooks/votacion/useVotacionDetalle.jsx';
 
 const VotacionDetalleNuevo = ({ votacionSeleccionada, loading, user, onVolver, handleVotar }) => {
   const { conteo, votos, loadingResultados, errorResultados } = useVotacionDetalle({
@@ -378,7 +378,7 @@ const VotacionDetalleNuevo = ({ votacionSeleccionada, loading, user, onVolver, h
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <Typography variant="body1" sx={{ mb: 2, fontWeight: 600 }}>
-                      📊 Resumen de Votación
+                        Resumen de Votación
                     </Typography>
                     <Typography variant="body2" sx={{ mb: 1 }}>
                       <strong>Total de votos emitidos:</strong> {totalVotos}

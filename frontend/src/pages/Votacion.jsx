@@ -1,11 +1,11 @@
 import { useContext } from 'react';
 import { AuthContext } from '@context/AuthContext.jsx';
-import FormularioCrearVotacion from '@components/VotacionFormularioCrear.jsx';
-import VotacionTabla from '@components/VotacionTabla.jsx';
-import VotacionDetalleNuevo from '@components/VotacionDetalleNuevo.jsx';
-import VotacionEditar from '@components/VotacionEditar.jsx';
-import HeaderVista from '@components/VotacionHeader.jsx';
-import useVotaciones from '@hooks/useVotaciones.jsx';
+import FormularioCrearVotacion from '@components/votacion/VotacionFormularioCrear.jsx';
+import VotacionTabla from '@components/votacion/VotacionTabla.jsx';
+import VotacionDetalleNuevo from '@components/votacion/VotacionDetalleNuevo.jsx';
+import VotacionEditar from '@components/votacion/VotacionEditar.jsx';
+import VotacionHeader from '@components/votacion/VotacionHeader.jsx';
+import useVotaciones from '@hooks/votacion/useVotaciones.jsx';
 import { Container, Paper, Typography, Box, Fade } from '@mui/material';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 
@@ -57,7 +57,7 @@ const Votacion = () => {
           {/* Vista de crear nueva votación */}
           <Fade in={view === 'crear'} unmountOnExit>
             <Box>
-              <HeaderVista titulo="Nueva Votación" volverAlMenu={volverAlMenu} />
+              <VotacionHeader titulo="Vamos a Crear una Nueva Votación" volverAlMenu={volverAlMenu} />
               <FormularioCrearVotacion
                 onSubmit={handleCrearVotacion}
                 onSuccess={volverAlMenu}

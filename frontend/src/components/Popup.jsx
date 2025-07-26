@@ -5,14 +5,14 @@ import QuestionIcon from '@assets/QuestionCircleIcon.svg';
 
 export default function Popup({ show, setShow, data, action }) {
     
-    console.log('🎯 Popup recibió data:', data);
+    console.log(' Popup recibió data:', data);
     
     const userData = data && data.length > 0 ? data[0] : {};
     
-    console.log('👤 userData extraído:', userData);
+    console.log(' userData extraído:', userData);
 
     const handleSubmit = (data) => {
-        console.log('📤 Popup enviando datos:', data);
+        console.log(' Popup enviando datos:', data);
         action(data);
     };
 
