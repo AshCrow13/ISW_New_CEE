@@ -1,6 +1,6 @@
 import { EntitySchema } from "typeorm";
 
-const AsistenciaSchema = new EntitySchema({
+const Asistencia = new EntitySchema({
   name: "Asistencia",
   tableName: "asistencia",
   columns: {
@@ -11,6 +11,16 @@ const AsistenciaSchema = new EntitySchema({
     idInstancia: {
       type: "int",
       primary: true,
+    },
+    nombreCompleto: {
+      type: "varchar",
+      length: 100,
+      nullable: false,
+    },
+    rut: {
+      type: "varchar",
+      length: 12,
+      nullable: false,
     },
   },
   relations: {
@@ -35,4 +45,4 @@ const AsistenciaSchema = new EntitySchema({
   },
 });
 
-export default AsistenciaSchema;
+export default Asistencia;

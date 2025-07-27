@@ -1,12 +1,12 @@
 "use strict";
 import Asistencia from "../entity/asistencia.entity.js";
 import { AppDataSource } from "../config/configDb.js";
+import { getEstudianteService } from "./estudiante.service.js";
 
 // Create
 export async function createAsistenciaService(data) {
     try {
         const repo = AppDataSource.getRepository(Asistencia);
-        
         // Verificar si ya existe una asistencia con el mismo correo e idInstancia
         const asistenciaExistente = await repo.findOne({
             where: {
@@ -14,12 +14,20 @@ export async function createAsistenciaService(data) {
                 idInstancia: data.idInstancia
             }
         });
-        
         if (asistenciaExistente) {
             return [null, "Ya existe una asistencia registrada para este estudiante en esta instancia"];
         }
-        
-        const asistencia = repo.create(data);
+        // Buscar estudiante para obtener nombreCompleto y rut
+        const [estudiante, errEst] = await getEstudianteService({ email: data.correo });
+        if (errEst || !estudiante) {
+            return [null, "Estudiante no encontrado"];
+        }
+        const asistencia = repo.create({
+            correo: data.correo,
+            idInstancia: data.idInstancia,
+            nombreCompleto: estudiante.nombreCompleto,
+            rut: estudiante.rut
+        });
         const resultado = await repo.save(asistencia);
         return [resultado, null];
     } catch (error) {
@@ -63,6 +71,15 @@ export async function updateAsistenciaService(query, data) {
         const repo = AppDataSource.getRepository(Asistencia);
         const asistencia = await repo.findOne({ where: query });
         if (!asistencia) return [null, "Asistencia no encontrada"];
+        // Si se actualiza correo, buscar estudiante y actualizar nombre/rut
+        if (data.correo && data.correo !== asistencia.correo) {
+            const [estudiante, errEst] = await getEstudianteService({ email: data.correo });
+            if (errEst || !estudiante) {
+                return [null, "Estudiante no encontrado"];
+            }
+            asistencia.nombreCompleto = estudiante.nombreCompleto;
+            asistencia.rut = estudiante.rut;
+        }
         Object.assign(asistencia, data);
         await repo.save(asistencia);
         return [asistencia, null];

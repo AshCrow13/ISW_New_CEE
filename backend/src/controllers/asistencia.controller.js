@@ -17,30 +17,24 @@ import {
 export async function createAsistencia(req, res) {
   try {
     const { correo, idInstancia, clave } = req.body;
-    
     // Validar existencia de estudiante
     const [estudiante, errEst] = await getEstudianteService({ email: correo });
     if (errEst) return handleErrorClient(res, 404, errEst);
-    
     // Validar existencia de instancia
     const [instancia, errInst] = await getInstanciaService({ id: idInstancia });
     if (errInst) return handleErrorClient(res, 404, errInst);
-    
     // Verificar que esté habilitada y clave coincida
     if (!instancia.AsistenciaAbierta) {
       return handleErrorClient(res, 403, "La asistencia no está habilitada");
     }
-    
     if (instancia.ClaveAsistencia !== clave) {
       return handleErrorClient(res, 403, "Clave incorrecta");
     }
-    
-    // Registrar asistencia
+    // Registrar asistencia (nombre y rut se obtienen en el service)
     const nuevaAsistencia = { 
       correo, 
       idInstancia 
     };
-    
     const [asistencia, err] = await createAsistenciaService(nuevaAsistencia);
     if (err) {
       if (err.includes("Ya existe")) {
@@ -48,7 +42,6 @@ export async function createAsistencia(req, res) {
       }
       return handleErrorServer(res, 500, err);
     }
-    
     handleSuccess(res, 201, "Asistencia registrada con éxito", asistencia);
   } catch (error) {
     console.error("Error en createAsistencia:", error);
