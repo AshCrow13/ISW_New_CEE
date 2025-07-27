@@ -6,6 +6,24 @@ import { updateUser, deleteUser } from '../services/user.service';
 
 export default function PerfilDialog({ open, onClose }) { // Componente de diálogo para el perfil del usuario
     const { user } = useAuth();
+
+    // Si user es null, mostrar mensaje de error y botón para cerrar
+    if (!user) {
+        return (
+            <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+                <DialogTitle>Perfil de usuario</DialogTitle>
+                <DialogContent>
+                    <Typography color="error" sx={{ mb: 2 }}>
+                        No se pudo cargar la información del usuario.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={onClose} variant="contained">Cerrar</Button>
+                </DialogActions>
+            </Dialog>
+        );
+    }
+
     const [nombre, setNombre] = useState(user?.nombreCompleto || '');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
