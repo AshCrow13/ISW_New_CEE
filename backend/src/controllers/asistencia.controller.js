@@ -16,31 +16,25 @@ import {
 // Create
 export async function createAsistencia(req, res) {
   try {
-    const { correo, idInstancia, clave } = req.body;
-    
+    const { rut, idInstancia, clave } = req.body;
     // Validar existencia de estudiante
-    const [estudiante, errEst] = await getEstudianteService({ email: correo });
+    const [estudiante, errEst] = await getEstudianteService({ rut: rut });
     if (errEst) return handleErrorClient(res, 404, errEst);
-    
     // Validar existencia de instancia
-    const [instancia, errInst] = await getInstanciaService({ id: idInstancia });
+    const [instancia, errInst] = await getInstanciaService(idInstancia);
     if (errInst) return handleErrorClient(res, 404, errInst);
-    
     // Verificar que esté habilitada y clave coincida
     if (!instancia.AsistenciaAbierta) {
       return handleErrorClient(res, 403, "La asistencia no está habilitada");
     }
-    
     if (instancia.ClaveAsistencia !== clave) {
       return handleErrorClient(res, 403, "Clave incorrecta");
     }
-    
-    // Registrar asistencia
+    // Registrar asistencia (nombre se obtiene en el service)
     const nuevaAsistencia = { 
-      correo, 
+      rut, 
       idInstancia 
     };
-    
     const [asistencia, err] = await createAsistenciaService(nuevaAsistencia);
     if (err) {
       if (err.includes("Ya existe")) {
@@ -48,7 +42,6 @@ export async function createAsistencia(req, res) {
       }
       return handleErrorServer(res, 500, err);
     }
-    
     handleSuccess(res, 201, "Asistencia registrada con éxito", asistencia);
   } catch (error) {
     console.error("Error en createAsistencia:", error);
@@ -70,8 +63,8 @@ export async function getAsistencias(req, res) {
 // Read one
 export async function getAsistencia(req, res) {
   try {
-    const { correo, idInstancia } = req.query;
-    const [asistencia, err] = await getAsistenciaService({ correo, idInstancia });
+    const { rut, idInstancia } = req.query;
+    const [asistencia, err] = await getAsistenciaService({ rut, idInstancia });
     if (err) return handleErrorClient(res, 404, err);
     handleSuccess(res, 200, "Asistencia encontrada", asistencia);
   } catch (error) {
@@ -82,8 +75,8 @@ export async function getAsistencia(req, res) {
 // Update
 export async function updateAsistencia(req, res) {
   try {
-    const { correo, idInstancia } = req.query;
-    const [asistencia, err] = await updateAsistenciaService({ correo, idInstancia }, req.body);
+    const { rut, idInstancia } = req.query;
+    const [asistencia, err] = await updateAsistenciaService({ rut, idInstancia }, req.body);
     if (err) return handleErrorClient(res, 404, err);
     handleSuccess(res, 200, "Asistencia actualizada correctamente", asistencia);
   } catch (error) {
@@ -94,8 +87,8 @@ export async function updateAsistencia(req, res) {
 // Delete
 export async function deleteAsistencia(req, res) {
   try {
-    const { correo, idInstancia } = req.query;
-    const [asistencia, err] = await deleteAsistenciaService({ correo, idInstancia });
+    const { rut, idInstancia } = req.query;
+    const [asistencia, err] = await deleteAsistenciaService({ rut, idInstancia });
     if (err) return handleErrorClient(res, 404, err);
     handleSuccess(res, 200, "Asistencia eliminada correctamente", asistencia);
   } catch (error) {
