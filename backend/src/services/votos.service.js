@@ -64,3 +64,24 @@ export async function getConteo(votacionId) {
         return [null, "Error interno del servidor"];
     }
 }
+
+//Eliminar todos los votos de una votación específica
+export async function deleteVotosByVotacion(votacionId) {
+    try {
+        const votoRep = AppDataSource.getRepository(votosSchema);
+        const votos = await votoRep.find({
+            where: {
+                votacion: { id: votacionId },
+            },
+        });
+        
+        if (votos.length > 0) {
+            await votoRep.remove(votos);
+        }
+        
+        return [votos.length, null];
+    } catch (error) {
+        console.error("Error al eliminar los votos:", error);
+        return [null, "Error interno del servidor"];
+    }
+}
