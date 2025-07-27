@@ -7,7 +7,7 @@ export async function login(dataUser) {
     try {
         // Validaciones preliminares en el cliente
         if (dataUser.email && (!dataUser.email.includes('@') || !dataUser.email.match(/@(alumnos\.)?ubiobio\.cl$/))) {
-            return { 
+            return { // Error de validación de email
                 status: 'Error', 
                 dataInfo: 'email',
                 message: 'Debe ingresar un correo institucional válido'
@@ -39,8 +39,8 @@ export async function login(dataUser) {
 
         // Soportar login por email o RUT
         const loginData = {
-            ...(dataUser.email && { email: dataUser.email }),
-            ...(dataUser.rut && { rut: dataUser.rut }),
+            ...(dataUser.email && { email: dataUser.email }), // Si se proporciona email, usarlo
+            ...(dataUser.rut && { rut: dataUser.rut }), // Si se proporciona RUT, usarlo
             password: dataUser.password
         };
 
@@ -53,13 +53,13 @@ export async function login(dataUser) {
             
             const token = data.data.token;
             
-            // ✅ USAR SOLO LOCALSTORAGE (las cookies no funcionan)
+            // Guardar el token en localStorage
             localStorage.setItem('jwt-auth', token);
             
             // Verificar que se guardó correctamente
-            const savedToken = localStorage.getItem('jwt-auth');
-            
-            // ✅ CONFIGURAR EN HEADERS INMEDIATAMENTE
+            const savedToken = localStorage.getItem('jwt-auth'); // Asegurarse de que el token se guardó correctamente
+
+            // Configurar en headers inmediatamente
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             
             return response.data;
@@ -72,19 +72,19 @@ export async function login(dataUser) {
                 const { dataInfo } = error.response.data.details;
                 
                 if (dataInfo === 'email') {
-                    return { 
+                    return {  // Error de validación de email
                         status: 'Error', 
                         dataInfo: 'email',
                         message: error.response.data.message || 'El correo electrónico no está registrado'
                     };
                 } else if (dataInfo === 'rut') {
-                    return { 
+                    return {  // Error de validación de RUT
                         status: 'Error', 
                         dataInfo: 'rut',
                         message: error.response.data.message || 'El RUT ingresado no está registrado'
                     };
                 } else if (dataInfo === 'password') {
-                    return { 
+                    return {  // Error de validación de contraseña
                         status: 'Error', 
                         dataInfo: 'password',
                         message: error.response.data.message || 'La contraseña es incorrecta'
@@ -139,7 +139,7 @@ export async function register(data) {
             };
         }
 
-        if (!data.password || data.password.length < 8) {
+        if (!data.password || data.password.length < 8) { // Validar longitud de la contraseña
             return {
                 status: 'Error',
                 dataInfo: 'password',
@@ -149,14 +149,14 @@ export async function register(data) {
 
         const dataRegister = convertirMinusculas(data);
         const { nombreCompleto, email, rut, password } = dataRegister;
-        const response = await axios.post('/auth/register', {
+        const response = await axios.post('/auth/register', { // Enviar datos de registro
             nombreCompleto,
             email,
             rut,
             password
         });
         return response.data;
-    } catch (error) {
+    } catch (error) { // Mejorar manejo de errores específicos
         if (error.response && error.response.data) {
             // Personalizar errores del backend
             if (error.response.data.details) {

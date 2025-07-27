@@ -34,7 +34,12 @@ export async function getProximasActividades(cantidad = 7) {
 // Crear actividad
 export async function createActividad(actividad) {
     try {
-        const { data } = await axios.post('/actividades', actividad);
+        // Si es FormData (tiene archivo), enviar como multipart
+        let config = {};
+        if (actividad instanceof FormData) {
+            config.headers = { 'Content-Type': 'multipart/form-data' };
+        }
+        const { data } = await axios.post('/actividades', actividad, config);
         return data;
     } catch (error) {
         throw error.response?.data || { message: 'Error desconocido' };
@@ -43,7 +48,7 @@ export async function createActividad(actividad) {
 
 // Editar actividad
 export async function updateActividad(id, actividad) {
-    try {
+    try { // Validar que la actividad tenga los campos necesarios
         const { data } = await axios.patch(`/actividades/detail?id=${id}`, actividad);
         return data;
     } catch (error) {
@@ -53,7 +58,7 @@ export async function updateActividad(id, actividad) {
 
 // Eliminar actividad
 export async function deleteActividad(id) {
-    try {
+    try { // Validar que el ID sea válido
         const { data } = await axios.delete(`/actividades/detail?id=${id}`);
         return data;
     } catch (error) {

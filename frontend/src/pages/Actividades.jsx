@@ -2,8 +2,26 @@ import ActividadForm from '@components/ActividadForm';
 import { showSuccessAlert, showErrorAlert } from '@helpers/sweetAlert';
 import { useState, useEffect, useMemo } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { Box, Typography, Button, Stack, TextField, Card, CardContent, CardActions, Grid, Pagination, IconButton, InputAdornment } from '@mui/material';
-import { getActividades, createActividad, updateActividad, deleteActividad, getProximasActividades } from '@services/actividad.service.js';
+import { 
+    Box, 
+    Typography, 
+    Button, Stack, 
+    TextField, 
+    Card, 
+    CardContent, 
+    CardActions, 
+    Grid, 
+    Pagination, 
+    InputAdornment 
+} from '@mui/material';
+import { 
+    getActividades, 
+    createActividad, 
+    updateActividad, 
+    deleteActividad, 
+    getProximasActividades 
+} from '@services/actividad.service.js';
+import { downloadDocumento } from '@services/documento.service.js';
 import { useAuth } from '@context/AuthContext';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -17,21 +35,21 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 const Actividades = () => {
     const [actividades, setActividades] = useState([]);
     const [proximasActividades, setProximasActividades] = useState([]);
-    const [filtro, setFiltro] = useState('');
-    const [formOpen, setFormOpen] = useState(false);
+    const [filtro, setFiltro] = useState(''); // Estado para el filtro de búsqueda
+    const [formOpen, setFormOpen] = useState(false); // Para mostrar el formulario
     const [formData, setFormData] = useState(null); // Para edición
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false); // Estado de carga
     const [verTodas, setVerTodas] = useState(false);
     const [paginaActual, setPaginaActual] = useState(1);
     const [totalPaginas, setTotalPaginas] = useState(1);
-    const [filtrosAvanzados, setFiltrosAvanzados] = useState({
+    const [filtrosAvanzados, setFiltrosAvanzados] = useState({ // Filtros avanzados
         titulo: '',
         lugar: '',
         categoria: '',
         fechaInicio: '',
         fechaFin: ''
     });
-    const { user } = useAuth();
+    const { user } = useAuth(); // Obtener información del usuario autenticado
 
     // Cargar actividades según la vista
     useEffect(() => {
@@ -218,6 +236,7 @@ const Actividades = () => {
                 await updateActividad(formData.id, data);
                 showSuccessAlert('Editada', 'Actividad editada');
             } else {
+                // Si es FormData (tiene archivo), usar createActividad con multipart
                 await createActividad(data);
                 showSuccessAlert('Creada', 'Actividad creada');
             }
@@ -228,6 +247,21 @@ const Actividades = () => {
             showErrorAlert('Error', e.message || 'Ocurrió un error');
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Descargar documento asociado a actividad
+    const handleDownloadDocumento = async (docId, titulo) => {
+        try {
+            const blob = await downloadDocumento(docId);
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = titulo || `documento_${docId}`;
+            link.click();
+            window.URL.revokeObjectURL(url);
+        } catch (e) {
+            showErrorAlert('Error', e.message || 'No se pudo descargar el archivo');
         }
     };
 
@@ -335,6 +369,17 @@ const Actividades = () => {
                                             <Typography variant="h5" gutterBottom fontWeight="bold" mt={1}>
                                                 {actividad.titulo}
                                             </Typography>
+                                            {/* Botón de descarga si tiene documento asociado */}
+                                            {actividad.documentos && actividad.documentos.length > 0 && (
+                                                <Button
+                                                    size="small"
+                                                    variant="outlined"
+                                                    sx={{ mb: 1 }}
+                                                    onClick={() => handleDownloadDocumento(actividad.documentos[0].id, actividad.documentos[0].titulo)}
+                                                >
+                                                    Descargar documento
+                                                </Button>
+                                            )}
                                             <Typography 
                                                 variant="body1" 
                                                 color="text.secondary" 

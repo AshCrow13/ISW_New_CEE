@@ -8,7 +8,7 @@ import {
 
 export function hasRoles(roles = []) {
     return async function (req, res, next) {
-        try {
+        try { // Verificar que el usuario esté autenticado
         if (!req.user || !req.user.email) {
             return handleErrorClient(res, 401, "No autenticado o usuario no válido.");
         }

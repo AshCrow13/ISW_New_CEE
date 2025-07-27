@@ -25,21 +25,21 @@ import sharp from "sharp"; // Agregar sharp para optimizar imágenes
 // CREATE - Subida de archivo
 export async function createDocumento(req, res) {
     try {
-        // ✅ PRIMERA VALIDACIÓN: Verificar que el archivo existe
+        // Verificar que el archivo existe
         if (!req.file) {
             return handleErrorClient(res, 400, "Debe adjuntar un archivo válido.");
         }
 
         // Optimizar imagen si el archivo es una imagen
-        const fileExt = path.extname(req.file.originalname).toLowerCase();
-        const isImage = ['.jpg', '.jpeg', '.png', '.webp'].includes(fileExt);
+        const fileExt = path.extname(req.file.originalname).toLowerCase(); // Obtener la extensión del archivo
+        const isImage = [".jpg", ".jpeg", ".png", ".webp"].includes(fileExt); // Verificar si es una imagen
         
         if (isImage) {
             try {
                 // Ruta del archivo original
                 const originalPath = req.file.path;
                 // Ruta para la imagen optimizada
-                const optimizedPath = `${originalPath.substring(0, originalPath.lastIndexOf('.'))}_opt${fileExt}`;
+                const optimizedPath = `${originalPath.substring(0, originalPath.lastIndexOf("."))}_opt${fileExt}`;
                 
                 // Optimizar imagen usando sharp
                 await sharp(originalPath)
@@ -56,21 +56,22 @@ export async function createDocumento(req, res) {
             }
         }
         
-        // ✅ CONSTRUIR los datos del documento con la URL generada
+        // los datos del documento con la URL generada
         const documentoData = {
             titulo: req.body.titulo,
             tipo: req.body.tipo,
             urlArchivo: `/api/documentos/download/${req.file.filename}`, // URL generada
             subidoPor: req.user.email,
-            id_actividad: req.body.id_actividad || null
+            id_actividad: req.body.id_actividad || null // ID de actividad opcional
         };
 
-        // ✅ SEGUNDA VALIDACIÓN: Ahora validar con todos los datos completos
-        const { error } = documentoSchema.validate(documentoData);
+        // Ahora validar con todos los datos completos
+        const { error } = documentoSchema.validate(documentoData); // Validar esquema
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
         
-        // ✅ CREAR el documento en la base de datos
-        const [documento, err] = await createDocumentoService(documentoData, req.user);
+        // el documento en la base de datos
+        // Llamar al servicio para crear el documento
+        const [documento, err] = await createDocumentoService(documentoData, req.user); 
         if (err) return handleErrorClient(res, 400, err);
 
         handleSuccess(res, 201, "Documento creado correctamente", documento);
@@ -84,7 +85,7 @@ export async function getDocumentos(req, res) {
     try {
         // Validar que la consulta cumpla con el esquema
         const [documentos, err] = await getDocumentosService(req.query);
-        if (err) return handleErrorClient(res, 404, err);
+        if (err) return handleErrorClient(res, 404, err); // Manejar error de consulta
         handleSuccess(res, 200, "Documentos encontrados", documentos);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
@@ -119,12 +120,12 @@ export async function updateDocumento(req, res) {
         if (bodyError) return handleErrorClient(res, 400, "Error en los datos", bodyError.message);
 
         // Si se está intentando cambiar el tipo de documento, verificar permisos adicionales
-        if (req.body.tipo && req.user.rol === 'vocalia') {
+        if (req.body.tipo && req.user.rol === "vocalia") {
             const repo = AppDataSource.getRepository(Documento);
             const documento = await repo.findOne({ where: { id: parseInt(req.query.id) } });
             
             // Si el documento existe y está intentando cambiar el tipo a uno no permitido
-            if (documento && !(req.body.tipo === 'Actividad' || req.body.tipo === 'Otros')) {
+            if (documento && !(req.body.tipo === "Actividad" || req.body.tipo === "Otros")) {
                 return handleErrorClient(
                     res, 
                     403, 
@@ -158,7 +159,7 @@ export async function deleteDocumento(req, res) {
 
         // borrar el archivo físico del servidor
         if (documento && documento.urlArchivo) {
-            const filename = documento.urlArchivo.split("/").pop();
+            const filename = documento.urlArchivo.split("/").pop(); // "filename.ext"
             const filePath = path.join(process.cwd(), "uploads", filename); // "uploads/filename.ext"
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
@@ -183,13 +184,23 @@ export async function downloadDocumento(req, res) {
         // Validar que el documento tenga una URL de archivo
         const url = documento.urlArchivo; // "/api/documentos/download/filename"
         const filename = url.split("/").pop();
-        const filePath = path.join(process.cwd(), "uploads", filename);
+        const filePath = path.join(process.cwd(), "uploads", filename); // "uploads/filename"
 
         // Verificar si el archivo existe en el servidor
         if (!fs.existsSync(filePath)) {
             return handleErrorClient(res, 404, "Archivo no encontrado en el servidor");
         }
-        res.download(filePath, documento.titulo + path.extname(filename));
+
+        // Sanitizar el título para usarlo como nombre de archivo
+        let safeTitle = documento.titulo
+            .toString()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-zA-Z0-9_\-]/g, "_")
+            .replace(/_+/g, "_")
+            .replace(/^_+|_+$/g, "")
+            .substring(0, 40);
+        if (!safeTitle) safeTitle = "documento";
+        res.download(filePath, safeTitle + path.extname(filename));
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }

@@ -10,18 +10,29 @@ import DocumentoTable from '@components/DocumentoTable';
 import DocumentoForm from '@components/DocumentoForm';
 import { showSuccessAlert, showErrorAlert } from '@helpers/sweetAlert';
 import { useAuth } from '@context/AuthContext';
-import { Dialog, DialogTitle, DialogContent, Button, Box, Typography, Paper, Divider, TextField, InputAdornment } from '@mui/material';
+import { 
+    Dialog, 
+    DialogTitle, 
+    DialogContent, 
+    Button, 
+    Box, 
+    Typography, 
+    Paper, 
+    Divider, 
+    TextField, 
+    InputAdornment 
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import SearchIcon from '@mui/icons-material/Search';
 
-const Documentos = () => {
+const Documentos = () => { // Componente principal para la gestión de documentos
     const [documentos, setDocumentos] = useState([]);
     const [formOpen, setFormOpen] = useState(false);
     const [formData, setFormData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
-    const { user } = useAuth();
+    const { user } = useAuth(); // Obtener información del usuario autenticado
 
     useEffect(() => {
         fetchDocumentos();
@@ -59,22 +70,22 @@ const Documentos = () => {
             initialData = { id: null, tipo: 'Actividad' };
         }
         
-        setFormData(initialData); 
+        setFormData(initialData); // Inicializar formData con el tipo preseleccionado
         setFormOpen(true);
     };
 
-    const handleEditar = (doc) => {
+    const handleEditar = (doc) => { // Función para editar un documento
         setFormData(doc);
         setFormOpen(true);
     };
 
-    const handleEliminar = async (id) => {
+    const handleEliminar = async (id) => { // Función para eliminar un documento
         if (window.confirm("¿Seguro que deseas eliminar este documento?")) {
             try {
-                setLoading(true);
-                await deleteDocumento(id);
+                setLoading(true); // Mostrar indicador de carga
+                await deleteDocumento(id); // Llamar al servicio para eliminar el documento
                 showSuccessAlert('Eliminado', 'El documento fue eliminado');
-                fetchDocumentos();
+                fetchDocumentos(); // Refrescar la lista de documentos
             } catch (e) {
                 showErrorAlert('Error', e.message || 'Ocurrió un error');
             } finally {
@@ -85,11 +96,28 @@ const Documentos = () => {
 
     const handleDownload = async (id) => {
         try {
-            const blob = await downloadDocumento(id);
-            const url = window.URL.createObjectURL(blob);
+            const blob = await downloadDocumento(id); // Llamar al servicio para descargar el documento
+            // Buscar el documento por id para obtener el título
+            const doc = documentos.find(d => d.id === id);
+            let nombre = doc?.titulo || `documento_${id}`;
+            // Sanitizar el nombre para evitar caracteres inválidos
+            nombre = nombre
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-zA-Z0-9_\-]/g, "_")
+                .replace(/_+/g, "_")
+                .replace(/^_+|_+$/g, "")
+                .substring(0, 40);
+            if (!nombre) nombre = `documento_${id}`;
+            // Obtener extensión del archivo original si está disponible
+            let ext = "";
+            if (doc?.urlArchivo) {
+                const parts = doc.urlArchivo.split(".");
+                if (parts.length > 1) ext = "." + parts.pop();
+            }
+            const url = window.URL.createObjectURL(blob); // Crear un objeto URL para el blob
             const link = document.createElement('a');
             link.href = url;
-            link.download = `documento_${id}`;
+            link.download = nombre + ext;
             link.click();
             window.URL.revokeObjectURL(url);
         } catch (e) {
@@ -99,7 +127,7 @@ const Documentos = () => {
 
     const onSubmit = async (formDataObj) => {
         try {
-            setLoading(true);
+            setLoading(true); // Mostrar indicador de carga
             if (formData && formData.id) {
                 // Solo llamar a updateDocumento si formData tiene un id válido
                 await updateDocumento(formData.id, formDataObj);
@@ -109,9 +137,9 @@ const Documentos = () => {
                 await createDocumento(formDataObj);
                 showSuccessAlert('Creado', 'Documento creado con éxito');
             }
-            setFormOpen(false);
-            setFormData(null);
-            fetchDocumentos();
+            setFormOpen(false); // Cerrar el formulario
+            setFormData(null); // Limpiar formData
+            fetchDocumentos(); // Refrescar la lista de documentos
         } catch (e) {
             console.error("Error en documento submit:", e);
             showErrorAlert('Error', e.message || 'Ocurrió un error');

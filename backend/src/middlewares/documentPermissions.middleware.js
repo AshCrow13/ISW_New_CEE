@@ -13,19 +13,19 @@ export const canCreateDocumentType = (req, res, next) => {
     const docType = req.body.tipo;
 
     // Verificar el rol y el tipo de documento
-    if (userRole === 'admin') {
+    if (userRole === "admin") {
       // Admin puede crear cualquier tipo de documento
       return next();
-    } else if (userRole === 'vocalia') {
+    } else if (userRole === "vocalia") {
       // Vocalia solo puede crear documentos de tipo "Actividad" u "Otros"
-      if (docType === 'Actividad' || docType === 'Otros') {
+      if (docType === "Actividad" || docType === "Otros") {
         return next();
       } else {
         return handleErrorClient(
           res, 
           403, 
           "Permisos insuficientes", 
-          "Vocalia solo puede crear documentos de tipo 'Actividad' u 'Otros'"
+          "Vocalia solo puede crear documentos de tipo \"Actividad\" u \"Otros\""
         );
       }
     } else {
@@ -54,7 +54,7 @@ export const canModifyDocument = async (req, res, next) => {
     }
 
     // Admin puede modificar cualquier documento
-    if (userRole === 'admin') {
+    if (userRole === "admin") {
       return next();
     }
 
@@ -67,7 +67,7 @@ export const canModifyDocument = async (req, res, next) => {
     }
 
     // Vocalia solo puede modificar documentos de tipo "Actividad" u "Otros"
-    if (userRole === 'vocalia' && (documento.tipo === 'Actividad' || documento.tipo === 'Otros')) {
+    if (userRole === "vocalia" && (documento.tipo === "Actividad" || documento.tipo === "Otros")) {
       return next();
     }
 

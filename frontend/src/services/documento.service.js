@@ -12,11 +12,11 @@ export async function getDocumentos(filtros = {}) { // Aquí filtros es un objet
 export async function createDocumento(formData) { // Aquí formData es un objeto FormData con los campos del formulario
     try {
         console.log("Llamando a createDocumento:", formData);
-        const { data } = await axios.post('/documentos', formData, {
+        const { data } = await axios.post('/documentos', formData, { // Enviamos formData directamente
             headers: { 'Content-Type': 'multipart/form-data' }
         });
         return data;
-    } catch (error) {
+    } catch (error) { // Aquí manejamos errores específicos de la creación del documento
         console.error("Error en createDocumento:", error.response?.data || error);
         throw error.response?.data || { message: 'Error desconocido' };
     }
@@ -29,9 +29,9 @@ export async function updateDocumento(id, fields) { // Aquí id es el ID del doc
             throw { message: 'ID no válido para actualización de documento' };
         }
         
-        console.log(`Llamando a updateDocumento con ID: ${id}`, fields);
-        const { data } = await axios.patch(`/documentos/detail?id=${id}`, fields);
-        return data;
+        console.log(`Llamando a updateDocumento con ID: ${id}`, fields); // Log para depuración
+        const { data } = await axios.patch(`/documentos/detail?id=${id}`, fields); // Enviamos los campos a actualizar
+        return data; // Retornamos la respuesta del servidor
     } catch (error) {
         console.error("Error en updateDocumento:", error.response?.data || error);
         throw error.response?.data || { message: 'Error desconocido' };
@@ -40,7 +40,7 @@ export async function updateDocumento(id, fields) { // Aquí id es el ID del doc
 
 export async function deleteDocumento(id) { // Aquí id es el ID del documento a eliminar
     try {
-        const { data } = await axios.delete(`/documentos/detail?id=${id}`);
+        const { data } = await axios.delete(`/documentos/detail?id=${id}`); // Enviamos el ID del documento a eliminar
         return data;
     } catch (error) {
         throw error.response?.data || { message: 'Error desconocido' };
@@ -49,8 +49,8 @@ export async function deleteDocumento(id) { // Aquí id es el ID del documento a
 
 export async function downloadDocumento(id) { // Aquí id es el ID del documento a descargar
     try {
-        const response = await axios.get(`/documentos/download/${id}`, {
-        responseType: 'blob'
+        const response = await axios.get(`/documentos/download/${id}`, { // Enviamos el ID del documento a descargar
+        responseType: 'blob' // Aseguramos que la respuesta sea un blob para descargar archivos
         });
         return response.data;
     } catch (error) {

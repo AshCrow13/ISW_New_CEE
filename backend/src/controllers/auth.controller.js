@@ -14,13 +14,13 @@ export async function loginEstudiante(req, res) {
     if (error)
       return handleErrorClient(res, 400, "Error de validación", error.message);
 
-    const [token, errMsg] = await loginEstudianteService(req.body);
+    const [token, errMsg] = await loginEstudianteService(req.body);// Validar que el servicio retorne un token
     if (errMsg)
       return handleErrorClient(res, 400, "Login fallido", errMsg);
 
     res.cookie("jwt-auth", token, {
       httpOnly: true, // true en producción para mayor seguridad
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000, // 1 día
       sameSite: "lax", // o "strict"
       secure: process.env.NODE_ENV === "production" // true si usas https
     });
@@ -37,11 +37,11 @@ export async function registerEstudiante(req, res) {
     if (error) {
       // Extraer información de error más específica de Joi
       const errorDetail = error.details[0];
-      let dataInfo = 'general';
+      let dataInfo = "general"; // Valor por defecto si no se puede identificar un campo específico
       
       // Identificar qué campo causó el error
       if (errorDetail.path && errorDetail.path.length > 0) {
-        dataInfo = errorDetail.path[0];
+        dataInfo = errorDetail.path[0]; // Usar el primer campo que causó el error
       }
       
       return handleErrorClient(
@@ -58,7 +58,7 @@ export async function registerEstudiante(req, res) {
     const [newEstudiante, errMsg] = await registerEstudianteService(req.body);
     if (errMsg) {
       // Si el servicio devuelve un objeto con información detallada del error
-      if (typeof errMsg === 'object' && errMsg.dataInfo) {
+      if (typeof errMsg === "object" && errMsg.dataInfo) {
         return handleErrorClient(
           res, 
           400, 
@@ -93,10 +93,10 @@ export async function registerEstudiante(req, res) {
 // LOGOUT
 export async function logoutEstudiante(req, res) {
   try {
-    res.clearCookie("jwt-auth", {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production"
+    res.clearCookie("jwt-auth", { // Limpiar la cookie de autenticación
+      httpOnly: true, // true en producción para mayor seguridad
+      sameSite: "lax", // o "strict"
+      secure: process.env.NODE_ENV === "production" // true si usas https
     });
     handleSuccess(res, 200, "Sesión cerrada exitosamente");
   } catch (error) {
