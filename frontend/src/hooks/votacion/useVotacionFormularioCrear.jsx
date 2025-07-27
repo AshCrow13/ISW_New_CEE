@@ -102,7 +102,7 @@ export function useVotacionFormularioCrear({ onSubmit, onSuccess }) {
         try {
             const inicioDate = new Date(formData.fechaInicio);
             const finDate = new Date(formData.fechaFin);
-            console.log("Inicio:", inicioDate, "Fin:", finDate);
+            //console.log("Inicio:", inicioDate, "Fin:", finDate);
             const duracionMinutos = Math.floor((finDate - inicioDate) / (1000 * 60));
             const datosVotacion = {
                 nombre: formData.titulo.trim(),

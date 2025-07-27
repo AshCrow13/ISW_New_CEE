@@ -2,6 +2,7 @@
 import votacionSchema from "../entity/votacion.entity.js";
 import opcionesSchema from "../entity/opciones.entity.js";
 import { AppDataSource } from "../config/configDb.js";
+import { deleteVotosByVotacion } from "./votos.service.js";
 
 export async function postVotacion(body) {
     try {
@@ -42,10 +43,19 @@ export async function deleteVotacion(id) {
             relations: ["opciones"] // Incluir las opciones relacionadas
         });
         if (!votacionToDelete) return [null, "Votación no encontrada"];
-        // Eliminar las opciones asociadas a la votación
+        
+        // Primero eliminamos todos los votos asociados a esta votación
+        const [votosEliminados, errorVotos] = await deleteVotosByVotacion(id);
+        if (errorVotos) {
+            return [null, "Error al eliminar los votos de la votación"];
+        }
+        
+        // Luego eliminamos las opciones asociadas a la votación
         if (votacionToDelete.opciones && votacionToDelete.opciones.length > 0) {
             await opcionesRepository.remove(votacionToDelete.opciones);
         }
+        
+        // Finalmente eliminamos la votación
         await votacionRepository.remove(votacionToDelete);
         return [votacionToDelete, null];
     } catch (error) {
