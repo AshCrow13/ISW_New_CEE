@@ -19,6 +19,8 @@ import {
 import { AppDataSource } from "../config/configDb.js";
 import Estudiante from "../entity/estudiante.entity.js";
 import { enviarCorreoEstudiantes } from "../helpers/email.helper.js";
+import { createDocumentoService } from "../services/documento.service.js";
+import path from "path";
 
 // CREATE
 export async function createActividad(req, res) {
@@ -26,23 +28,63 @@ export async function createActividad(req, res) {
         // Validar que el cuerpo de la solicitud cumpla con el esquema
         const { error } = actividadSchema.validate(req.body);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
+
+        // Validar que la fecha sea posterior a la fecha actual
+        const fechaActividad = new Date(req.body.fecha);
+        const ahora = new Date();
+        if (isNaN(fechaActividad.getTime())) {
+            return handleErrorClient(res, 400, "La fecha de la actividad no es válida.");
+        }
+        if (fechaActividad < ahora) {
+            return handleErrorClient(res, 400, "La fecha de la actividad debe ser posterior a la fecha actual.");
+        }
         
         // Validar que el usuario tenga el rol adecuado        
+        // 1. Crear la actividad
         const [actividad, err] = await createActividadService(req.body, req.user); 
         if (err) return handleErrorClient(res, 400, err);
-        
+
+        // 2. Si hay archivo, crear el documento y asociarlo a la actividad
+        let archivoAdjunto = null;
+        if (req.file) {
+            const docData = {
+                titulo: req.body.titulo || "Documento de actividad",
+                tipo: "Actividad",
+                urlArchivo: `/api/documentos/download/${req.file.filename}`,
+                subidoPor: req.user.email,
+                id_actividad: actividad.id,
+            };
+            await createDocumentoService(docData, req.user);
+
+            // Preparar adjunto para el correo
+            archivoAdjunto = {
+                filename: req.file.originalname,
+                path: path.join(process.cwd(), "uploads", req.file.filename)
+            };
+        }
+
         // Buscar los emails de todos los estudiantes
         const estudiantes = await AppDataSource.getRepository(Estudiante).find();
         const emails = estudiantes.map(e => e.email);
 
-        // Enviar el correo
+
+        // Enviar el correo mejorado con adjunto si existe
         await enviarCorreoEstudiantes(
             `Nueva actividad publicada: ${actividad.titulo}`,
-            `<p>Se ha publicado una nueva actividad: <b>${actividad.titulo}</b><br>
-            Fecha: ${actividad.fecha}<br>
-            Lugar: ${actividad.lugar}<br>
-            ¡No te la pierdas!</p>`,
-            emails
+            `
+            <p>¡Hola estudiante!</p>
+            <p>Te informamos que se ha publicado una nueva actividad organizada por el Centro de Estudiantes:</p>
+            <ul>
+                <li><b>${actividad.titulo}</b></li>
+                <li><b>Fecha:</b> ${actividad.fecha}</li>
+                <li><b>Lugar:</b> ${actividad.lugar}</li>
+                <li><b>Descripción:</b> ${actividad.descripcion}</li>
+                <li><b>Recursos:</b> ${actividad.recursos || "No especificados"}</li>
+            </ul>
+            <p>¡No te la pierdas!</p>
+            `,
+            emails,
+            archivoAdjunto ? [archivoAdjunto] : undefined
         );
 
         handleSuccess(res, 201, "Actividad creada correctamente y notificación enviada", actividad);
@@ -99,7 +141,8 @@ export async function updateActividad(req, res) {
         if (req.body.responsableId) {
             const responsableId = parseInt(req.body.responsableId);
             if (isNaN(responsableId) || responsableId <= 0) {
-                return handleErrorClient(res, 400, "ID de responsable inválido", "El ID del responsable debe ser un número positivo");
+                return handleErrorClient(res, 400, 
+                    "ID de responsable inválido", "El ID del responsable debe ser un número positivo");
             }
         }
 

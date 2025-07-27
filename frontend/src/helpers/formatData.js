@@ -22,7 +22,7 @@ export function convertirMinusculas(obj) {
 }
 
 export function formatPostUpdate(user) {
-    return {
+    return { // Formatea los datos del usuario para la actualización
         nombreCompleto: startCase(user.nombreCompleto),
         rol: startCase(user.rol),
         rut: formatRut(user.rut),

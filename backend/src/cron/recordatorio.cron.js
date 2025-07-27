@@ -27,19 +27,28 @@ cron.schedule("0 8 * * *", async () => {
         const estudiantes = await AppDataSource.getRepository(Estudiante).find();
         const emails = estudiantes.map(e => e.email);
 
-        for (const act of actividades) {
+
+        for (const act of actividades) { // Enviar recordatorio por cada actividad
             await enviarCorreoEstudiantes(
-                `Recordatorio: Actividad "${act.titulo}" es pronto`,
+                `⏰ ¡Hoy es el gran día! No olvides tu actividad: ${act.titulo}`,
                 `
-                <p>Recuerda que la actividad <b>${act.titulo}</b> será el <b>${act.fecha}</b> en <b>${act.lugar}</b>.</p>
-                <p>No faltes.</p>
+                <p>¡Hola estudiante!</p>
+                <p>Este es un recordatorio de que hoy se realizará la siguiente actividad:</p>
+                <ul>
+                    <li><b>${act.titulo}</b></li>
+                    <li><b>Fecha y hora:</b> ${act.fecha}</li>
+                    <li><b>Lugar:</b> ${act.lugar}</li>
+                    <li><b></b> ${act.descripcion}</li>
+                    <li><b>Recursos:</b> ${act.recursos || "No especificados"}</li>
+                </ul>
+                <p>¡Te esperamos! Recuerda ser puntual y llevar todo lo necesario.</p>
                 `,
                 emails
             );
         }
 
         
-        console.log(`[CRON] ${actividades.length} actividades notificadas para las próximas 24 horas`);
+        console.log(`[CRON] ${actividades.length} actividades notificadas para el mismo dia`);
     } catch (err) {
         console.error("[CRON] Error en recordatorio de eventos:", err.message);
     }

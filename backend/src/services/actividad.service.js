@@ -7,24 +7,24 @@ import { Between, LessThanOrEqual, Like, MoreThanOrEqual } from "typeorm";
 
 // CREATE
 export async function createActividadService(data, usuario) {
-    try {
+    try { // Validar que el cuerpo de la solicitud cumpla con el esquema
         const repo = AppDataSource.getRepository(Actividad);
         const estudianteRepo = AppDataSource.getRepository(Estudiante);
 
-        // ✅ CAMBIO: Buscar cualquier estudiante disponible si el ID no existe
+        // Buscar cualquier estudiante disponible si el ID no existe
         let responsable;
         if (data.responsableId) {
             responsable = await estudianteRepo.findOne({ where: { id: data.responsableId } });
         }
         
-        // ✅ CORREGIR: Si no se encuentra, usar find() con limit en lugar de findOne()
+        // Si no se encuentra, usar find() con limit en lugar de findOne()
         if (!responsable) {
             const estudiantes = await estudianteRepo.find({ 
-                order: { id: "ASC" },
+                order: { id: "ASC" }, // Ordenar por ID ascendente
                 take: 1 // Tomar solo el primer resultado
             });
             
-            if (estudiantes.length === 0) {
+            if (estudiantes.length === 0) { // No hay estudiantes registrados
                 return [null, "No hay estudiantes registrados en el sistema"];
             }
             
@@ -36,18 +36,18 @@ export async function createActividadService(data, usuario) {
 
         // Registrar en historial
         const historialRepo = AppDataSource.getRepository(Historial);
-        await historialRepo.save({
+        await historialRepo.save({ // Registrar la acción en el historial
             usuario: usuario?.email || "Sistema",
             accion: "crear",
             tipo: "actividad",
             referenciaId: actividad.id
         });
 
-        const actividadCompleta = await repo.findOne({ 
+        const actividadCompleta = await repo.findOne({  // Obtener la actividad completa con relaciones
             where: { id: actividad.id }, 
             relations: ["responsable"] 
         });
-        return [actividadCompleta, null];
+        return [actividadCompleta, null]; // Devolver la actividad creada con el responsable
     } catch (error) {
         return [null, "Error al crear actividad: " + error.message];
     }
@@ -55,16 +55,16 @@ export async function createActividadService(data, usuario) {
 
 // READ (Todos - con filtro)
 export async function getActividadesService(filtro = {}) {
-    try {
+    try { // Validar que la consulta cumpla con el esquema
         const repo = AppDataSource.getRepository(Actividad);
         const where = {};
         
-        // ✅ CORREGIR: Usar nombres correctos de columna según la entidad
+        // Usar nombres correctos de columna según la entidad
         if (filtro.categoria) where.categoria = filtro.categoria;
         if (filtro.lugar) where.lugar = Like(`%${filtro.lugar}%`);
         
         if (filtro.fechaInicio && filtro.fechaFin) {
-            // ✅ CAMBIO: Usar 'fecha' en lugar de 'fechaInicio/fechaFin'
+            // Usar 'fecha' en lugar de 'fechaInicio/fechaFin'
             where.fecha = Between(filtro.fechaInicio, filtro.fechaFin);
         } else if (filtro.fechaInicio) {
             where.fecha = MoreThanOrEqual(filtro.fechaInicio);
@@ -74,22 +74,22 @@ export async function getActividadesService(filtro = {}) {
         
         let queryBuilder = repo.createQueryBuilder("actividad").where(where);
 
-        if (filtro.q) {
+        if (filtro.q) { // Búsqueda por título o descripción
             queryBuilder = queryBuilder.andWhere(
                 "(actividad.titulo ILIKE :q OR actividad.descripcion ILIKE :q)",
                 { q: `%${filtro.q}%` }
             );
         }
 
-        // ✅ MEJORADO: Ordenamiento configurable
+        // Ordenamiento configurable
         let orderField = "actividad.fecha";
         let orderDirection = "DESC";
         
         if (filtro.orderBy) {
-            const parts = filtro.orderBy.split('_');
-            if (parts.length === 2) {
+            const parts = filtro.orderBy.split("_");
+            if (parts.length === 2) { // Formato esperado: campo_direccion
                 const [field, direction] = parts;
-                orderField = `actividad.${field}`;
+                orderField = `actividad.${field}`; // Asegurarse de que el campo sea válido
                 orderDirection = direction.toUpperCase() === "ASC" ? "ASC" : "DESC";
             }
         }
@@ -117,7 +117,7 @@ export async function getActividadService(query) {
         // Validar que la consulta cumpla con el esquema
         const repo = AppDataSource.getRepository(Actividad);
         const actividad = await repo.findOne({ where: query, relations: ["responsable"] });
-        if (!actividad) return [null, "Actividad no encontrada"];
+        if (!actividad) return [null, "Actividad no encontrada"]; // Si no se encuentra la actividad, devolver un error
         return [actividad, null];
     } catch (error) {
         return [null, "Error al buscar actividad: " + error.message];
@@ -126,7 +126,7 @@ export async function getActividadService(query) {
 
 // UPDATE
 export async function updateActividadService(query, data, usuario) {
-    try {
+    try { // Validar que la consulta cumpla con el esquema
         const repo = AppDataSource.getRepository(Actividad);
         const estudianteRepo = AppDataSource.getRepository(Estudiante);
         
@@ -136,8 +136,8 @@ export async function updateActividadService(query, data, usuario) {
             relations: ["responsable"]
         });
 
-        if (!actividad) return [null, "Actividad no encontrada"];
-        
+        if (!actividad) return [null, "Actividad no encontrada"]; // Si no se encuentra la actividad, devolver un error
+
         // Manejar responsableId específicamente antes de aplicar otros cambios
         if (data.responsableId !== undefined) {
             console.log(`Buscando responsable con ID: ${data.responsableId}`);
@@ -157,7 +157,7 @@ export async function updateActividadService(query, data, usuario) {
                         order: { id: "ASC" }
                     });
                     
-                    if (estudiantes && estudiantes.length > 0) {
+                    if (estudiantes && estudiantes.length > 0) { // Si hay estudiantes, usar el primero
                         responsable = estudiantes[0];
                         console.log(`Usando responsable alternativo: ${responsable.id}`);
                     } else {
@@ -204,7 +204,7 @@ export async function deleteActividadService(query, usuario) {
         const repo = AppDataSource.getRepository(Actividad);
         const actividad = await repo.findOne({ where: query, relations: ["responsable"] });
         if (!actividad) return [null, "Actividad no encontrada"];
-        await repo.remove(actividad);
+        await repo.remove(actividad); // Eliminar la actividad
 
         // Registrar en historial
         const historialRepo = AppDataSource.getRepository(Historial);

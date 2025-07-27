@@ -6,7 +6,7 @@ import { comparePassword, encryptPassword } from "../helpers/bcrypt.helper.js";
 import { ACCESS_TOKEN_SECRET } from "../config/configEnv.js";
 
 export async function loginService(estudiante) {
-  try {
+  try { // Validar que el cuerpo de la solicitud cumpla con el esquema
     const estudianteRepository = AppDataSource.getRepository(Estudiante);
     const { email, rut, password } = estudiante;
 
@@ -29,17 +29,24 @@ export async function loginService(estudiante) {
       where: whereCondition
     });
 
-    if (!estudianteFound) {
-      return [null, createErrorMessage(email ? "email" : "rut", `El ${email ? 'correo electrónico' : 'RUT'} no está registrado`)];
+    if (!estudianteFound) { // Si no se encuentra el estudiante por email o rut
+      return [
+        null,
+        createErrorMessage(
+          email ? "email" : "rut",
+          "El " + (email ? "correo electrónico" : "RUT") + " no está registrado"
+        )
+      ];
     }
 
-    const isMatch = await comparePassword(password, estudianteFound.password);
+    // Comparar la contraseña proporcionada con la almacenada
+    const isMatch = await comparePassword(password, estudianteFound.password); 
 
-    if (!isMatch) {
+    if (!isMatch) { // Si la contraseña no coincide
       return [null, createErrorMessage("password", "La contraseña es incorrecta")];
     }
 
-    const payload = {
+    const payload = { // Crear el payload del token
       nombreCompleto: estudianteFound.nombreCompleto,
       email: estudianteFound.email,
       rut: estudianteFound.rut,
@@ -47,7 +54,7 @@ export async function loginService(estudiante) {
       carrera: estudianteFound.carrera,
     };
 
-    const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
+    const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, { // Firmar el token con la clave secreta
       expiresIn: "1d",
     });
 
@@ -60,24 +67,24 @@ export async function loginService(estudiante) {
 
 
 export async function registerService(estudiante) {
-  try {
+  try { // Validar que el cuerpo de la solicitud cumpla con el esquema
     const estudianteRepository = AppDataSource.getRepository(Estudiante);
 
     const { nombreCompleto, rut, email, password } = estudiante;
 
-    const createErrorMessage = (dataInfo, message) => ({
+    const createErrorMessage = (dataInfo, message) => ({ // Crear un objeto de error con información específica
       dataInfo,
       message
     });
 
     // Validar formato de RUT (solo con puntos)
     const rutRegexConPuntos = /^(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}-[\dkK]$/;
-    if (!rutRegexConPuntos.test(rut)) {
+    if (!rutRegexConPuntos.test(rut)) { // Si el RUT no cumple con el formato esperado
       return [null, createErrorMessage("rut", "El RUT debe tener formato xx.xxx.xxx-x")];
     }
 
     // Validación de formato de correo institucional
-    if (!email.match(/@(alumnos\.)?ubiobio\.cl$/)) {
+    if (!email.match(/@(alumnos\.)?ubiobio\.cl$/)) { // Si el correo no es institucional
       return [null, createErrorMessage("email", "Solo se aceptan correos institucionales")];
     }
 
@@ -91,7 +98,7 @@ export async function registerService(estudiante) {
       where: { email }
     });
     
-    if (existingEmailEstudiante) {
+    if (existingEmailEstudiante) { // Si ya existe un estudiante con el mismo correo
       return [null, createErrorMessage("email", "Este correo electrónico ya está registrado")];
     }
 
@@ -100,7 +107,7 @@ export async function registerService(estudiante) {
       where: { rut }
     });
 
-    if (existingRutEstudiante) {
+    if (existingRutEstudiante) { // Si ya existe un estudiante con el mismo RUT
       return [null, createErrorMessage("rut", "Este RUT ya está registrado")];
     }
 
@@ -109,10 +116,10 @@ export async function registerService(estudiante) {
     if (!carrera) {
       // Si el email es @alumnos.ubiobio.cl, asumimos que es "Ingeniería Civil Informática"
       // Si el email es @ubiobio.cl, asumimos que es "Personal UBB"
-      carrera = email.includes('@alumnos.') ? "Ingeniería Civil Informática" : "Personal UBB";
+      carrera = email.includes("@alumnos.") ? "Ingeniería Civil Informática" : "Personal UBB";
     }
 
-    const newEstudiante = estudianteRepository.create({
+    const newEstudiante = estudianteRepository.create({ // Crear una nueva instancia de Estudiante
       nombreCompleto,
       email,
       rut,
@@ -121,9 +128,9 @@ export async function registerService(estudiante) {
       password: await encryptPassword(password),
     });
 
-    await estudianteRepository.save(newEstudiante);
+    await estudianteRepository.save(newEstudiante); // Guardar el nuevo estudiante en la base de datos
 
-    const { password: _, ...dataEstudiante } = newEstudiante;
+    const { password: _, ...dataEstudiante } = newEstudiante; // Excluir la contraseña del objeto de respuesta
 
     return [dataEstudiante, null];
   } catch (error) {

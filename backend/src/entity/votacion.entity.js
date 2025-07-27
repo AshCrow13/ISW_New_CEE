@@ -39,6 +39,7 @@ const votacionSchema = new EntitySchema({
             target: "OpcionVotacion",
             inverseSide: "votacion",
             cascade: true,
+            onDelete: "CASCADE",
         },
     },
 });

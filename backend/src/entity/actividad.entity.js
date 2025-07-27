@@ -70,7 +70,8 @@ const ActividadSchema = new EntitySchema({
         documentos: { // Documentos asociados a la actividad
             type: "one-to-many",
             target: "Documento",
-            inverseSide: "actividad"
+            inverseSide: "actividad",
+            cascade: true // Asegura que los documentos se gestionen con la actividad
         }
     }
 });

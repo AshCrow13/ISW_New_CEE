@@ -20,7 +20,6 @@ export async function postOpcion(req, res) {
         const { votacionId } = req.params;
         const { body } = req;
     
-        //
         body.votacion = {id: Number(votacionId)};
 
         const { error } = opcionesBodyValidation.validate(body);

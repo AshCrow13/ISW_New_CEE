@@ -8,12 +8,12 @@ import { Between, LessThanOrEqual, Like, MoreThanOrEqual } from "typeorm";
 
 // CREATE
 export async function createDocumentoService(data, usuario) {
-    try {
+    try { // Validar que el cuerpo de la solicitud cumpla con el esquema
         const repo = AppDataSource.getRepository(Documento);
         const estudianteRepo = AppDataSource.getRepository(Estudiante);
         const actividadRepo = AppDataSource.getRepository(Actividad);
 
-        // ✅ BUSCAR por email en lugar de por ID
+        // email en lugar de por ID
         const subidoPor = await estudianteRepo.findOne({ where: { email: data.subidoPor } });
         if (!subidoPor) return [null, "Usuario que sube el documento no existe"];
 
@@ -60,7 +60,7 @@ export async function getDocumentosService(filtro = {}) {
         // Filtros básicos
         if (filtro.tipo) where.tipo = filtro.tipo;
         if (filtro.fechaInicio && filtro.fechaFin) {
-            // ✅ USAR EL NOMBRE CORRECTO DE LA COLUMNA
+            // Filtro por rango de fechas
             where.fechaSubida = Between(filtro.fechaInicio, filtro.fechaFin);
         } else if (filtro.fechaInicio) {
             where.fechaSubida = MoreThanOrEqual(filtro.fechaInicio);
@@ -85,22 +85,22 @@ export async function getDocumentosService(filtro = {}) {
         let queryBuilder = repo.createQueryBuilder("documento").where(where);
         if (filtro.q) {
             queryBuilder = queryBuilder.andWhere(
-                "(documento.titulo ILIKE :q)", // ✅ ELIMINAR referencia a descripcion que no existe
+                "(documento.titulo ILIKE :q)", // Usar ILIKE para búsqueda insensible a mayúsculas/minúsculas
                 { q: `%${filtro.q}%` }
             );
         }
 
-        // Ordenamiento - ✅ USAR EL NOMBRE CORRECTO
+        // Ordenamiento
         let order = "documento.fechaSubida";
         let direction = "DESC";
         
-        if (filtro.orderBy) {
+        if (filtro.orderBy) { // Si se especifica un ordenamiento
             const [campo, dir] = filtro.orderBy.split("_");
             order = `documento.${campo}`;
             direction = dir.toUpperCase() === "DESC" ? "DESC" : "ASC";
         }
         
-        queryBuilder = queryBuilder.orderBy(order, direction);
+        queryBuilder = queryBuilder.orderBy(order, direction); // Ordenar por fecha de subida por defecto
 
         // Paginación
         const limit = filtro.limit ? parseInt(filtro.limit) : 20;
@@ -191,7 +191,7 @@ export async function deleteDocumentoService(query, usuario) {
 
         // Registrar en historial
         const historialRepo = AppDataSource.getRepository(Historial);
-        await historialRepo.save({
+        await historialRepo.save({ // Registrar acción de eliminación
             usuario: usuario?.email || "Sistema",
             accion: "eliminar",
             tipo: "documento",

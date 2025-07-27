@@ -36,8 +36,16 @@ export async function postVotacion(body) {
 export async function deleteVotacion(id) {
     try {
         const votacionRepository = AppDataSource.getRepository(votacionSchema);
-        const votacionToDelete = await votacionRepository.findOneBy({ id });
+        const opcionesRepository = AppDataSource.getRepository(opcionesSchema);
+        const votacionToDelete = await votacionRepository.findOne({ 
+            where: { id },
+            relations: ["opciones"] // Incluir las opciones relacionadas
+        });
         if (!votacionToDelete) return [null, "Votación no encontrada"];
+        // Eliminar las opciones asociadas a la votación
+        if (votacionToDelete.opciones && votacionToDelete.opciones.length > 0) {
+            await opcionesRepository.remove(votacionToDelete.opciones);
+        }
         await votacionRepository.remove(votacionToDelete);
         return [votacionToDelete, null];
     } catch (error) {

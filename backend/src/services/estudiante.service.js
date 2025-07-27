@@ -2,23 +2,26 @@
 import bcrypt from "bcryptjs";
 import Estudiante from "../entity/estudiante.entity.js";
 import { AppDataSource } from "../config/configDb.js";
-import Historial from "../entity/historial.entity.js"; // ✅ IMPORTAR: Entidad Historial
+import Historial from "../entity/historial.entity.js"; 
 
 // CREATE
 export async function createEstudianteService(data) {
-    try {
+    try { // Validar que el cuerpo de la solicitud cumpla con el esquema
         const repo = AppDataSource.getRepository(Estudiante);
 
+        // Validar que el RUT y email sean únicos
         const existingRut = await repo.findOne({ where: { rut: data.rut } });
         if (existingRut) return [null, "Ya existe un estudiante con ese RUT."];
 
         const existingEmail = await repo.findOne({ where: { email: data.email } });
         if (existingEmail) return [null, "Ya existe un estudiante con ese email."];
 
+        // Validar que el rol sea estudiante
         const hash = await bcrypt.hash(data.password, 10);
         const estudiante = repo.create({ ...data, password: hash });
         await repo.save(estudiante);
 
+        // Registrar en historial
         const { password, ...estudianteSinPassword } = estudiante;
         return [estudianteSinPassword, null];
     } catch (error) {
@@ -29,10 +32,10 @@ export async function createEstudianteService(data) {
 // READ (Todos)
 export async function getEstudiantesService() {
     try {
-        const repo = AppDataSource.getRepository(Estudiante);
+        const repo = AppDataSource.getRepository(Estudiante); // Obtener todos los estudiantes
         const estudiantes = await repo.find({ order: { createdAt: "DESC" } });
         const result = estudiantes.map(({ password, ...rest }) => rest);
-        return [result, null]; // ✅ Formato correcto
+        return [result, null]; // Formato correcto
     } catch (error) {
         return [null, "Error al obtener estudiantes: " + error.message];
     }
@@ -40,11 +43,11 @@ export async function getEstudiantesService() {
 
 // READ (Uno)
 export async function getEstudianteService(query) {
-    try {
+    try { // Validar que la consulta cumpla con el esquema
         const repo = AppDataSource.getRepository(Estudiante);
         const estudiante = await repo.findOne({ where: query });
         if (!estudiante) return [null, "Estudiante no encontrado"];
-        const { password, ...estudianteSinPassword } = estudiante;
+        const { password, ...estudianteSinPassword } = estudiante; // Excluir la contraseña del resultado
         return [estudianteSinPassword, null];
     } catch (error) {
         return [null, "Error al buscar estudiante: " + error.message];
@@ -52,33 +55,33 @@ export async function getEstudianteService(query) {
 }
 
 // UPDATE
-export async function updateEstudianteService(query, data, usuario) { // ✅ AGREGAR: parámetro usuario
-    try {
+export async function updateEstudianteService(query, data, usuario) {
+    try { // Validar que la consulta cumpla con el esquema
         const repo = AppDataSource.getRepository(Estudiante);
-        const estudiante = await repo.findOne({ where: query });
+        const estudiante = await repo.findOne({ where: query }); // Buscar estudiante por ID
         if (!estudiante) return [null, "Estudiante no encontrado"];
 
-        let dataToUpdate = { ...data, updatedAt: new Date() };
+        let dataToUpdate = { ...data, updatedAt: new Date() }; // Actualizar fecha de modificación
         
-        if (data.newPassword) {
+        if (data.newPassword) { // Si se proporciona una nueva contraseña, hashearla
             dataToUpdate.password = await bcrypt.hash(data.newPassword, 10);
             delete dataToUpdate.newPassword;
         }
         
-        Object.assign(estudiante, dataToUpdate);
+        Object.assign(estudiante, dataToUpdate); // Actualizar los campos del estudiante
         await repo.save(estudiante);
 
-        // ✅ MEJORAR: Usar el usuario real que hace la acción
+        // Usar el usuario real que hace la acción
         const historialRepo = AppDataSource.getRepository(Historial);
-        await historialRepo.save({
-            usuario: usuario || { email: "sistema@cee.cl" }, // ✅ Usuario real o sistema
+        await historialRepo.save({ // Registrar en historial
+            usuario: usuario || { email: "sistema@cee.cl" }, // Usuario real o sistema
             accion: "editar",
             tipo: "estudiante", 
             referenciaId: estudiante.id,
             fecha: new Date()
         });
 
-        const { password, ...estudianteSinPassword } = estudiante;
+        const { password, ...estudianteSinPassword } = estudiante; // Excluir la contraseña del resultado
         return [estudianteSinPassword, null];
     } catch (error) {
         return [null, "Error al actualizar estudiante: " + error.message];
@@ -87,12 +90,12 @@ export async function updateEstudianteService(query, data, usuario) { // ✅ AGR
 
 // DELETE
 export async function deleteEstudianteService(query) {
-    try {
+    try { // Validar que la consulta cumpla con el esquema
         const repo = AppDataSource.getRepository(Estudiante);
-        const estudiante = await repo.findOne({ where: query });
+        const estudiante = await repo.findOne({ where: query }); // Buscar estudiante por ID
         if (!estudiante) return [null, "Estudiante no encontrado"];
         await repo.remove(estudiante);
-        const { password, ...estudianteSinPassword } = estudiante;
+        const { password, ...estudianteSinPassword } = estudiante; // Excluir la contraseña del resultado
         return [estudianteSinPassword, null];
     } catch (error) {
         return [null, "Error al eliminar estudiante: " + error.message];

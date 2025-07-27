@@ -48,9 +48,9 @@ const fileFilter = (req, file, cb) => {
   // Verificar extensión
   const ext = path.extname(file.originalname).toLowerCase();
   if (!FILE_CONFIG[fileType].extensions.includes(ext)) {
-    req.fileValidationError = `Extensión de archivo no permitida. Solo se aceptan: ${FILE_CONFIG[fileType].extensions.join(
-      ", "
-    )}`;
+    req.fileValidationError =
+      "Extensión de archivo no permitida. Solo se aceptan: "
+      + FILE_CONFIG[fileType].extensions.join(", ");
     return cb(null, false);
   }
 
