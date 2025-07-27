@@ -55,7 +55,7 @@ export async function deleteOpcion(req, res) {
 export async function getOpcion(req, res) {
     try {
         const { votacionId, id } = req.params;
-        console.log("VotacionId", votacionId , "Id", id);
+        //console.log("VotacionId", votacionId , "Id", id);
         const { error } = opcionesQueryValidation.validate({ id: Number(id) });
         if (error) return handleErrorClient(res, 400, error.message);
     
@@ -72,7 +72,7 @@ export async function getOpcion(req, res) {
 export async function getOpciones(req, res) {
     try {
         const { votacionId } = req.params;
-        console.log("VotacionId", votacionId);
+        //console.log("VotacionId", votacionId);
         const { error } = opcionesVotacionIdValidation.validate({ votacionId });
         if (error) return handleErrorClient(res, 400, error.message);
 

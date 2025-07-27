@@ -32,7 +32,7 @@ export async function postVoto(req, res){
 export async function getVotos(req, res){
     try{
         const votacionId = req.params.votacionId;
-        console.log("Votacion ID:", votacionId);
+        //console.log("Votacion ID:", votacionId);
         const { errorq } = votosQueryValidation.validate({ id: votacionId });
         if (errorq) return handleErrorClient(res, 400, errorq.message);
         const [votos, error] = await getVotosService(Number(votacionId));
