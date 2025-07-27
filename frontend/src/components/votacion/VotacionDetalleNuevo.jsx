@@ -195,7 +195,8 @@ const VotacionDetalleNuevo = ({ votacionSeleccionada, loading, user, onVolver, h
                   {votacionSeleccionada.duracion || 'No definida'} {votacionSeleccionada.duracion ? 'minutos' : ''}
                 </Typography>
               </Grid>
-
+              
+              {user && user.rol !== 'estudiante' && (
               <Grid item xs={12} sm={6}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
@@ -206,6 +207,7 @@ const VotacionDetalleNuevo = ({ votacionSeleccionada, loading, user, onVolver, h
                   #{votacionSeleccionada.id || 'No disponible'}
                 </Typography>
               </Grid>
+              )}
             </Grid>
           </Paper>
         </Grid>
