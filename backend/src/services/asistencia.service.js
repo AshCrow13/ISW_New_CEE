@@ -7,26 +7,25 @@ import { getEstudianteService } from "./estudiante.service.js";
 export async function createAsistenciaService(data) {
     try {
         const repo = AppDataSource.getRepository(Asistencia);
-        // Verificar si ya existe una asistencia con el mismo correo e idInstancia
+        // Verificar si ya existe una asistencia con el mismo rut e idInstancia
         const asistenciaExistente = await repo.findOne({
             where: {
-                correo: data.correo,
+                rut: data.rut,
                 idInstancia: data.idInstancia
             }
         });
         if (asistenciaExistente) {
             return [null, "Ya existe una asistencia registrada para este estudiante en esta instancia"];
         }
-        // Buscar estudiante para obtener nombreCompleto y rut
-        const [estudiante, errEst] = await getEstudianteService({ email: data.correo });
+        // Buscar estudiante para obtener nombreCompleto
+        const [estudiante, errEst] = await getEstudianteService({ rut: data.rut });
         if (errEst || !estudiante) {
             return [null, "Estudiante no encontrado"];
         }
         const asistencia = repo.create({
-            correo: data.correo,
+            rut: data.rut,
             idInstancia: data.idInstancia,
-            nombreCompleto: estudiante.nombreCompleto,
-            rut: estudiante.rut
+            nombreCompleto: estudiante.nombreCompleto
         });
         const resultado = await repo.save(asistencia);
         return [resultado, null];
@@ -44,9 +43,12 @@ export async function getAsistenciasService(filtro = {}) {
     try {
         const repo = AppDataSource.getRepository(Asistencia);
         const where = {};
-        if (filtro.correo) where.correo = filtro.correo;
+        if (filtro.rut) where.rut = filtro.rut;
         if (filtro.idInstancia) where.idInstancia = filtro.idInstancia;
-        const asistencias = await repo.find({ where });
+        const asistencias = await repo.find({ 
+            where,
+            order: { id: "ASC" }
+        });
         return [asistencias, null];
     } catch (error) {
         return [null, "Error al obtener asistencias: " + error.message];
@@ -71,14 +73,13 @@ export async function updateAsistenciaService(query, data) {
         const repo = AppDataSource.getRepository(Asistencia);
         const asistencia = await repo.findOne({ where: query });
         if (!asistencia) return [null, "Asistencia no encontrada"];
-        // Si se actualiza correo, buscar estudiante y actualizar nombre/rut
-        if (data.correo && data.correo !== asistencia.correo) {
-            const [estudiante, errEst] = await getEstudianteService({ email: data.correo });
+        // Si se actualiza rut, buscar estudiante y actualizar nombre
+        if (data.rut && data.rut !== asistencia.rut) {
+            const [estudiante, errEst] = await getEstudianteService({ rut: data.rut });
             if (errEst || !estudiante) {
                 return [null, "Estudiante no encontrado"];
             }
             asistencia.nombreCompleto = estudiante.nombreCompleto;
-            asistencia.rut = estudiante.rut;
         }
         Object.assign(asistencia, data);
         await repo.save(asistencia);

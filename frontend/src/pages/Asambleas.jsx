@@ -13,7 +13,7 @@ const Asambleas = () => {
     const [loading, setLoading] = useState(false);
     const { user } = useAuth();
 
-    // Cargar asambleas
+// Cargar asambleas
     useEffect(() => {
         fetchAsambleas();
     }, []);

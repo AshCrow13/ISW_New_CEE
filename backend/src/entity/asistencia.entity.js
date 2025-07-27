@@ -4,13 +4,14 @@ const Asistencia = new EntitySchema({
   name: "Asistencia",
   tableName: "asistencia",
   columns: {
-    correo: {
-      type: "varchar",
+    id: {
+      type: "int",
       primary: true,
+      generated: true,
     },
     idInstancia: {
       type: "int",
-      primary: true,
+      nullable: false,
     },
     nombreCompleto: {
       type: "varchar",
@@ -24,15 +25,6 @@ const Asistencia = new EntitySchema({
     },
   },
   relations: {
-    estudiante: {
-      target: "Estudiante",
-      type: "many-to-one",
-      joinColumn: { 
-        name: "correo",          
-        referencedColumnName: "email"
-      },
-      onDelete: "CASCADE",
-    },
     instancia: {
       target: "Instancia",
       type: "many-to-one",
@@ -43,6 +35,13 @@ const Asistencia = new EntitySchema({
       onDelete: "CASCADE",
     },
   },
+  indices: [
+    {
+      name: "IDX_ASISTENCIA_INSTANCIA_RUT",
+      unique: true,
+      columns: ["idInstancia", "rut"]
+    }
+  ]
 });
 
 export default Asistencia;
