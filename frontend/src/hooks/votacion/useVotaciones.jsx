@@ -132,6 +132,9 @@ const useVotaciones = () => {
 
   //Votar en una opción de votación
   const handleVotar = async (votacionId, opcionId) => {
+    if (!confirm('¿Estás seguro de que quieres votar por esta opción?')) {
+      return;
+    }
     try {
       const resultado = await postVoto({ votacionId , opcionId });
       if (resultado.status === 'Success') {
