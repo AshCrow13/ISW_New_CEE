@@ -41,10 +41,10 @@ export async function getInstanciasService(filtro = {}) {
 }
 
 // Read one
-export async function getInstanciaService(query) {
+export async function getInstanciaService(id) {
     try {
         const repo = AppDataSource.getRepository(Instancia);
-        const instancia = await repo.findOneBy({id:query});
+        const instancia = await repo.findOneBy({id: id});
         if (!instancia) return [null, "Instancia no encontrada"];
         return [instancia, null];
     } catch (error) {
