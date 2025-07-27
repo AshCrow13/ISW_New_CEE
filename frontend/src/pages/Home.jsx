@@ -21,32 +21,8 @@ const Home = () => {
           
         </Typography>
         <Grid container spacing={3}> 
-          {(
-            <Grid item xs={12}>
-              <Button 
-                fullWidth
-                variant="contained"
-                color="primary"
-                onClick={() => navigate('/feedback')}
-                sx={{ minHeight: 80 }}
-              >
-                Enviar Feedback 
-              </Button>
-            </Grid>
-          )}
-          {(
-            <Grid item xs={12}>
-              <Button 
-                fullWidth
-                variant="contained"
-                color="primary"
-                onClick={() => navigate('/votacion')}
-                sx={{ minHeight: 80 }}
-              >
-                Votaciones
-              </Button>
-            </Grid>
-          )}
+          {
+          }
 
         </Grid>
       </Paper>
