@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import Search from '@components/Search';
+import AsistenciaForm from '@components/AsistenciaForm';
+import AsistenciasList from '@components/AsistenciasList';
 import { showSuccessAlert, showErrorAlert } from '@helpers/sweetAlert';
 import '@styles/asamblea.css';
 
@@ -7,6 +9,9 @@ const AsambleaTable = ({ asambleas, onEdit, onDelete, userRole }) => {
     const [filter, setFilter] = useState('');
     const [sortField, setSortField] = useState('Fecha');
     const [sortDirection, setSortDirection] = useState('desc');
+    const [mostrarAsistenciaForm, setMostrarAsistenciaForm] = useState(false);
+    const [mostrarAsistenciasList, setMostrarAsistenciasList] = useState(false);
+    const [asambleaSeleccionada, setAsambleaSeleccionada] = useState(null);
 
     // Filtrar asambleas
     const filteredAsambleas = asambleas.filter(asamblea =>
@@ -49,6 +54,31 @@ const AsambleaTable = ({ asambleas, onEdit, onDelete, userRole }) => {
         } catch (error) {
             showErrorAlert('Error', 'No se pudo eliminar la asamblea');
         }
+    };
+
+    const handleRegistrarAsistencia = (asamblea) => {
+        setAsambleaSeleccionada(asamblea);
+        setMostrarAsistenciaForm(true);
+    };
+
+    const handleVerAsistencias = (asamblea) => {
+        setAsambleaSeleccionada(asamblea);
+        setMostrarAsistenciasList(true);
+    };
+
+    const handleCloseAsistenciaForm = () => {
+        setMostrarAsistenciaForm(false);
+        setAsambleaSeleccionada(null);
+    };
+
+    const handleCloseAsistenciasList = () => {
+        setMostrarAsistenciasList(false);
+        setAsambleaSeleccionada(null);
+    };
+
+    const handleAsistenciaSuccess = () => {
+        // Aquí podrías actualizar la lista de asambleas si es necesario
+        showSuccessAlert('Éxito', 'Asistencia registrada correctamente');
     };
 
     const formatDate = (dateString) => {
@@ -120,15 +150,13 @@ const AsambleaTable = ({ asambleas, onEdit, onDelete, userRole }) => {
                             </th>
                             <th>Estado</th>
                             <th>Asistencia</th>
-                            {(userRole === 'admin' || userRole === 'vocalia') && (
-                                <th>Acciones</th>
-                            )}
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {sortedAsambleas.length === 0 ? (
                             <tr>
-                                <td colSpan={userRole === 'admin' || userRole === 'vocalia' ? 6 : 5} className="no-data">
+                                <td colSpan={6} className="no-data">
                                     <div className="no-data-content">
                                         <span className="no-data-icon">📋</span>
                                         <p>No se encontraron asambleas</p>
@@ -167,32 +195,74 @@ const AsambleaTable = ({ asambleas, onEdit, onDelete, userRole }) => {
                                             )}
                                         </div>
                                     </td>
-                                    {(userRole === 'admin' || userRole === 'vocalia') && (
-                                        <td className="actions-cell">
-                                            <div className="action-buttons">
+                                    <td className="actions-cell">
+                                        <div className="action-buttons">
+                                            {/* Botón de registrar asistencia - visible para todos los usuarios */}
+                                            {asamblea.AsistenciaAbierta && (
                                                 <button 
-                                                    onClick={() => onEdit(asamblea)}
-                                                    className="action-btn edit-btn"
-                                                    title={asamblea.AsistenciaAbierta ? "Cerrar asistencia" : "Abrir asistencia"}
+                                                    onClick={() => handleRegistrarAsistencia(asamblea)}
+                                                    className="action-btn asistencia-btn"
+                                                    title="Registrar asistencia"
                                                 >
-                                                    {asamblea.AsistenciaAbierta ? "🔒" : "🔓"}
+                                                    ✅
                                                 </button>
+                                            )}
+                                            
+                                            {/* Botón de ver asistencias - solo para admin y vocalía */}
+                                            {(userRole === 'admin' || userRole === 'vocalia') && (
                                                 <button 
-                                                    onClick={() => handleDelete(asamblea.id)}
-                                                    className="action-btn delete-btn"
-                                                    title="Eliminar asamblea"
+                                                    onClick={() => handleVerAsistencias(asamblea)}
+                                                    className="action-btn list-btn"
+                                                    title="Ver asistencias"
                                                 >
-                                                    🗑️
+                                                    👥
                                                 </button>
-                                            </div>
-                                        </td>
-                                    )}
+                                            )}
+                                            
+                                            {/* Botones de administración - solo para admin y vocalía */}
+                                            {(userRole === 'admin' || userRole === 'vocalia') && (
+                                                <>
+                                                    <button 
+                                                        onClick={() => onEdit(asamblea)}
+                                                        className="action-btn edit-btn"
+                                                        title={asamblea.AsistenciaAbierta ? "Cerrar asistencia" : "Abrir asistencia"}
+                                                    >
+                                                        {asamblea.AsistenciaAbierta ? "🔒" : "🔓"}
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleDelete(asamblea.id)}
+                                                        className="action-btn delete-btn"
+                                                        title="Eliminar asamblea"
+                                                    >
+                                                        🗑️
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </td>
                                 </tr>
                             ))
                         )}
                     </tbody>
                 </table>
             </div>
+
+            {/* Modal de registro de asistencia */}
+            {mostrarAsistenciaForm && asambleaSeleccionada && (
+                <AsistenciaForm
+                    asamblea={asambleaSeleccionada}
+                    onClose={handleCloseAsistenciaForm}
+                    onSuccess={handleAsistenciaSuccess}
+                />
+            )}
+
+            {/* Modal de lista de asistencias */}
+            {mostrarAsistenciasList && asambleaSeleccionada && (
+                <AsistenciasList
+                    asamblea={asambleaSeleccionada}
+                    onClose={handleCloseAsistenciasList}
+                />
+            )}
         </div>
     );
 };
