@@ -137,7 +137,7 @@ const Login = () => {
                             />
                             <FormHelperText component="span">
                                 <Box display="flex" alignItems="center">
-                                    <div>Contenido</div>
+                                    <div></div>
                                 </Box>
                             </FormHelperText>
                         </>
@@ -159,7 +159,7 @@ const Login = () => {
                             />
                             <FormHelperText component="span">
                                 <Box display="flex" alignItems="center">
-                                    <div>Contenido</div>
+                                    <div></div>
                                 </Box>
                             </FormHelperText>
                         </>
