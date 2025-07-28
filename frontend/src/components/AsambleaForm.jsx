@@ -22,6 +22,21 @@ const AsambleaForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false,
 
     const [charCount, setCharCount] = useState(form.Temas.length);
 
+    // Calcular la fecha mínima (24 horas desde ahora) considerando zona horaria local
+    const getMinDateTime = () => {
+        const twentyFourHoursFromNow = new Date();
+        twentyFourHoursFromNow.setHours(twentyFourHoursFromNow.getHours() + 24);
+        
+        // Formatear para datetime-local (YYYY-MM-DDTHH:MM)
+        const year = twentyFourHoursFromNow.getFullYear();
+        const month = String(twentyFourHoursFromNow.getMonth() + 1).padStart(2, '0');
+        const day = String(twentyFourHoursFromNow.getDate()).padStart(2, '0');
+        const hours = String(twentyFourHoursFromNow.getHours()).padStart(2, '0');
+        const minutes = String(twentyFourHoursFromNow.getMinutes()).padStart(2, '0');
+        
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+
     useEffect(() => {
         setCharCount(form.Temas.length);
     }, [form.Temas]);
@@ -46,8 +61,23 @@ const AsambleaForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false,
         } else {
             const selectedDate = new Date(form.Fecha);
             const now = new Date();
-            if (selectedDate < now) {
+            
+            console.log('Fecha seleccionada:', selectedDate); // Debug
+            console.log('Fecha actual:', now); // Debug
+            
+            // Validar que la fecha no sea anterior a la actual
+            if (selectedDate <= now) {
                 error.Fecha = "La fecha no puede ser anterior a la actual.";
+            } else {
+                // Calcular 24 horas desde ahora
+                const twentyFourHoursFromNow = new Date();
+                twentyFourHoursFromNow.setHours(twentyFourHoursFromNow.getHours() + 24);
+                
+                console.log('24 horas desde ahora:', twentyFourHoursFromNow); // Debug
+                
+                if (selectedDate < twentyFourHoursFromNow) {
+                    error.Fecha = "La asamblea debe agendarse con al menos 24 horas de anticipación.";
+                }
             }
         }
         if (!form.Sala || form.Sala.length < 2) {
@@ -80,7 +110,9 @@ const AsambleaForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false,
 
     const handleSubmit = e => {
         e.preventDefault();
+        console.log('Formulario enviado, validando...'); // Debug
         const errors = validate();
+        console.log('Errores de validación:', errors); // Debug
         if (Object.keys(errors).length > 0) {
             setForm(prev => ({ ...prev, error: errors }));
             return;
@@ -137,10 +169,11 @@ const AsambleaForm = ({ initialData = {}, onSubmit, onCancel, isEditing = false,
                                     type="datetime-local"
                                     value={form.Fecha}
                                     onChange={handleChange}
+                                    min={getMinDateTime()}
                                     required
                                     className={`form-input ${form.error.Fecha ? 'error' : ''}`}
                                 />
-                                <small>Selecciona fecha y hora de la asamblea</small>
+                                <small>La asamblea debe agendarse con al menos 24 horas de anticipación</small>
                                 {form.error.Fecha && <span className="form-error">{form.error.Fecha}</span>}
                             </label>
                         </div>
