@@ -26,6 +26,7 @@ import UsersTable from '@components/UsersTable';
 import Popup from '@components/Popup';
 import useUsers from '@hooks/users/useGetUsers.jsx';
 import useEditUser from '@hooks/users/useEditUser.jsx';
+import useDeleteUser from '@hooks/users/useDeleteUser.jsx';
 import { useAuth } from '@context/AuthContext';
 import { getUsers, getStaffUsers } from '@services/user.service.js';
 
@@ -58,6 +59,9 @@ const Users = () => {
     dataUser,
     setDataUser
   } = useEditUser(setUsers);
+
+  // Hook de eliminación
+  const { handleDelete } = useDeleteUser(fetchUsers, setDataUser);
 
   // Cargar usuarios staff (admin y vocalia)
   useEffect(() => {
@@ -109,14 +113,18 @@ const Users = () => {
   };
 
   const handleEditUser = (userData) => {
-    setSelectedUser(userData);
-    handleClickUpdate(userData);
+    // Siempre pasar como array para el hook y el Popup
+    const arr = Array.isArray(userData) ? userData : [userData];
+    setSelectedUser(arr);
+    setDataUser(arr);
+    handleClickUpdate(arr);
   };
 
 
   const handleDeleteUser = (userData) => {
-    // TODO: Implementar eliminación con confirmación
-    console.log('Eliminar usuario:', userData);
+    // Siempre pasar como array para el hook
+    const arr = Array.isArray(userData) ? userData : [userData];
+    handleDelete(arr);
   };
 
   const handleToggleView = () => {
@@ -154,24 +162,20 @@ const Users = () => {
           { label: 'Usuarios' }
         ]}
         stats={getStatsData()}
-        actions={[
-          {
-            label: showAllUsers ? 'Ver Solo Staff' : 'Ver Todos',
-            icon: <PeopleIcon />,
-            props: {
-              variant: 'outlined',
-              onClick: handleToggleView,
-            },
-          },
-          {
-            label: 'Nuevo Usuario',
-            icon: <AddIcon />,
-            props: {
-              variant: 'contained',
-              onClick: handleCreateUser,
-            },
-          },
-        ]}
+        actions={
+          userRole !== 'estudiante'
+            ? [
+                {
+                  label: showAllUsers ? 'Ver Solo Staff' : 'Ver Todos',
+                  icon: <PeopleIcon />,
+                  props: {
+                    variant: 'outlined',
+                    onClick: handleToggleView,
+                  },
+                },
+              ]
+            : []
+        }
       />
 
       <UsersTable
@@ -179,17 +183,20 @@ const Users = () => {
         onEdit={handleEditUser}
         onDelete={handleDeleteUser}
         searchValue={filterTerm}
-        onSearchChange={setFilterTerm}
+        onSearchChange={userRole !== 'estudiante' ? setFilterTerm : undefined}
+        searchable={userRole !== 'estudiante'}
+        showAllUsers={showAllUsers}
+        userRole={userRole}
       />
 
       {/* Modal de edición existente */}
       {isEditPopupOpen && (
         <Popup 
-          isOpen={isEditPopupOpen} 
-          setIsOpen={setIsEditPopupOpen}
-        >
-          {/* Contenido del popup de edición existente */}
-        </Popup>
+          show={isEditPopupOpen}
+          setShow={setIsEditPopupOpen}
+          data={dataUser}
+          action={handleUpdate}
+        />
       )}
     </PageContainer>
   );

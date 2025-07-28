@@ -39,7 +39,6 @@ cron.schedule("0 8 * * *", async () => {
                     <li><b>Fecha y hora:</b> ${act.fecha}</li>
                     <li><b>Lugar:</b> ${act.lugar}</li>
                     <li><b></b> ${act.descripcion}</li>
-                    <li><b>Recursos:</b> ${act.recursos || "No especificados"}</li>
                 </ul>
                 <p>¡Te esperamos! Recuerda ser puntual y llevar todo lo necesario.</p>
                 `,
