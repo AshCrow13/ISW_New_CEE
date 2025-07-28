@@ -1,14 +1,52 @@
 import { useState } from 'react';
-import Search from '@components/Search';
+import { 
+    Box, 
+    Chip, 
+    Typography,
+    Button,
+    Tooltip
+} from '@mui/material';
+import { 
+    Edit as EditIcon,
+    Delete as DeleteIcon,
+    CheckCircle as CheckIcon,
+    Group as GroupIcon,
+    Lock as LockIcon,
+    LockOpen as UnlockIcon
+} from '@mui/icons-material';
+import { styled } from '@mui/material/styles';
+import DataTable from '@components/common/DataTable';
+import StatusChip from '@components/common/StatusChip';
+import ActionButton from '@components/common/ActionButton';
 import AsistenciaForm from '@components/AsistenciaForm';
 import AsistenciasList from '@components/AsistenciasList';
 import { showSuccessAlert, showErrorAlert } from '@helpers/sweetAlert';
-import '@styles/asamblea.css';
+
+// Styled components
+const SalaChip = styled(Chip)(({ theme }) => ({
+    background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.grey[100]} 100%)`,
+    color: theme.palette.primary.main,
+    fontWeight: 500,
+    border: `1px solid ${theme.palette.grey[300]}`,
+    maxWidth: '120px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+}));
+
+const ClaveBox = styled(Box)(({ theme }) => ({
+    fontSize: '0.8rem',
+    color: theme.palette.text.secondary,
+    fontFamily: 'Courier New, monospace',
+    background: theme.palette.grey[50],
+    padding: theme.spacing(0.5, 1),
+    borderRadius: theme.spacing(0.75),
+    border: `1px solid ${theme.palette.grey[200]}`,
+    marginTop: theme.spacing(0.5),
+}));
 
 const AsambleaTable = ({ asambleas, onEdit, onDelete, userRole }) => {
     const [filter, setFilter] = useState('');
-    const [sortField, setSortField] = useState('Fecha');
-    const [sortDirection, setSortDirection] = useState('desc');
     const [mostrarAsistenciaForm, setMostrarAsistenciaForm] = useState(false);
     const [mostrarAsistenciasList, setMostrarAsistenciasList] = useState(false);
     const [asambleaSeleccionada, setAsambleaSeleccionada] = useState(null);
@@ -19,34 +57,166 @@ const AsambleaTable = ({ asambleas, onEdit, onDelete, userRole }) => {
         asamblea.Sala?.toLowerCase().includes(filter.toLowerCase())
     );
 
-    // Ordenar asambleas
-    const sortedAsambleas = [...filteredAsambleas].sort((a, b) => {
-        let aValue = a[sortField];
-        let bValue = b[sortField];
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    const getStatusBadge = (asamblea) => {
+        const now = new Date();
+        const asambleaDate = new Date(asamblea.Fecha);
         
-        if (sortField === 'Fecha') {
-            aValue = new Date(aValue);
-            bValue = new Date(bValue);
+        if (asambleaDate < now) {
+            return <StatusChip variant="completed" label="Finalizada" size="small" />;
+        } else if (asambleaDate.getTime() - now.getTime() < 24 * 60 * 60 * 1000) {
+            return <StatusChip variant="upcoming" label="Próxima" size="small" />;
         } else {
-            aValue = aValue?.toString().toLowerCase();
-            bValue = bValue?.toString().toLowerCase();
-        }
-
-        if (sortDirection === 'asc') {
-            return aValue > bValue ? 1 : -1;
-        } else {
-            return aValue < bValue ? 1 : -1;
-        }
-    });
-
-    const handleSort = (field) => {
-        if (sortField === field) {
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortDirection('asc');
+            return <StatusChip variant="scheduled" label="Programada" size="small" />;
         }
     };
+
+    const getAsistenciaStatus = (asamblea) => {
+        return (
+            <Box>
+                <StatusChip 
+                    variant={asamblea.AsistenciaAbierta ? 'open' : 'closed'}
+                    label={asamblea.AsistenciaAbierta ? 'Abierta' : 'Cerrada'}
+                    size="small"
+                />
+                {asamblea.ClaveAsistencia && (userRole === 'admin' || userRole === 'vocalia') && (
+                    <ClaveBox>
+                        Clave: {asamblea.ClaveAsistencia}
+                    </ClaveBox>
+                )}
+            </Box>
+        );
+    };
+
+    const renderActions = (asamblea) => {
+        return (
+            <Box display="flex" gap={1}>
+                {/* Botón de registrar asistencia - visible para todos los usuarios */}
+                {asamblea.AsistenciaAbierta && (
+                    <ActionButton 
+                        variant="asistencia"
+                        tooltip="Registrar asistencia"
+                        onClick={() => handleRegistrarAsistencia(asamblea)}
+                    >
+                        <CheckIcon fontSize="small" />
+                    </ActionButton>
+                )}
+                
+                {/* Botón de ver asistencias - solo para admin y vocalía */}
+                {(userRole === 'admin' || userRole === 'vocalia') && (
+                    <ActionButton 
+                        variant="list"
+                        tooltip="Ver asistencias"
+                        onClick={() => handleVerAsistencias(asamblea)}
+                    >
+                        <GroupIcon fontSize="small" />
+                    </ActionButton>
+                )}
+                
+                {/* Botones de administración - solo para admin y vocalía */}
+                {(userRole === 'admin' || userRole === 'vocalia') && (
+                    <>
+                        <ActionButton 
+                            variant="edit"
+                            tooltip={asamblea.AsistenciaAbierta ? "Cerrar asistencia" : "Abrir asistencia"}
+                            onClick={() => onEdit(asamblea)}
+                        >
+                            {asamblea.AsistenciaAbierta ? <LockIcon fontSize="small" /> : <UnlockIcon fontSize="small" />}
+                        </ActionButton>
+                        <ActionButton 
+                            variant="delete"
+                            tooltip="Eliminar asamblea"
+                            onClick={() => handleDelete(asamblea.id)}
+                        >
+                            <DeleteIcon fontSize="small" />
+                        </ActionButton>
+                    </>
+                )}
+            </Box>
+        );
+    };
+
+    // Definir columnas para la DataTable
+    const columns = [
+        {
+            id: 'Temas',
+            label: 'Tema',
+            minWidth: 250,
+            maxWidth: 300,
+            render: (value) => (
+                <Box>
+                    <Tooltip title={value} arrow placement="top">
+                        <Typography 
+                            variant="subtitle2" 
+                            fontWeight={600} 
+                            color="text.primary"
+                            sx={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                maxWidth: '280px'
+                            }}
+                        >
+                            {value}
+                        </Typography>
+                    </Tooltip>
+                </Box>
+            ),
+        },
+        {
+            id: 'Fecha',
+            label: 'Fecha y Hora',
+            minWidth: 200,
+            render: (value) => (
+                <Typography variant="body2" color="text.primary" fontWeight={500}>
+                    {formatDate(value)}
+                </Typography>
+            ),
+        },
+        {
+            id: 'Sala',
+            label: 'Sala',
+            minWidth: 120,
+            maxWidth: 120,
+            render: (value) => (
+                <Tooltip title={value} arrow placement="top">
+                    <SalaChip label={value} size="small" />
+                </Tooltip>
+            ),
+        },
+        {
+            id: 'estado',
+            label: 'Estado',
+            minWidth: 120,
+            sortable: false,
+            render: (_, row) => getStatusBadge(row),
+        },
+        {
+            id: 'asistencia',
+            label: 'Asistencia',
+            minWidth: 140,
+            sortable: false,
+            render: (_, row) => getAsistenciaStatus(row),
+        },
+        {
+            id: 'acciones',
+            label: 'Acciones',
+            minWidth: 160,
+            maxWidth: 160,
+            sortable: false,
+            render: (_, row) => renderActions(row),
+        },
+    ];
 
     const handleDelete = async (id) => {
         try {
@@ -81,171 +251,28 @@ const AsambleaTable = ({ asambleas, onEdit, onDelete, userRole }) => {
         showSuccessAlert('Éxito', 'Asistencia registrada correctamente');
     };
 
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
-
-    const getStatusBadge = (asamblea) => {
-        const now = new Date();
-        const asambleaDate = new Date(asamblea.Fecha);
-        
-        if (asambleaDate < now) {
-            return <span className="status-badge completed">Finalizada</span>;
-        } else if (asambleaDate.getTime() - now.getTime() < 24 * 60 * 60 * 1000) {
-            return <span className="status-badge upcoming">Próxima</span>;
-        } else {
-            return <span className="status-badge scheduled">Programada</span>;
-        }
-    };
+    // Estadísticas para mostrar en la tabla
+    const stats = [
+        {
+            label: 'asambleas',
+            value: filteredAsambleas.length,
+        },
+    ];
 
     return (
-        <div className="asamblea-container">
-            <div className="asamblea-header">
-                <Search 
-                    value={filter} 
-                    onChange={e => setFilter(e.target.value)} 
-                    placeholder="Buscar asamblea por tema o sala..." 
-                />
-                <div className="asamblea-stats">
-                    <span className="stat-item">
-                        <strong>{filteredAsambleas.length}</strong> asambleas
-                    </span>
-                </div>
-            </div>
-
-            <div className="asamblea-table-container">
-                <table className="asamblea-table">
-                    <thead>
-                        <tr>
-                            <th onClick={() => handleSort('Temas')} className="sortable">
-                                Tema
-                                {sortField === 'Temas' && (
-                                    <span className="sort-indicator">
-                                        {sortDirection === 'asc' ? '↑' : '↓'}
-                                    </span>
-                                )}
-                            </th>
-                            <th onClick={() => handleSort('Fecha')} className="sortable">
-                                Fecha y Hora
-                                {sortField === 'Fecha' && (
-                                    <span className="sort-indicator">
-                                        {sortDirection === 'asc' ? '↑' : '↓'}
-                                    </span>
-                                )}
-                            </th>
-                            <th onClick={() => handleSort('Sala')} className="sortable">
-                                Sala
-                                {sortField === 'Sala' && (
-                                    <span className="sort-indicator">
-                                        {sortDirection === 'asc' ? '↑' : '↓'}
-                                    </span>
-                                )}
-                            </th>
-                            <th>Estado</th>
-                            <th>Asistencia</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {sortedAsambleas.length === 0 ? (
-                            <tr>
-                                <td colSpan={6} className="no-data">
-                                    <div className="no-data-content">
-                                        <span className="no-data-icon">📋</span>
-                                        <p>No se encontraron asambleas</p>
-                                        {filter && <p>Intenta con otros términos de búsqueda</p>}
-                                    </div>
-                                </td>
-                            </tr>
-                        ) : (
-                            sortedAsambleas.map((asamblea) => (
-                                <tr key={asamblea.id} className="asamblea-row">
-                                    <td className="tema-cell">
-                                        <div className="tema-content">
-                                            <h4>{asamblea.Temas}</h4>
-                                        </div>
-                                    </td>
-                                    <td className="fecha-cell">
-                                        <div className="fecha-content">
-                                            <span className="fecha">{formatDate(asamblea.Fecha)}</span>
-                                        </div>
-                                    </td>
-                                    <td className="sala-cell">
-                                        <span className="sala-badge">{asamblea.Sala}</span>
-                                    </td>
-                                    <td className="status-cell">
-                                        {getStatusBadge(asamblea)}
-                                    </td>
-                                    <td className="asistencia-cell">
-                                        <div className="asistencia-info">
-                                            <span className={`asistencia-status ${asamblea.AsistenciaAbierta ? 'open' : 'closed'}`}>
-                                                {asamblea.AsistenciaAbierta ? 'Abierta' : 'Cerrada'}
-                                            </span>
-                                            {asamblea.ClaveAsistencia && (userRole === 'admin' || userRole === 'vocalia') && (
-                                                <small className="clave-asistencia">
-                                                    Clave: {asamblea.ClaveAsistencia}
-                                                </small>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="actions-cell">
-                                        <div className="action-buttons">
-                                            {/* Botón de registrar asistencia - visible para todos los usuarios */}
-                                            {asamblea.AsistenciaAbierta && (
-                                                <button 
-                                                    onClick={() => handleRegistrarAsistencia(asamblea)}
-                                                    className="action-btn asistencia-btn"
-                                                    title="Registrar asistencia"
-                                                >
-                                                    ✅
-                                                </button>
-                                            )}
-                                            
-                                            {/* Botón de ver asistencias - solo para admin y vocalía */}
-                                            {(userRole === 'admin' || userRole === 'vocalia') && (
-                                                <button 
-                                                    onClick={() => handleVerAsistencias(asamblea)}
-                                                    className="action-btn list-btn"
-                                                    title="Ver asistencias"
-                                                >
-                                                    👥
-                                                </button>
-                                            )}
-                                            
-                                            {/* Botones de administración - solo para admin y vocalía */}
-                                            {(userRole === 'admin' || userRole === 'vocalia') && (
-                                                <>
-                                                    <button 
-                                                        onClick={() => onEdit(asamblea)}
-                                                        className="action-btn edit-btn"
-                                                        title={asamblea.AsistenciaAbierta ? "Cerrar asistencia" : "Abrir asistencia"}
-                                                    >
-                                                        {asamblea.AsistenciaAbierta ? "🔒" : "🔓"}
-                                                    </button>
-                                                    <button 
-                                                        onClick={() => handleDelete(asamblea.id)}
-                                                        className="action-btn delete-btn"
-                                                        title="Eliminar asamblea"
-                                                    >
-                                                        🗑️
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
+        <Box>
+            <DataTable
+                data={filteredAsambleas}
+                columns={columns}
+                searchable={true}
+                searchPlaceholder="Buscar asamblea por tema o sala..."
+                searchValue={filter}
+                onSearchChange={setFilter}
+                stats={stats}
+                emptyStateText="No se encontraron asambleas"
+                emptyStateIcon="📋"
+                sortable={true}
+            />
 
             {/* Modal de registro de asistencia */}
             {mostrarAsistenciaForm && asambleaSeleccionada && (
@@ -263,7 +290,7 @@ const AsambleaTable = ({ asambleas, onEdit, onDelete, userRole }) => {
                     onClose={handleCloseAsistenciasList}
                 />
             )}
-        </div>
+        </Box>
     );
 };
 

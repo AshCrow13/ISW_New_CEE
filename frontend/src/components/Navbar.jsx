@@ -50,7 +50,14 @@ const Navbar = () => { // Componente de navegación
 
     return ( // Renderizado del componente
         <>
-        <AppBar position="static" color="primary">
+        <AppBar 
+            position="static"
+            sx={{
+                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.info.main} 100%)`,
+                boxShadow: '0 4px 20px rgba(0, 51, 102, 0.15)',
+                borderRadius: 0,
+            }}
+        >
             <Toolbar>
             <IconButton
                 color="inherit"
