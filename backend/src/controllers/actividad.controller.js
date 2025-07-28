@@ -22,14 +22,14 @@ import { enviarCorreoEstudiantes } from "../helpers/email.helper.js";
 import { createDocumentoService } from "../services/documento.service.js";
 import path from "path";
 
-// CREATE
+// CREATE - Crear una nueva actividad
 export async function createActividad(req, res) {
     try {
-        // Validar que el cuerpo de la solicitud cumpla con el esquema
+        // Validar datos de entrada (esquema y fecha)
         const { error } = actividadSchema.validate(req.body);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
 
-        // Validar que la fecha sea posterior a la fecha actual
+        // Validar que la fecha sea válida y futura
         const fechaActividad = new Date(req.body.fecha);
         const ahora = new Date();
         if (isNaN(fechaActividad.getTime())) {
@@ -38,13 +38,12 @@ export async function createActividad(req, res) {
         if (fechaActividad < ahora) {
             return handleErrorClient(res, 400, "La fecha de la actividad debe ser posterior a la fecha actual.");
         }
-        
-        // Validar que el usuario tenga el rol adecuado        
-        // 1. Crear la actividad
+
+        // Crear la actividad en la base de datos
         const [actividad, err] = await createActividadService(req.body, req.user); 
         if (err) return handleErrorClient(res, 400, err);
 
-        // 2. Si hay archivo, crear el documento y asociarlo a la actividad
+        // Si hay archivo adjunto, crear el documento y asociarlo a la actividad
         let archivoAdjunto = null;
         if (req.file) {
             const docData = {
@@ -63,12 +62,10 @@ export async function createActividad(req, res) {
             };
         }
 
-        // Buscar los emails de todos los estudiantes
+        // Notificar a todos los estudiantes por correo electrónico
         const estudiantes = await AppDataSource.getRepository(Estudiante).find();
         const emails = estudiantes.map(e => e.email);
 
-
-        // Enviar el correo mejorado con adjunto si existe
         await enviarCorreoEstudiantes(
             `Nueva actividad publicada: ${actividad.titulo}`,
             `
@@ -79,7 +76,6 @@ export async function createActividad(req, res) {
                 <li><b>Fecha:</b> ${actividad.fecha}</li>
                 <li><b>Lugar:</b> ${actividad.lugar}</li>
                 <li><b>Descripción:</b> ${actividad.descripcion}</li>
-                <li><b>Recursos:</b> ${actividad.recursos || "No especificados"}</li>
             </ul>
             <p>¡No te la pierdas!</p>
             `,
@@ -87,57 +83,56 @@ export async function createActividad(req, res) {
             archivoAdjunto ? [archivoAdjunto] : undefined
         );
 
+        // Responder al cliente con éxito
         handleSuccess(res, 201, "Actividad creada correctamente y notificación enviada", actividad);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
 }
 
-// READ (Todos - con filtro)
+// READ - Obtener todas las actividades (con filtro opcional)
 export async function getActividades(req, res) {
     try {
-        // Validar que la consulta cumpla con el esquema
+        // Validar parámetros de consulta (si aplica)
         const [actividades, err] = await getActividadesService(req.query);
         if (err) return handleErrorClient(res, 404, err);
+        // Responder con la lista de actividades
         handleSuccess(res, 200, "Actividades encontradas", actividades);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
 }
 
-// READ (Uno)
+// READ - Obtener una actividad específica
 export async function getActividad(req, res) {
     try {
-        // Validar que la consulta cumpla con el esquema
+        // Validar parámetros de consulta
         const { error } = actividadQuerySchema.validate(req.query);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
 
-        // Llamar al servicio para obtener la actividad
+        // Buscar la actividad por ID o filtro
         const [actividad, err] = await getActividadService(req.query);
         if (err) return handleErrorClient(res, 404, err);
+        // Responder con la actividad encontrada
         handleSuccess(res, 200, "Actividad encontrada", actividad);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
 }
 
-// UPDATE
+// UPDATE - Actualizar una actividad existente
 export async function updateActividad(req, res) {
     try {
-        console.log("Body recibido para actualización:", req.body);
-        
-        // Validar que la consulta cumpla con el esquema
+        // Validar parámetros de consulta y cuerpo de la solicitud
         const { error: queryError } = actividadQuerySchema.validate(req.query);
         if (queryError) return handleErrorClient(res, 400, "Error en la consulta", queryError.message);
 
-        // Validar que el cuerpo de la solicitud cumpla con el esquema de actualización
         const { error: bodyError } = actividadUpdateSchema.validate(req.body);
         if (bodyError) {
-            console.error("Error de validación:", bodyError.details[0].message);
             return handleErrorClient(res, 400, "Error en los datos", bodyError.details[0].message);
         }
 
-        // Verificar que el responsableId sea válido si se proporciona
+        // Validar responsableId si se proporciona
         if (req.body.responsableId) {
             const responsableId = parseInt(req.body.responsableId);
             if (isNaN(responsableId) || responsableId <= 0) {
@@ -146,15 +141,14 @@ export async function updateActividad(req, res) {
             }
         }
 
-        // Llamar al servicio para actualizar la actividad
+        // Actualizar la actividad en la base de datos
         const [actividad, err] = await updateActividadService(req.query, req.body, req.user);
         if (err) return handleErrorClient(res, 400, err);
-        
-        // Buscar los emails de todos los estudiantes
+
+        // Notificar a todos los estudiantes por correo electrónico
         const estudiantes = await AppDataSource.getRepository(Estudiante).find();
         const emails = estudiantes.map(e => e.email);
 
-        // Enviar el correo
         await enviarCorreoEstudiantes(
             `Actividad actualizada: ${actividad.titulo}`,
             `<p>La actividad <b>${actividad.titulo}</b> ha sido actualizada.<br>
@@ -163,23 +157,25 @@ export async function updateActividad(req, res) {
             emails
         );
 
+        // Responder al cliente con éxito
         handleSuccess(res, 200, "Actividad actualizada correctamente", actividad);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
 }
 
-// DELETE
+// DELETE - Eliminar una actividad
 export async function deleteActividad(req, res) {
     try {
-        // Validar que la consulta cumpla con el esquema
+        // Validar parámetros de consulta
         const { error } = actividadQuerySchema.validate(req.query);
         if (error) return handleErrorClient(res, 400, "Error en la consulta", error.message);
-        
-        // Llamar al servicio para eliminar la actividad
+
+        // Eliminar la actividad de la base de datos
         const [actividad, err] = await deleteActividadService(req.query, req.user);
         if (err) return handleErrorClient(res, 404, err);
 
+        // Responder al cliente con éxito
         handleSuccess(res, 200, "Actividad eliminada correctamente", actividad);
     } catch (error) {
         handleErrorServer(res, 500, error.message);

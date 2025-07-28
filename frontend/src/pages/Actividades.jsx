@@ -50,7 +50,9 @@ const Actividades = () => {
     const [verTodas, setVerTodas] = useState(false);
     const { user } = useAuth();
 
-    // Cargar actividades según la vista
+    // Cargar actividades según la vista y el rol del usuario
+    // Si es estudiante y no está en "ver todas", solo carga próximas actividades
+    // Si es admin/vocalía o estudiante en "ver todas", carga todas las actividades
     useEffect(() => {
         if (user?.rol === 'estudiante' && !verTodas) {
             fetchProximasActividades();
@@ -59,7 +61,7 @@ const Actividades = () => {
         }
     }, [user?.rol, verTodas]);
 
-    // Fetch próximas actividades para estudiantes
+    // Obtener próximas actividades (solo para estudiantes)
     const fetchProximasActividades = async () => {
         setLoading(true);
         try {
@@ -72,7 +74,7 @@ const Actividades = () => {
         setLoading(false);
     };
 
-    // Fetch actividades
+    // Obtener todas las actividades (admin/vocalía o estudiantes en "ver todas")
     const fetchActividades = async () => {
         setLoading(true);
         try {
@@ -85,7 +87,7 @@ const Actividades = () => {
         setLoading(false);
     };
 
-    // Submit crear/editar
+    // Enviar formulario de crear o editar actividad
     const onSubmit = async (data) => {
         setLoading(true);
         try {
@@ -106,13 +108,13 @@ const Actividades = () => {
         }
     };
 
-    // Manejar edición
+    // Abrir formulario de edición con los datos de la actividad seleccionada
     const handleEdit = (actividad) => {
         setFormData(actividad);
         setFormOpen(true);
     };
 
-    // Manejar eliminación
+    // Eliminar una actividad (con confirmación)
     const handleDelete = async (id) => {
         if (window.confirm('¿Estás seguro de que quieres eliminar esta actividad?')) {
             try {
@@ -125,7 +127,7 @@ const Actividades = () => {
         }
     };
 
-    // Descargar documento asociado a actividad
+    // Descargar documento asociado a una actividad
     const handleDownloadDocumento = async (docId, titulo) => {
         try {
             const blob = await downloadDocumento(docId);
@@ -140,7 +142,7 @@ const Actividades = () => {
         }
     };
 
-    // Vista para estudiantes - próximas actividades como cards
+    // Renderizar próximas actividades como tarjetas (solo para estudiantes)
     const renderProximasActividades = () => {
         const getCategoryColor = (categoria) => {
             switch (categoria) {
@@ -375,7 +377,7 @@ const Actividades = () => {
                 ]}
             />
 
-            {/* Mostrar vista según rol y estado */}
+            {/* Mostrar vista según el rol y el estado de la vista */}
             {user?.rol === 'estudiante' && !verTodas 
                 ? renderProximasActividades() 
                 : (
@@ -389,7 +391,7 @@ const Actividades = () => {
                 )
             }
 
-            {/* Formulario de crear/editar (modal) */}
+            {/* Modal para crear o editar una actividad */}
             <Dialog
                 open={formOpen}
                 onClose={() => {

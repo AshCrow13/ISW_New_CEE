@@ -5,8 +5,7 @@ import {
 } from '@mui/material';
 import { 
     Edit as EditIcon,
-    Delete as DeleteIcon,
-    Person as PersonIcon
+    Delete as DeleteIcon
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import DataTable from '@components/common/DataTable';
@@ -27,16 +26,21 @@ const UserAvatar = styled(Box)(({ theme }) => ({
     marginRight: theme.spacing(2),
 }));
 
-const UsersTable = ({ users, onEdit, onDelete, searchValue = "", onSearchChange = () => {} }) => {
+import { useAuth } from '@context/AuthContext';
+
+const UsersTable = ({ users, onEdit, onDelete, searchValue = "", onSearchChange = () => {}, searchable = true, userRole }) => {
     const [filter, setFilter] = useState(searchValue);
 
-    // Filtrar usuarios
-    const filteredUsers = users.filter(user =>
-        user.nombreCompleto?.toLowerCase().includes(filter.toLowerCase()) ||
-        user.email?.toLowerCase().includes(filter.toLowerCase()) ||
-        user.rut?.toLowerCase().includes(filter.toLowerCase()) ||
-        user.rol?.toLowerCase().includes(filter.toLowerCase())
-    );
+    // Si es estudiante, no filtrar (mostrar solo lo que recibe)
+    const isEstudiante = userRole === 'estudiante';
+    const filteredUsers = isEstudiante
+        ? users
+        : users.filter(user =>
+            user.nombreCompleto?.toLowerCase().includes(filter.toLowerCase()) ||
+            user.email?.toLowerCase().includes(filter.toLowerCase()) ||
+            user.rut?.toLowerCase().includes(filter.toLowerCase()) ||
+            user.rol?.toLowerCase().includes(filter.toLowerCase())
+        );
 
     const formatDate = (dateString) => {
         if (!dateString) return '-';
@@ -75,20 +79,22 @@ const UsersTable = ({ users, onEdit, onDelete, searchValue = "", onSearchChange 
         );
     };
 
-    const renderActions = (user) => {
+    // Renderizar acciones solo si el rol es admin
+    const renderActions = (userRow) => {
+        if (userRole !== 'admin') return null;
         return (
             <Box display="flex" gap={1}>
                 <ActionButton 
                     variant="edit"
                     tooltip="Editar usuario"
-                    onClick={() => onEdit(user)}
+                    onClick={() => onEdit([userRow])} // Pasar como array para el hook de edición
                 >
                     <EditIcon fontSize="small" />
                 </ActionButton>
                 <ActionButton 
                     variant="delete"
                     tooltip="Eliminar usuario"
-                    onClick={() => onDelete(user)}
+                    onClick={() => onDelete([userRow])} // Pasar como array para el hook de eliminación
                 >
                     <DeleteIcon fontSize="small" />
                 </ActionButton>
@@ -156,10 +162,10 @@ const UsersTable = ({ users, onEdit, onDelete, searchValue = "", onSearchChange 
         <DataTable
             data={filteredUsers}
             columns={columns}
-            searchable={true}
+            searchable={searchable && !isEstudiante}
             searchPlaceholder="Buscar por nombre, email, RUT o rol..."
             searchValue={filter}
-            onSearchChange={handleSearchChange}
+            onSearchChange={searchable && !isEstudiante ? handleSearchChange : undefined}
             emptyStateText="No se encontraron usuarios"
             emptyStateIcon="👥"
             sortable={true}
