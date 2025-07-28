@@ -146,6 +146,8 @@ const Documentos = () => { // Componente principal para la gestión de documento
             setFormData(null); // Limpiar formData
             fetchDocumentos(); // Refrescar la lista de documentos
         } catch (e) {
+            setFormOpen(false);
+            setFormData(null);
             console.error("Error en documento submit:", e);
             showErrorAlert('Error', e.message || 'Ocurrió un error');
         } finally {

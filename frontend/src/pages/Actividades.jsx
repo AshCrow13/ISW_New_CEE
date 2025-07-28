@@ -102,6 +102,8 @@ const Actividades = () => {
             setFormData(null);
             fetchActividades();
         } catch (e) {
+            setFormOpen(false);
+            setFormData(null);
             showErrorAlert('Error', e.message || 'Ocurrió un error');
         } finally {
             setLoading(false);
