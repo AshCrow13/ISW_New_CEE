@@ -22,41 +22,35 @@ import { AppDataSource } from "../config/configDb.js";
 import Documento from "../entity/documento.entity.js";
 import sharp from "sharp"; // Agregar sharp para optimizar imágenes
 
-// CREATE - Subida de archivo
+// CREATE - Subida de archivo y registro de documento
 export async function createDocumento(req, res) {
     try {
-        // Verificar que el archivo existe
+        // Verificar que el archivo fue adjuntado correctamente
         if (!req.file) {
             return handleErrorClient(res, 400, "Debe adjuntar un archivo válido.");
         }
 
-        // Optimizar imagen si el archivo es una imagen
-        const fileExt = path.extname(req.file.originalname).toLowerCase(); // Obtener la extensión del archivo
-        const isImage = [".jpg", ".jpeg", ".png", ".webp"].includes(fileExt); // Verificar si es una imagen
-        
+        // Si es imagen, optimizar antes de guardar
+        const fileExt = path.extname(req.file.originalname).toLowerCase();
+        const isImage = [".jpg", ".jpeg", ".png", ".webp"].includes(fileExt);
         if (isImage) {
             try {
-                // Ruta del archivo original
+                // Optimización de imagen (resize y compresión)
                 const originalPath = req.file.path;
-                // Ruta para la imagen optimizada
                 const optimizedPath = `${originalPath.substring(0, originalPath.lastIndexOf("."))}_opt${fileExt}`;
-                
-                // Optimizar imagen usando sharp
                 await sharp(originalPath)
-                    .resize(1200) // Redimensionar para que el ancho máximo sea 1200px
-                    .jpeg({ quality: 80 }) // Optimizar calidad
+                    .resize(1200)
+                    .jpeg({ quality: 80 })
                     .toFile(optimizedPath);
-                
-                // Eliminar archivo original y reemplazar con la versión optimizada
                 fs.unlinkSync(originalPath);
                 fs.renameSync(optimizedPath, originalPath);
             } catch (optimizationError) {
                 console.error("Error al optimizar imagen:", optimizationError);
-                // Continuar con el archivo original si falla la optimización
+                // Si falla la optimización, continuar con el archivo original
             }
         }
-        
-        // los datos del documento con la URL generada
+
+        // Preparar datos del documento para guardar en la base de datos
         const documentoData = {
             titulo: req.body.titulo,
             tipo: req.body.tipo,
@@ -65,66 +59,65 @@ export async function createDocumento(req, res) {
             id_actividad: req.body.id_actividad || null // ID de actividad opcional
         };
 
-        // Ahora validar con todos los datos completos
-        const { error } = documentoSchema.validate(documentoData); // Validar esquema
+        // Validar datos del documento
+        const { error } = documentoSchema.validate(documentoData);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
-        
-        // el documento en la base de datos
-        // Llamar al servicio para crear el documento
+
+        // Guardar el documento en la base de datos
         const [documento, err] = await createDocumentoService(documentoData, req.user); 
         if (err) return handleErrorClient(res, 400, err);
 
+        // Responder con éxito
         handleSuccess(res, 201, "Documento creado correctamente", documento);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
 }
 
-// READ ALL
+// READ ALL - Obtener todos los documentos (con filtro opcional)
 export async function getDocumentos(req, res) {
     try {
-        // Validar que la consulta cumpla con el esquema
+        // Obtener documentos según filtros de consulta
         const [documentos, err] = await getDocumentosService(req.query);
-        if (err) return handleErrorClient(res, 404, err); // Manejar error de consulta
+        if (err) return handleErrorClient(res, 404, err);
+        // Responder con la lista de documentos
         handleSuccess(res, 200, "Documentos encontrados", documentos);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
 }
 
-// READ ONE
+// READ ONE - Obtener un documento específico
 export async function getDocumento(req, res) {
     try {
-        // Validar que la consulta cumpla con el esquema
+        // Validar parámetros de consulta
         const { error } = documentoQuerySchema.validate(req.query);
         if (error) return handleErrorClient(res, 400, "Error de validación", error.message);
 
-        // Llamar al servicio para obtener el documento
+        // Buscar el documento por ID o filtro
         const [documento, err] = await getDocumentoService(req.query);
         if (err) return handleErrorClient(res, 404, err);
+        // Responder con el documento encontrado
         handleSuccess(res, 200, "Documento encontrado", documento);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
 }
 
-// UPDATE - solo actualiza los datos de texto
+// UPDATE - Actualizar los datos de un documento (solo texto, no archivo)
 export async function updateDocumento(req, res) {
     try {
-        // Validar que la consulta y el cuerpo de la solicitud cumplan con los esquemas
+        // Validar parámetros de consulta y cuerpo de la solicitud
         const { error: queryError } = documentoQuerySchema.validate(req.query);
         if (queryError) return handleErrorClient(res, 400, "Error en la consulta", queryError.message);
 
-        // Validar que el cuerpo de la solicitud cumpla con el esquema de actualización
         const { error: bodyError } = documentoUpdateSchema.validate(req.body);
         if (bodyError) return handleErrorClient(res, 400, "Error en los datos", bodyError.message);
 
-        // Si se está intentando cambiar el tipo de documento, verificar permisos adicionales
+        // Validar permisos si se cambia el tipo de documento (solo vocalía)
         if (req.body.tipo && req.user.rol === "vocalia") {
             const repo = AppDataSource.getRepository(Documento);
             const documento = await repo.findOne({ where: { id: parseInt(req.query.id) } });
-            
-            // Si el documento existe y está intentando cambiar el tipo a uno no permitido
             if (documento && !(req.body.tipo === "Actividad" || req.body.tipo === "Otros")) {
                 return handleErrorClient(
                     res, 
@@ -135,63 +128,64 @@ export async function updateDocumento(req, res) {
             }
         }
 
-        // Verificar si se está intentando actualizar el archivo
+        // Actualizar el documento en la base de datos
         const [documento, err] = await updateDocumentoService(req.query, req.body, req.user);
         if (err) return handleErrorClient(res, 400, err);
 
+        // Responder con éxito
         handleSuccess(res, 200, "Documento actualizado correctamente", documento);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
 }
 
-// DELETE
+// DELETE - Eliminar un documento y su archivo físico
 export async function deleteDocumento(req, res) {
     try {
-        // Validar que la consulta cumpla con el esquema
+        // Validar parámetros de consulta
         const { error } = documentoQuerySchema.validate(req.query);
         if (error) return handleErrorClient(res, 400, "Error en la consulta", error.message);
 
-        // Llamar al servicio para eliminar el documento
-        // y registrar en el historial
+        // Eliminar el documento de la base de datos y registrar en historial
         const [documento, err] = await deleteDocumentoService(req.query, req.user);
         if (err) return handleErrorClient(res, 404, err);
 
-        // borrar el archivo físico del servidor
+        // Eliminar el archivo físico del servidor si existe
         if (documento && documento.urlArchivo) {
-            const filename = documento.urlArchivo.split("/").pop(); // "filename.ext"
-            const filePath = path.join(process.cwd(), "uploads", filename); // "uploads/filename.ext"
+            const filename = documento.urlArchivo.split("/").pop();
+            const filePath = path.join(process.cwd(), "uploads", filename);
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
             }
         }
 
+        // Responder con éxito
         handleSuccess(res, 200, "Documento eliminado correctamente", documento);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
 }
 
-// DOWNLOAD 
+// DOWNLOAD - Descargar el archivo físico de un documento
 export async function downloadDocumento(req, res) {
     try {
-        // Validar que el ID del documento sea un número válido
+        // Validar el ID del documento recibido por parámetro
         const { id } = req.params;
         const repo = AppDataSource.getRepository(Documento);
         const documento = await repo.findOne({ where: { id: parseInt(id) } });
         if (!documento) return handleErrorClient(res, 404, "Documento no encontrado");
 
         // Validar que el documento tenga una URL de archivo
-        const url = documento.urlArchivo; // "/api/documentos/download/filename"
+        const url = documento.urlArchivo;
         const filename = url.split("/").pop();
-        const filePath = path.join(process.cwd(), "uploads", filename); // "uploads/filename"
+        const filePath = path.join(process.cwd(), "uploads", filename);
 
         // Verificar si el archivo existe en el servidor
         if (!fs.existsSync(filePath)) {
             return handleErrorClient(res, 404, "Archivo no encontrado en el servidor");
         }
 
-        // Sanitizar el título para usarlo como nombre de archivo
+        // Sanitizar el título para usarlo como nombre de archivo descargado
         let safeTitle = documento.titulo
             .toString()
             .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -200,6 +194,7 @@ export async function downloadDocumento(req, res) {
             .replace(/^_+|_+$/g, "")
             .substring(0, 40);
         if (!safeTitle) safeTitle = "documento";
+        // Descargar el archivo al cliente
         res.download(filePath, safeTitle + path.extname(filename));
     } catch (error) {
         handleErrorServer(res, 500, error.message);
