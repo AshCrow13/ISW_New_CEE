@@ -70,7 +70,7 @@ export async function generarPDFResultados(votacionId, esAutomatico = false) {
         if (esAutomatico) {
             doc.fontSize(10)
                .fillColor('#16a34a')
-               .text('📄 Generado automáticamente al cierre de votación', 50, 75, { align: 'center' });
+               .text('Generado automáticamente al cierre de votación', 50, 75, { align: 'center' });
         }
 
         // Línea separadora
