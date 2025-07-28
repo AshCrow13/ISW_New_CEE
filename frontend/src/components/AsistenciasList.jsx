@@ -128,7 +128,7 @@ const AsistenciasList = ({ asamblea, onClose }) => {
                                 >
                                     <div className="asistencia-avatar">
                                         <span className="avatar-text">
-                                            {asistencia.nombreCompleto.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                            {asistencia.nombreCompleto.split(' ')[0]?.[0]?.toUpperCase() || '?'}
                                         </span>
                                     </div>
                                     <div className="asistencia-info">

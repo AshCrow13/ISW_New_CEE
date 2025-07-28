@@ -110,10 +110,6 @@ const AsistenciaForm = ({ asamblea, onClose, onSuccess }) => {
                                     <span className="info-label">🏢 Sala:</span>
                                     <span className="info-value">{asamblea.Sala}</span>
                                 </div>
-                                <div className="info-item">
-                                    <span className="info-label">🔑 Clave:</span>
-                                    <span className="info-value clave-display">{asamblea.ClaveAsistencia}</span>
-                                </div>
                             </div>
                         </div>
                     </div>
