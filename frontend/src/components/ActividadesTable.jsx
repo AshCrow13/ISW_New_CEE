@@ -2,20 +2,18 @@ import { useState } from 'react';
 import { 
     Box, 
     Typography,
-    Chip,
-    Button
+    Chip
 } from '@mui/material';
 import { 
     Edit as EditIcon,
     Delete as DeleteIcon,
     CalendarToday as CalendarTodayIcon,
     LocationOn as LocationOnIcon,
-    Category as CategoryIcon,
     FileDownload as FileDownloadIcon
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import DataTable from '@components/common/DataTable';
-import StatusChip from '@components/common/StatusChip';
+// ...existing code...
 import ActionButton from '@components/common/ActionButton';
 
 // Styled components
@@ -37,7 +35,7 @@ const CategoriaChip = styled(Chip)(({ theme, variant }) => {
     };
 });
 
-const FechaBox = styled(Box)(({ theme }) => ({
+const FechaBox = styled(Box)(() => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
@@ -201,26 +199,6 @@ const ActividadesTable = ({
         },
     ];
 
-    // Estadísticas para mostrar en la tabla
-    const stats = [
-        {
-            label: 'actividades totales',
-            value: filteredActividades.length,
-            icon: <CategoryIcon />,
-        },
-        {
-            label: 'deportivas',
-            value: filteredActividades.filter(a => a.categoria === 'Deportivo').length,
-        },
-        {
-            label: 'recreativas',
-            value: filteredActividades.filter(a => a.categoria === 'Recreativo').length,
-        },
-        {
-            label: 'oficiales',
-            value: filteredActividades.filter(a => a.categoria === 'Oficial').length,
-        },
-    ];
 
     return (
         <DataTable
@@ -230,7 +208,6 @@ const ActividadesTable = ({
             searchPlaceholder="Buscar actividad por título, descripción, lugar o categoría..."
             searchValue={filter}
             onSearchChange={setFilter}
-            stats={stats}
             emptyStateText="No se encontraron actividades"
             emptyStateIcon="🎯"
             sortable={true}
