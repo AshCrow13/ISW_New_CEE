@@ -1,26 +1,31 @@
-import { Container, Paper, Typography, Box, Button, Grid } from '@mui/material';
-import EventIcon from '@mui/icons-material/Event';
-import ArticleIcon from '@mui/icons-material/Article';
-import GroupIcon from '@mui/icons-material/Group';
-import HistoryIcon from '@mui/icons-material/History';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@context/AuthContext'; // 
+import { Paper, Typography, Box, Grid } from '@mui/material';
+import { 
+    Event as EventIcon,
+    Article as ArticleIcon,
+    Group as GroupIcon,
+    History as HistoryIcon,
+    Home as HomeIcon
+} from '@mui/icons-material';
+import { useAuth } from '@context/AuthContext';
+import PageContainer from '@components/common/PageContainer';
+import PageHeader from '@components/common/PageHeader';
 
 const Home = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth(); // Importa el hook useAuth para acceder al usuario autenticado
-  const userRole = user?.rol; // Obtiene el rol del usuario autenticado
+  const { user } = useAuth();
 
   return (
-    <Container maxWidth="md" sx={{ py: 7 }}>
-      <Paper elevation={6} sx={{ p: 5, borderRadius: 4 }}>
-        <Typography variant="h4" sx={{ mb: 2 }}>
-          ¡Bienvenido al Portal del Centro de Estudiantes!
-        </Typography>
-        <Typography variant="h6" sx={{ mb: 2, color: 'primary.main' }}>
-          Representando a la comunidad estudiantil con compromiso y transparencia
-        </Typography>
-        <Typography sx={{ mb: 4, textAlign: 'justify' }}>
+    <PageContainer>
+      <PageHeader
+        title="¡Bienvenido al Portal del Centro de Estudiantes!"
+        subtitle="Representando a la comunidad estudiantil con compromiso y transparencia"
+        icon={<HomeIcon />}
+        breadcrumbs={[
+          { label: 'Inicio' }
+        ]}
+      />
+      
+      <Paper elevation={3} sx={{ p: 4, borderRadius: 3, mb: 3 }}>
+        <Typography sx={{ mb: 4, textAlign: 'justify', fontSize: '1.1rem' }}>
           Somos la voz oficial de los estudiantes, trabajando incansablemente para mejorar la calidad 
           educativa, promover actividades extracurriculares y crear un ambiente universitario que 
           fomente el crecimiento académico y personal de toda nuestra comunidad estudiantil.
@@ -28,10 +33,10 @@ const Home = () => {
 
         {/* Sección de Objetivos */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h5" sx={{ mb: 3, color: 'primary.main' }}>
+          <Typography variant="h5" sx={{ mb: 3, color: 'primary.main', fontWeight: 'bold' }}>
             Nuestros Objetivos
           </Typography>
-          <Grid container spacing={2}>
+          <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
                 <GroupIcon sx={{ color: 'primary.main', mr: 2, mt: 0.5 }} />
@@ -40,12 +45,10 @@ const Home = () => {
                     Representación Estudiantil
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Ser la voz auténtica de todos los estudiantes ante las autoridades académicas
+                    Ser la voz unificada de todos los estudiantes ante las autoridades académicas
                   </Typography>
                 </Box>
               </Box>
-            </Grid>
-            <Grid item xs={12} md={6}>
               <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
                 <EventIcon sx={{ color: 'primary.main', mr: 2, mt: 0.5 }} />
                 <Box>
@@ -53,7 +56,7 @@ const Home = () => {
                     Actividades y Eventos
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Organizar eventos culturales, deportivos y académicos que enriquezcan la experiencia universitaria
+                    Organizar eventos que enriquezcan la experiencia universitaria y fomenten la integración
                   </Typography>
                 </Box>
               </Box>
@@ -63,15 +66,13 @@ const Home = () => {
                 <ArticleIcon sx={{ color: 'primary.main', mr: 2, mt: 0.5 }} />
                 <Box>
                   <Typography variant="h6" sx={{ mb: 1 }}>
-                    Gestión Transparente
+                    Transparencia
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Mantener procesos democráticos y transparentes en todas nuestras decisiones
+                    Mantener informada a la comunidad estudiantil sobre nuestras gestiones y decisiones
                   </Typography>
                 </Box>
               </Box>
-            </Grid>
-            <Grid item xs={12} md={6}>
               <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
                 <HistoryIcon sx={{ color: 'primary.main', mr: 2, mt: 0.5 }} />
                 <Box>
@@ -86,6 +87,7 @@ const Home = () => {
             </Grid>
           </Grid>
         </Box>
+        
         {/* Mensaje de bienvenida personalizado */}
         {user && (
           <Box sx={{ mt: 4, p: 3, bgcolor: 'primary.light', borderRadius: 2 }}>
@@ -98,14 +100,9 @@ const Home = () => {
             </Typography>
           </Box>
         )}
-
-        <Grid container spacing={3}>
-
-        </Grid>
       </Paper>
-    </Container>
+    </PageContainer>
   );
 };
 
 export default Home;
-

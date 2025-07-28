@@ -11,7 +11,6 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
-  IconButton,
   Chip,
   Paper
 } from "@mui/material";
@@ -21,6 +20,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import FolderIcon from '@mui/icons-material/Folder';
+import ActionButton from '@components/common/ActionButton';
 
 const DocumentoTable = ({
     documentos = [],
@@ -184,20 +184,20 @@ const DocumentoTable = ({
                             {/* Solo mostrar botones de edición y eliminación si el usuario tiene permisos */}
                             {canEditDocument(userRole, doc.tipo) && (
                               <>
-                                <IconButton 
-                                  size="small" 
+                                <ActionButton 
+                                  variant="edit"
+                                  tooltip="Editar documento"
                                   onClick={() => onEdit(doc)}
-                                  sx={{ color: "primary.main" }}
                                 >
                                   <EditIcon fontSize="small" />
-                                </IconButton>
-                                <IconButton 
-                                  size="small" 
+                                </ActionButton>
+                                <ActionButton 
+                                  variant="delete"
+                                  tooltip="Eliminar documento"
                                   onClick={() => onDelete(doc.id)}
-                                  sx={{ color: "error.main" }}
                                 >
                                   <DeleteIcon fontSize="small" />
-                                </IconButton>
+                                </ActionButton>
                               </>
                             )}
                           </Box>

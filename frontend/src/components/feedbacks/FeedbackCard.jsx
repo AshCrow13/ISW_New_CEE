@@ -1,5 +1,6 @@
 import { Paper, Typography, Box } from '@mui/material';
-import deleteIcon from '@assets/deleteIcon.svg';
+import { Delete as DeleteIcon } from '@mui/icons-material';
+import ActionButton from '@components/common/ActionButton';
 
 const FeedbackCard = ({ feedback, onDelete, showDeleteButton = false }) => {
   const formatFecha = (fecha) => {
@@ -26,24 +27,14 @@ const FeedbackCard = ({ feedback, onDelete, showDeleteButton = false }) => {
           )}
         </Box>
         {showDeleteButton && (
-          <Box 
-            component="img"
-            src={deleteIcon}
-            alt="Eliminar feedback"
+          <ActionButton
+            variant="delete"
             onClick={() => onDelete(feedback.id)}
-            sx={{ 
-              width: 20,
-              height: 20,
-              cursor: 'pointer',
-              opacity: 0.7,
-              transition: 'opacity 0.2s',
-              '&:hover': { 
-                opacity: 1,
-                transform: 'scale(1.1)'
-              },
-              ml: 1
-            }}
-          />
+            tooltip="Eliminar feedback"
+            size="small"
+          >
+            <DeleteIcon />
+          </ActionButton>
         )}
       </Box>
       <Typography color="text.secondary" sx={{ mb: 1 }}>

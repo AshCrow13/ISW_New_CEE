@@ -1,36 +1,53 @@
-/*
-import Table from '@components/Table';
-import Search from '../components/Search';
-import DeleteIcon from '../assets/deleteIcon.svg';
-import UpdateIcon from '../assets/updateIcon.svg';
-import UpdateIconDisable from '../assets/updateIconDisabled.svg';
-import DeleteIconDisable from '../assets/deleteIconDisabled.svg';
-import useEditUser from '@hooks/users/useEditUser';
-import useDeleteUser from '@hooks/users/useDeleteUser'; 
-*/
-import '@styles/users.css';
-import { DataGrid } from '@mui/x-data-grid';
-import { Box, Typography, Button, Stack, TextField, Paper, Card, CardContent, Avatar, Divider, InputAdornment } from '@mui/material';
 import { useCallback, useState, useMemo, useEffect } from 'react';
+import { 
+    Button, 
+    Dialog, 
+    DialogTitle, 
+    DialogContent,
+    DialogActions,
+    TextField,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Grid,
+    Typography,
+    Box
+} from '@mui/material';
+import { 
+    Add as AddIcon, 
+    People as PeopleIcon,
+    Delete as DeleteIcon
+} from '@mui/icons-material';
+import { styled } from '@mui/material/styles';
+import PageContainer from '@components/common/PageContainer';
+import PageHeader from '@components/common/PageHeader';
+import UsersTable from '@components/UsersTable';
+import Popup from '@components/Popup';
 import useUsers from '@hooks/users/useGetUsers.jsx';
-import Popup from '../components/Popup';
+import useEditUser from '@hooks/users/useEditUser.jsx';
 import { useAuth } from '@context/AuthContext';
 import { getUsers, getStaffUsers } from '@services/user.service.js';
-import useEditUser from '@hooks/users/useEditUser.jsx';
-import PersonIcon from '@mui/icons-material/Person';
-import EmailIcon from '@mui/icons-material/Email';
-import SearchIcon from '@mui/icons-material/Search';
+
+// Styled components
+const FormDialog = styled(Dialog)(({ theme }) => ({
+  '& .MuiDialog-paper': {
+    borderRadius: theme.spacing(2),
+    minWidth: 500,
+  },
+}));
 
 const Users = () => {
   const { users, fetchUsers, setUsers } = useUsers();
   const [staffUsers, setStaffUsers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
   const [filterTerm, setFilterTerm] = useState('');
+  const [showAllUsers, setShowAllUsers] = useState(false);
   const { user } = useAuth();
   const userRole = user?.rol;
 
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   // Hook de edición
   const {
@@ -72,166 +89,110 @@ const Users = () => {
     }
   };
 
-  // Filtrar los usuarios staff por el término de búsqueda
-  const filteredStaffUsers = useMemo(() => {
-    if (!filterTerm.trim()) return staffUsers;
+  // Determinar qué usuarios mostrar
+  const displayUsers = useMemo(() => {
+    const baseUsers = showAllUsers ? allUsers : staffUsers;
     
-    return staffUsers.filter(user => 
+    if (!filterTerm.trim()) return baseUsers;
+    
+    return baseUsers.filter(user => 
       user.nombreCompleto?.toLowerCase().includes(filterTerm.toLowerCase()) ||
       user.email?.toLowerCase().includes(filterTerm.toLowerCase()) ||
       user.rut?.toLowerCase().includes(filterTerm.toLowerCase()) ||
       user.rol?.toLowerCase().includes(filterTerm.toLowerCase())
     );
-  }, [staffUsers, filterTerm]);
+  }, [allUsers, staffUsers, filterTerm, showAllUsers]);
 
-  // Filtrar todos los usuarios por el término de búsqueda
-  const filteredUsers = useMemo(() => {
-    if (!filterTerm.trim()) {
-      // Solo staff por defecto
-      return allUsers.filter(user => user.rol === 'admin' || user.rol === 'vocalia');
-    }
-    // Todos los usuarios al buscar
-    return allUsers.filter(user =>
-      user.nombreCompleto?.toLowerCase().includes(filterTerm.toLowerCase()) ||
-      user.email?.toLowerCase().includes(filterTerm.toLowerCase()) ||
-      user.rut?.toLowerCase().includes(filterTerm.toLowerCase()) ||
-      user.rol?.toLowerCase().includes(filterTerm.toLowerCase())
-    );
-  }, [allUsers, filterTerm]);
-
-  // Abrir el modal de edición para admin
-  const handleEditUser = (userData) => {
-    setDataUser([userData]);
-    setSelectedRow(userData);
-    setIsEditPopupOpen(true);
+  const handleCreateUser = () => {
+    setSelectedUser(null);
+    setIsCreateOpen(true);
   };
 
-  // Renderizar la vista de tarjetas para todos los roles
-  const renderCardView = () => (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>Directivos del Centro de Estudiantes</Typography>
-      
-      {/* Campo de búsqueda solo visible para admin y vocalia */}
-      {(userRole === 'admin' || userRole === 'vocalia') && (
-        <TextField
-          label="Buscar estudiante"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={filterTerm}
-          onChange={(e) => setFilterTerm(e.target.value)}
-          sx={{ mb: 4, maxWidth: 500 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      )}
-      
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 3 }}>
-        {filteredUsers.map((user) => (
-          <Card key={user.id} sx={{ 
-            boxShadow: 2, 
-            transition: 'transform 0.2s', 
-            '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 } 
-          }}>
-            <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <Avatar 
-                sx={{ 
-                  width: 80, 
-                  height: 80, 
-                  mb: 2,
-                  bgcolor: user.rol === 'admin' ? 'primary.main' : 'secondary.main',
-                  fontSize: '2rem'
-                }}
-              >
-                {user.nombreCompleto.charAt(0)}
-              </Avatar>
-              
-              <Typography variant="h6" align="center" gutterBottom>
-                {user.nombreCompleto}
-              </Typography>
-              
-              <Typography 
-                variant="caption" 
-                align="center" 
-                sx={{ 
-                  bgcolor: user.rol === 'admin' ? 'primary.light' : 'secondary.light',
-                  color: user.rol === 'admin' ? 'primary.contrastText' : 'secondary.contrastText',
-                  px: 1.5,
-                  py: 0.5,
-                  borderRadius: 1,
-                  mb: 2,
-                  fontWeight: 'bold'
-                }}
-              >
-                {user.rol === 'admin'
-                  ? 'Administrador'
-                  : user.rol === 'vocalia'
-                    ? 'Vocalía'
-                    : 'Estudiante'}
-              </Typography>
-              
-              <Divider sx={{ width: '100%', my: 1.5 }} />
-              
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%', mb: 1 }}>
-                <EmailIcon color="action" fontSize="small" />
-                <Typography variant="body2">{user.email}</Typography>
-              </Box>
-              
-              {/* Botón de editar solo para administradores */}
-              {userRole === 'admin' && (
-                <Button
-                  variant="outlined"
-                  size="small"
-                  color="primary"
-                  sx={{ mt: 2 }}
-                  onClick={() => handleEditUser(user)}
-                >
-                  Editar usuario
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </Box>
-      
-      {/* Mensaje si no hay resultados */}
-      {filteredUsers.length === 0 && (
-        <Box sx={{ 
-          p: 4, 
-          textAlign: 'center', 
-          bgcolor: '#f5f5f5', 
-          borderRadius: 2, 
-          mt: 3 
-        }}>
-          <Typography variant="h6" color="text.secondary">
-            No se encontraron directivos
-          </Typography>
-          {filterTerm && (
-            <Typography variant="body2" color="text.secondary" mt={1}>
-              Intenta con otro término de búsqueda
-            </Typography>
-          )}
-        </Box>
-      )}
-      
-      {/* Popup para editar usuario (solo visible para admin) */}
-      {userRole === 'admin' && (
-        <Popup
-          show={isEditPopupOpen}
-          setShow={setIsEditPopupOpen}
-          data={dataUser}
-          action={handleUpdate}
-        />
-      )}
-    </Box>
-  );
+  const handleEditUser = (userData) => {
+    setSelectedUser(userData);
+    handleClickUpdate(userData);
+  };
 
-  return renderCardView();
+
+  const handleDeleteUser = (userData) => {
+    // TODO: Implementar eliminación con confirmación
+    console.log('Eliminar usuario:', userData);
+  };
+
+  const handleToggleView = () => {
+    setShowAllUsers(!showAllUsers);
+    setFilterTerm(''); // Limpiar filtro al cambiar vista
+  };
+
+  const getStatsData = () => {
+    const currentUsers = showAllUsers ? allUsers : staffUsers;
+    return [
+      {
+        label: showAllUsers ? 'usuarios totales' : 'usuarios staff',
+        value: displayUsers.length,
+        icon: <PeopleIcon />,
+      },
+      {
+        label: 'administradores',
+        value: currentUsers.filter(u => u.rol === 'admin').length,
+      },
+      {
+        label: 'estudiantes',
+        value: currentUsers.filter(u => u.rol === 'estudiante').length,
+      },
+    ];
+  };
+
+  return (
+    <PageContainer>
+      <PageHeader
+        title="Gestión de Usuarios"
+        subtitle="Administra los usuarios del sistema"
+        icon={<PeopleIcon />}
+        breadcrumbs={[
+          { label: 'Inicio', href: '/home' },
+          { label: 'Usuarios' }
+        ]}
+        stats={getStatsData()}
+        actions={[
+          {
+            label: showAllUsers ? 'Ver Solo Staff' : 'Ver Todos',
+            icon: <PeopleIcon />,
+            props: {
+              variant: 'outlined',
+              onClick: handleToggleView,
+            },
+          },
+          {
+            label: 'Nuevo Usuario',
+            icon: <AddIcon />,
+            props: {
+              variant: 'contained',
+              onClick: handleCreateUser,
+            },
+          },
+        ]}
+      />
+
+      <UsersTable
+        users={displayUsers}
+        onEdit={handleEditUser}
+        onDelete={handleDeleteUser}
+        searchValue={filterTerm}
+        onSearchChange={setFilterTerm}
+      />
+
+      {/* Modal de edición existente */}
+      {isEditPopupOpen && (
+        <Popup 
+          isOpen={isEditPopupOpen} 
+          setIsOpen={setIsEditPopupOpen}
+        >
+          {/* Contenido del popup de edición existente */}
+        </Popup>
+      )}
+    </PageContainer>
+  );
 };
 
 export default Users;

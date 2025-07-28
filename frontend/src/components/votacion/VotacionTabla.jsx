@@ -7,21 +7,18 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton,
   Chip,
   Typography,
   Box,
-  CircularProgress,
-  Button,
-  Tooltip
+  CircularProgress
 } from '@mui/material';
 import {
   Visibility as VisibilityIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon,
-  Add as AddIcon
+  Delete as DeleteIcon
 } from '@mui/icons-material';
 import FiltroFecha from '@components/feedbacks/FiltroFecha.jsx';
+import ActionButton from '@components/common/ActionButton';
 import { filterVotacionesByDate } from '@helpers/votacionHelpers.js';
 
 const VotacionTabla = ({ 
@@ -120,20 +117,6 @@ const VotacionTabla = ({
 
   return (
     <Box>
-      {/* Botón para crear nueva votación - solo para admins y vocalia */}
-      {puedeEditarEliminar && (
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={onCrearNueva}
-            sx={{ borderRadius: 2, fontWeight: 600 }}
-          >
-            Nueva Votación
-          </Button>
-        </Box>
-      )}
-
       {/* Filtro por fecha */}
       <FiltroFecha 
         fechaFiltro={fechaFiltro}
@@ -205,37 +188,31 @@ const VotacionTabla = ({
                     </TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                        <Tooltip title="Ver detalles">
-                          <IconButton
-                            color="primary"
-                            onClick={() => onVerDetalle(votacion.id)}
-                            size="small"
-                          >
-                            <VisibilityIcon />
-                          </IconButton>
-                        </Tooltip>
+                        <ActionButton
+                          variant="view"
+                          tooltip="Ver detalles"
+                          onClick={() => onVerDetalle(votacion.id)}
+                        >
+                          <VisibilityIcon fontSize="small" />
+                        </ActionButton>
                         
                         {puedeEditarEliminar && (
                           <>
-                            <Tooltip title="Editar votación">
-                              <IconButton
-                                color="warning"
-                                onClick={() => onEditar(votacion.id)}
-                                size="small"
-                              >
-                                <EditIcon />
-                              </IconButton>
-                            </Tooltip>
+                            <ActionButton
+                              variant="edit"
+                              tooltip="Editar votación"
+                              onClick={() => onEditar(votacion.id)}
+                            >
+                              <EditIcon fontSize="small" />
+                            </ActionButton>
                             
-                            <Tooltip title="Eliminar votación">
-                              <IconButton
-                                color="error"
-                                onClick={() => onEliminar(votacion.id)}
-                                size="small"
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </Tooltip>
+                            <ActionButton
+                              variant="delete"
+                              tooltip="Eliminar votación"
+                              onClick={() => onEliminar(votacion.id)}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </ActionButton>
                           </>
                         )}
                       </Box>

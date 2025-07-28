@@ -2,15 +2,21 @@ import { useState, useEffect } from 'react';
 import { getAsambleas, createAsamblea, updateAsamblea, deleteAsamblea } from '@services/asamblea.service.js';
 import AsambleaTable from '@components/AsambleaTable';
 import AsambleaForm from '@components/AsambleaForm';
+import PageContainer from '@components/common/PageContainer';
+import PageHeader from '@components/common/PageHeader';
 import { showSuccessAlert, showErrorAlert } from '@helpers/sweetAlert';
 import { useAuth } from '@context/AuthContext';
-import '@styles/asamblea.css';
+import { Button, CircularProgress, Box } from '@mui/material';
+import { Add as AddIcon, Description as DescriptionIcon, ListAlt as ListAltIcon } from '@mui/icons-material';
 
 const Asambleas = () => {
     const [asambleas, setAsambleas] = useState([]);
+    const [todasAsambleas, setTodasAsambleas] = useState([]);
+    const [proximasAsambleas, setProximasAsambleas] = useState([]);
     const [mostrarForm, setMostrarForm] = useState(false);
     const [formData, setFormData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [verTodas, setVerTodas] = useState(false);
     const { user } = useAuth();
 
 // Cargar asambleas
@@ -18,11 +24,35 @@ const Asambleas = () => {
         fetchAsambleas();
     }, []);
 
+    // Actualizar vista cuando cambia el filtro
+    useEffect(() => {
+        if (verTodas) {
+            setAsambleas(todasAsambleas);
+        } else {
+            setAsambleas(proximasAsambleas);
+        }
+    }, [verTodas, todasAsambleas, proximasAsambleas]);
+
     const fetchAsambleas = async () => {
         try {
             setLoading(true);
             const res = await getAsambleas();
-            setAsambleas(res);
+            setTodasAsambleas(res);
+            
+            // Filtrar próximas asambleas (no finalizadas)
+            const ahora = new Date();
+            const proximas = res.filter(asamblea => {
+                const fechaAsamblea = new Date(asamblea.Fecha);
+                return fechaAsamblea >= ahora;
+            });
+            setProximasAsambleas(proximas);
+            
+            // Establecer vista inicial según preferencia
+            if (!verTodas) {
+                setAsambleas(proximas);
+            } else {
+                setAsambleas(res);
+            }
         } catch (error) {
             showErrorAlert('Error', 'No se pudieron cargar las asambleas');
         } finally {
@@ -95,35 +125,69 @@ const Asambleas = () => {
     };
 
     return (
-        <div className="asambleas-page">
-            <div className="page-header">
-                <div className="header-content">
-                    <h1>Gestión de Asambleas</h1>
-                    <p>Administra las asambleas estudiantiles y sus configuraciones</p>
-                </div>
-                {(user?.rol === 'admin' || user?.rol === 'vocalia') && (
-                    <button onClick={handleCrear} className="create-btn">
-                        <span className="btn-icon">📋</span>
-                        Nueva Asamblea
-                    </button>
-                )}
-            </div>
+        <PageContainer>
+            <PageHeader
+                title="Gestión de Asambleas"
+                subtitle="Administra las asambleas estudiantiles y sus configuraciones"
+                icon={<DescriptionIcon />}
+                breadcrumbs={[
+                    { label: 'Inicio', href: '/home' },
+                    { label: 'Asambleas' }
+                ]}
+                stats={[
+                    {
+                        label: !verTodas ? 'próximas asambleas' : 'asambleas totales',
+                        value: asambleas.length,
+                        icon: <DescriptionIcon />,
+                    },
+                    {
+                        label: 'finalizadas',
+                        value: todasAsambleas.length - proximasAsambleas.length,
+                    }
+                ]}
+                actions={[
+                    // Botón para alternar vista - disponible para todos los usuarios
+                    {
+                        label: verTodas ? 'Ver Próximas' : 'Ver Todas',
+                        icon: <ListAltIcon />,
+                        props: {
+                            variant: 'outlined',
+                            onClick: () => setVerTodas(!verTodas),
+                        },
+                    },
+                    // Botón para admin/vocalia - crear asamblea
+                    ...(user?.rol === 'admin' || user?.rol === 'vocalia' ? [{
+                        label: 'Nueva Asamblea',
+                        icon: <AddIcon />,
+                        props: {
+                            variant: 'contained',
+                            onClick: handleCrear,
+                            disabled: loading,
+                        },
+                    }] : [])
+                ]}
+            />
 
-            <div className="page-content">
-                {loading && asambleas.length === 0 ? (
-                    <div className="loading-container">
-                        <div className="loading-spinner"></div>
-                        <p>Cargando asambleas...</p>
-                    </div>
-                ) : (
-                    <AsambleaTable
-                        asambleas={asambleas}
-                        onEdit={handleEditar}
-                        onDelete={handleEliminar}
-                        userRole={user?.rol}
-                    />
-                )}
-            </div>
+            {loading && asambleas.length === 0 ? (
+                <Box 
+                    display="flex" 
+                    justifyContent="center" 
+                    alignItems="center" 
+                    minHeight="400px"
+                    flexDirection="column"
+                    gap={2}
+                >
+                    <CircularProgress size={48} />
+                    <Box>Cargando asambleas...</Box>
+                </Box>
+            ) : (
+                <AsambleaTable
+                    asambleas={asambleas}
+                    onEdit={handleEditar}
+                    onDelete={handleEliminar}
+                    userRole={user?.rol}
+                />
+            )}
 
             {mostrarForm && (
                 <AsambleaForm
@@ -134,7 +198,7 @@ const Asambleas = () => {
                     loading={loading}
                 />
             )}
-        </div>
+        </PageContainer>
     );
 };
 
