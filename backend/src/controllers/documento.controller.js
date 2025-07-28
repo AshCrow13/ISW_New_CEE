@@ -175,32 +175,50 @@ export async function deleteDocumento(req, res) {
 // DOWNLOAD 
 export async function downloadDocumento(req, res) {
     try {
-        // Validar que el ID del documento sea un número válido
         const { id } = req.params;
-        const repo = AppDataSource.getRepository(Documento);
-        const documento = await repo.findOne({ where: { id: parseInt(id) } });
-        if (!documento) return handleErrorClient(res, 404, "Documento no encontrado");
+        
+        // Verificar si el parámetro es un número (ID) o un nombre de archivo
+        const isNumericId = !isNaN(parseInt(id)) && parseInt(id).toString() === id;
+        
+        if (isNumericId) {
+            // Descargar por ID (método original)
+            const repo = AppDataSource.getRepository(Documento);
+            const documento = await repo.findOne({ where: { id: parseInt(id) } });
+            if (!documento) return handleErrorClient(res, 404, "Documento no encontrado");
 
-        // Validar que el documento tenga una URL de archivo
-        const url = documento.urlArchivo; // "/api/documentos/download/filename"
-        const filename = url.split("/").pop();
-        const filePath = path.join(process.cwd(), "uploads", filename); // "uploads/filename"
+            // Validar que el documento tenga una URL de archivo
+            const url = documento.urlArchivo; // "/api/documentos/download/filename"
+            const filename = url.split("/").pop();
+            const filePath = path.join(process.cwd(), "uploads", filename); // "uploads/filename"
 
-        // Verificar si el archivo existe en el servidor
-        if (!fs.existsSync(filePath)) {
-            return handleErrorClient(res, 404, "Archivo no encontrado en el servidor");
+            // Verificar si el archivo existe en el servidor
+            if (!fs.existsSync(filePath)) {
+                return handleErrorClient(res, 404, "Archivo no encontrado en el servidor");
+            }
+
+            // Sanitizar el título para usarlo como nombre de archivo
+            let safeTitle = documento.titulo
+                .toString()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-zA-Z0-9_\-]/g, "_")
+                .replace(/_+/g, "_")
+                .replace(/^_+|_+$/g, "")
+                .substring(0, 40);
+            if (!safeTitle) safeTitle = "documento";
+            res.download(filePath, safeTitle + path.extname(filename));
+        } else {
+            // Descargar por nombre de archivo directo (para PDFs)
+            const filename = id; // En este caso, 'id' es realmente el nombre del archivo
+            const filePath = path.join(process.cwd(), "uploads", filename);
+
+            // Verificar si el archivo existe en el servidor
+            if (!fs.existsSync(filePath)) {
+                return handleErrorClient(res, 404, "Archivo no encontrado en el servidor");
+            }
+
+            // Para archivos directos, usar el nombre original
+            res.download(filePath, filename);
         }
-
-        // Sanitizar el título para usarlo como nombre de archivo
-        let safeTitle = documento.titulo
-            .toString()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^a-zA-Z0-9_\-]/g, "_")
-            .replace(/_+/g, "_")
-            .replace(/^_+|_+$/g, "")
-            .substring(0, 40);
-        if (!safeTitle) safeTitle = "documento";
-        res.download(filePath, safeTitle + path.extname(filename));
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }

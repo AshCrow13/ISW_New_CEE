@@ -57,13 +57,13 @@ export const votacionBodyValidation = Joi.object({
         "string.max": "El texto de la opción debe tener como máximo 255 caracteres.",
       }),
     duracion: Joi.number()
-    .integer()
-    .positive()
+    .min(0.1)  // Mínimo 0.1 minutos (6 segundos) para pruebas rápidas
+    .max(10080)  // Máximo 1 semana (10080 minutos)
     .required()
     .messages({
       "number.base": "La duración debe ser un número.",
-      "number.integer": "La duración debe ser un número entero.",
-      "number.positive": "La duración debe ser un número positivo.",
+      "number.min": "La duración debe ser de al menos 0.1 minutos (6 segundos).",
+      "number.max": "La duración no puede exceder 1 semana (10080 minutos).",
     }),
 });
 
@@ -91,11 +91,11 @@ export const votacionUpdateBodyValidation = Joi.object({
       }
     ).optional(),
   duracion: Joi.number()
-    .integer()
-    .positive()
+    .min(0.1)  // Mínimo 0.1 minutos (6 segundos) para pruebas rápidas
+    .max(10080)  // Máximo 1 semana
     .messages({
       "number.base": "La duración debe ser un número.",
-      "number.integer": "La duración debe ser un número entero.",
-      "number.positive": "La duración debe ser un número positivo.",
+      "number.min": "La duración debe ser de al menos 0.1 minutos (6 segundos).",
+      "number.max": "La duración no puede exceder 1 semana (10080 minutos).",
     }).optional()
 });
