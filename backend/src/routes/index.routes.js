@@ -11,6 +11,7 @@ import votosRoutes from "./votos.routes.js";
 import feedbackRoutes from "./vfeedback.routes.js";
 import instanciaRoutes from "./instancias.routes.js";
 import historialRoutes from "./historial.routes.js";
+import pdfRoutes from "./pdf.routes.js";
 
 const router = Router();
 
@@ -25,5 +26,6 @@ router.use("/votar", votosRoutes);
 router.use("/feedback", feedbackRoutes);
 router.use("/asamblea", instanciaRoutes);
 router.use("/historial", historialRoutes);
+router.use("/pdf", pdfRoutes);
 
 export default router;

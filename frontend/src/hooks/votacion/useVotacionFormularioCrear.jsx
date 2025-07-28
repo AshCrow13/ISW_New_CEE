@@ -83,7 +83,7 @@ export function useVotacionFormularioCrear({ onSubmit, onSuccess }) {
                 }
                 const duracionHoras = (fechaFin - fechaInicio) / (1000 * 60);
                 if (duracionHoras < 10) {
-                    newErrors.fechaFin = 'La votación debe durar al menos 10';
+                    newErrors.fechaFin = 'La votación debe durar al menos 10 minutos';
                 }
             }
         }
