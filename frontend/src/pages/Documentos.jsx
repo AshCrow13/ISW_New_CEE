@@ -22,9 +22,14 @@ import {
     TextField, 
     InputAdornment 
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import NoteAddIcon from '@mui/icons-material/NoteAdd';
-import SearchIcon from '@mui/icons-material/Search';
+import { 
+    Add as AddIcon, 
+    NoteAdd as NoteAddIcon,
+    Search as SearchIcon,
+    Description as DescriptionIcon
+} from '@mui/icons-material';
+import PageContainer from '@components/common/PageContainer';
+import PageHeader from '@components/common/PageHeader';
 
 const Documentos = () => { // Componente principal para la gestión de documentos
     const [documentos, setDocumentos] = useState([]);
@@ -148,46 +153,51 @@ const Documentos = () => { // Componente principal para la gestión de documento
         }
     };
 
+    const getStatsData = () => {
+        return [
+            {
+                label: 'documentos totales',
+                value: filteredDocumentos.length,
+                icon: <DescriptionIcon />,
+            },
+            {
+                label: 'actividades',
+                value: documentos.filter(d => d.tipo === 'Actividad').length,
+            },
+            {
+                label: 'actas',
+                value: documentos.filter(d => d.tipo === 'Acta').length,
+            },
+        ];
+    };
+
     return (
-        <Box sx={{ p: 3 }}>
-            <Paper elevation={2} sx={{ p: 3, borderRadius: 3, mb: 3 }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                        Gestión de Documentos
-                    </Typography>
-                    {(user?.rol === 'admin' || user?.rol === 'vocalia') && (
-                        <Button
-                            variant="contained"
-                            startIcon={<NoteAddIcon />}
-                            onClick={handleCrear}
-                            sx={{ borderRadius: 2 }}
-                        >
-                            Nuevo documento
-                        </Button>
-                    )}
-                </Box>
-                <Divider sx={{ my: 2 }} />
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="body1" color="text.secondary">
-                        Aquí encontrarás todos los documentos organizados por categorías. Puedes expandir cada sección para ver su contenido.
-                    </Typography>
-                    {/* Campo de búsqueda */}
-                    <TextField
-                        placeholder="Buscar documentos..."
-                        size="small"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        sx={{ width: '300px', maxWidth: '100%' }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon color="action" />
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                </Box>
-            </Paper>
+        <PageContainer>
+            <PageHeader
+                title="Gestión de Documentos"
+                subtitle="Administra y organiza todos los documentos del sistema"
+                icon={<DescriptionIcon />}
+                breadcrumbs={[
+                    { label: 'Inicio', href: '/home' },
+                    { label: 'Documentos' }
+                ]}
+                stats={getStatsData()}
+                actions={
+                    (user?.rol === 'admin' || user?.rol === 'vocalia') 
+                        ? [{
+                            label: 'Nuevo Documento',
+                            icon: <NoteAddIcon />,
+                            props: {
+                                variant: 'contained',
+                                onClick: handleCrear,
+                            },
+                        }]
+                        : []
+                }
+                searchValue={searchTerm}
+                onSearchChange={setSearchTerm}
+                searchPlaceholder="Buscar documentos por título o tipo..."
+            />
 
             <DocumentoTable
                 documentos={filteredDocumentos}
@@ -223,7 +233,7 @@ const Documentos = () => { // Componente principal para la gestión de documento
                     />
                 </DialogContent>
             </Dialog>
-        </Box>
+        </PageContainer>
     );
 };
 

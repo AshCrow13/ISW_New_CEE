@@ -6,15 +6,21 @@ import FiltroFecha from "@components/feedbacks/FiltroFecha.jsx";
 import { AuthContext } from '@context/AuthContext.jsx';
 import { deleteFeedback } from '@services/feedback.service.js';
 import { filterFeedbacksByDate, isAdmin } from '@helpers/feedbackHelpers.js';
-import { Container, Paper, Typography, Box, Button, Grid, IconButton, Fade } from '@mui/material';
-import FeedbackIcon from '@mui/icons-material/Feedback';
-import ListAltIcon from '@mui/icons-material/ListAlt';
-import AddCommentIcon from '@mui/icons-material/AddComment';
-import CloseIcon from '@mui/icons-material/Close';
+import { Container, Paper, Typography, Box, Button, Grid, IconButton, Fade, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { 
+    Feedback as FeedbackIcon,
+    ListAlt as ListAltIcon,
+    AddComment as AddCommentIcon,
+    Close as CloseIcon,
+    Add as AddIcon
+} from '@mui/icons-material';
+import PageContainer from '@components/common/PageContainer';
+import PageHeader from '@components/common/PageHeader';
 
 const Feedback = () => {
   const [view, setView] = useState(null);
   const [fechaFiltro, setFechaFiltro] = useState('');
+  const [modalCrearOpen, setModalCrearOpen] = useState(false);
   const { feedbacks, loading, fetchFeedbacks } = useFeedback();
   const { user } = useContext(AuthContext);
 
@@ -62,79 +68,120 @@ const Feedback = () => {
     if (nuevaVista === 'ver') fetchFeedbacks();
   }, [view, fetchFeedbacks]);
 
-  
+  const getStatsData = () => {
+    return [
+      {
+        label: 'feedbacks totales',
+        value: feedbacks?.length || 0,
+        icon: <FeedbackIcon />,
+      },
+      {
+        label: 'este mes',
+        value: feedbacksFiltrados?.length || 0,
+      },
+      {
+        label: 'pendientes',
+        value: feedbacks?.filter(f => f.estado === 'pendiente')?.length || 0,
+      },
+    ];
+  };
+
+  const handleCrearFeedbackSuccess = () => {
+    setModalCrearOpen(false);
+    fetchFeedbacks();
+  };
+
+  const renderMainContent = () => {
+    switch (view) {
+      case 'ver':
+        return userIsAdmin ? (
+          <Fade in={true}>
+            <Box>
+              <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
+                <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+                  <Typography variant="h5" color="primary" fontWeight={700}>
+                    Feedbacks Publicados
+                  </Typography>
+                  <IconButton onClick={() => setView(null)} color="error">
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
+                
+                <FiltroFecha 
+                  fechaFiltro={fechaFiltro}
+                  onFechaChange={handleFechaChange}
+                  onClearFilter={handleClearFilter}
+                />
+
+                <FeedbackList
+                  feedbacks={feedbacksFiltrados}
+                  loading={loading}
+                  fechaFiltro={fechaFiltro}
+                  onDeleteFeedback={handleEliminarFeedback}
+                  showDeleteButton={userIsAdmin}
+                />
+              </Paper>
+            </Box>
+          </Fade>
+        ) : null;
+      default:
+        return (
+          <PageHeader
+            title="Centro de Feedback"
+            subtitle="Comparte tu opinión y mejora tu experiencia estudiantil"
+            icon={<FeedbackIcon />}
+            breadcrumbs={[
+              { label: 'Inicio', href: '/home' },
+              { label: 'Feedback' }
+            ]}
+            stats={getStatsData()}
+            actions={[
+              {
+                label: 'Crear Feedback',
+                icon: <AddCommentIcon />,
+                props: {
+                  variant: 'contained',
+                  onClick: () => setModalCrearOpen(true),
+                },
+              },
+              ...(userIsAdmin ? [{
+                label: view === 'ver' ? 'Ocultar Feedbacks' : 'Ver Feedbacks',
+                icon: <ListAltIcon />,
+                props: {
+                  variant: view === 'ver' ? 'outlined' : 'contained',
+                  color: 'secondary',
+                  onClick: handleToggleView,
+                },
+              }] : [])
+            ]}
+          />
+        );
+    }
+  };
+
   return (
-    <Container maxWidth="md" sx={{ py: 7 }}>
-      <Paper elevation={6} sx={{ p: 5, borderRadius: 4 }}>
-        <Box display="flex" alignItems="center" mb={3}>
-          <FeedbackIcon color="primary" sx={{ fontSize: 40, mr: 2 }} />
-          <Typography variant="h4" color="primary.main" fontWeight={700}>
-            Feedback del Centro de Estudiantes
-          </Typography>
-        </Box>
-        <Grid container spacing={2} mb={3}>
-          <Grid item>
-            <Button
-              variant={view === 'crear' ? 'outlined' : 'contained'}
-              color="primary"
-              startIcon={<AddCommentIcon />}
-              onClick={() => setView(view === 'crear' ? null : 'crear')}
-              sx={{ fontWeight: 700, minWidth: 180 }}
-            >
-              {view === 'crear' ? 'Ocultar formulario' : 'Crear feedback'}
-            </Button>
-          </Grid>
-          {userIsAdmin && (
-            <Grid item>
-              <Button
-                variant={view === 'ver' ? 'outlined' : 'contained'}
-                color="secondary"
-                startIcon={<ListAltIcon />}
-                onClick={handleToggleView}
-                sx={{ fontWeight: 700, minWidth: 180 }}
-              >
-                {view === 'ver' ? 'Ocultar feedbacks' : 'Ver feedbacks'}
-              </Button>
-            </Grid>
-          )}
-        </Grid>
+    <PageContainer>
+      {renderMainContent()}
 
-        <Fade in={view === 'crear'} unmountOnExit>
-          <Box>
-            <FeedbackForm onSuccess={fetchFeedbacks} />
-          </Box>
-        </Fade>
-
-        <Fade in={view === 'ver' && userIsAdmin} unmountOnExit>
-          <Box mt={4}>
-            <Paper elevation={3} sx={{ p: 3, borderRadius: 3, background: '#f8f9fa' }}>
-              <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-                <Typography variant="h5" color="primary" fontWeight={700}>
-                  Feedbacks Publicados
-                </Typography>
-                <IconButton onClick={() => setView(null)} color="error">
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-              
-              <FiltroFecha 
-                fechaFiltro={fechaFiltro}
-                onFechaChange={handleFechaChange}
-                onClearFilter={handleClearFilter}
-              />
-
-              <FeedbackList
-                feedbacks={feedbacksFiltrados}
-                loading={loading}
-                fechaFiltro={fechaFiltro}
-                onDeleteFeedback={handleEliminarFeedback}
-                showDeleteButton={userIsAdmin}
-              />
-            </Paper>
-          </Box>
-        </Fade>
-      </Paper>
-    </Container>
+      {/* Modal de crear feedback */}
+      <Dialog
+        open={modalCrearOpen}
+        onClose={() => setModalCrearOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            background: 'transparent',
+            boxShadow: 'none',
+            overflow: 'visible'
+          }
+        }}
+      >
+        <DialogContent sx={{ p: 0 }}>
+          <FeedbackForm onSuccess={handleCrearFeedbackSuccess} />
+        </DialogContent>
+      </Dialog>
+    </PageContainer>
   );
 };
 
