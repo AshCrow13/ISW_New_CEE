@@ -86,6 +86,16 @@ const ActividadForm = ({
     if (!form.lugar) error.lugar = "Campo obligatorio.";
     if (!form.categoria) error.categoria = "Seleccione una categoría.";
     if (!form.responsableId) error.responsableId = "Debe seleccionar un responsable.";
+
+    // Validar que la fecha no sea anterior a hoy al editar
+    if (isEditing && form.fecha) {
+      const hoy = new Date();
+      hoy.setHours(0,0,0,0);
+      const fechaActividad = new Date(form.fecha);
+      if (fechaActividad < hoy) {
+        error.fecha = "La fecha de la actividad debe ser posterior o igual a la fecha actual.";
+      }
+    }
     return error;
   };
 
