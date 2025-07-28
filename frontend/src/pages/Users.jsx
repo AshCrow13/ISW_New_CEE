@@ -114,7 +114,7 @@ const Users = () => {
       {/* Campo de búsqueda solo visible para admin y vocalia */}
       {(userRole === 'admin' || userRole === 'vocalia') && (
         <TextField
-          label="Buscar directivo"
+          label="Buscar estudiante"
           variant="outlined"
           fullWidth
           margin="normal"
