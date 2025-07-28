@@ -146,22 +146,6 @@ const UsersTable = ({ users, onEdit, onDelete, searchValue = "", onSearchChange 
         },
     ];
 
-    // Estadísticas para mostrar en la tabla
-    const stats = [
-        {
-            label: 'usuarios totales',
-            value: filteredUsers.length,
-            icon: <PersonIcon />,
-        },
-        {
-            label: 'administradores',
-            value: filteredUsers.filter(u => u.rol === 'admin').length,
-        },
-        {
-            label: 'estudiantes',
-            value: filteredUsers.filter(u => u.rol === 'estudiante').length,
-        },
-    ];
 
     const handleSearchChange = (value) => {
         setFilter(value);
@@ -176,7 +160,6 @@ const UsersTable = ({ users, onEdit, onDelete, searchValue = "", onSearchChange 
             searchPlaceholder="Buscar por nombre, email, RUT o rol..."
             searchValue={filter}
             onSearchChange={handleSearchChange}
-            stats={stats}
             emptyStateText="No se encontraron usuarios"
             emptyStateIcon="👥"
             sortable={true}

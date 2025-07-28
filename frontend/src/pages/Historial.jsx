@@ -213,12 +213,6 @@ const Historial = () => { // Componente para mostrar el historial de acciones
                 onSearchChange={setFilter}
                 searchPlaceholder="Buscar por usuario, acción, tipo o detalle..."
                 sortable={true}
-                stats={[
-                    {
-                        label: 'registros',
-                        value: filteredRows.length,
-                    },
-                ]}
             />
         </PageContainer>
     );

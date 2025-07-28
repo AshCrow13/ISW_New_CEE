@@ -163,14 +163,6 @@ const Users = () => {
               onClick: handleToggleView,
             },
           },
-          {
-            label: 'Nuevo Usuario',
-            icon: <AddIcon />,
-            props: {
-              variant: 'contained',
-              onClick: handleCreateUser,
-            },
-          },
         ]}
       />
 
